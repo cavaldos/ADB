@@ -13,19 +13,8 @@ const NotfoundError = lazy(() => import("~/components/err"));
 
 
 function App() {
-  const user = useSelector((state) => state.user);
-
   const VerifyRoure = () => {
-    switch (user.ROLE) {
-      case "admin":
-        return AdminRouter;
-      case "student":
-        return StudentRouter;
-      case "instructor":
-        return InstructorRouter;
-      default:
-        return GuestRouter;
-    }
+   return GuestRouter;
   };
 
   return (

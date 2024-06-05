@@ -1,7 +1,17 @@
+import React from 'react';
+import  { useEffect } from 'react';
 const DevPage = () => {
+
+  const handleClick = () => {
+    alert('khanhs');
+  }
+
   return (
     <div className="">
-     dev
+      <h1>instructor</h1>
+      <button
+        onClick={handleClick}
+      >khanhs</button>
     </div>
   );
 };
