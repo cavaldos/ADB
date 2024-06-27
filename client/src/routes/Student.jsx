@@ -48,7 +48,12 @@ const StudentRouter = [
     component: Chats,
     Layout: StudentLayout,
   },
- 
+  {
+    name: null,
+    path: "/chatdd",
+    component: Chats,
+    Layout: StudentLayout,
+  },
 ];
 
 export default StudentRouter;

@@ -12,11 +12,13 @@ import Loading from "./components/err/loading";
 const NotfoundError = lazy(() => import("~/components/err"));
 
 function App() {
+  const role = useSelector((state) => state.auth.user);
   const VerifyRoure = () => {
-    return StudentRouter;
-    return GuestRouter;
-    return InstructorRouter;
-    return AdminRouter;
+    if (role === "admin") return AdminRouter;
+    if (role === "instructor") return InstructorRouter;
+    if (role === "student") return StudentRouter;
+    if (role === "guest") return GuestRouter;
+    else return GuestRouter;
   };
 
   return (

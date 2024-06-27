@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { InstructorRouter } from "../../routes";
+import { InstructorAccount } from "../AccountCpn";
 
 const ButtonItem = ({ isHovered, name, icon, path }) => {
   const navigate = useNavigate();
@@ -9,6 +10,9 @@ const ButtonItem = ({ isHovered, name, icon, path }) => {
     navigate(path);
   };
   const isActive = location.pathname === path;
+  if (name === null) {
+    return <div></div>;
+  }
   return (
     <button
       onClick={() => handleClick(path)}
@@ -67,7 +71,11 @@ const Sidebar = () => {
 const Header = () => {
   return (
     <>
-      <div className="fixed left-14 top-0 right-0 h-16  "></div>
+      <div className="fixed flex  left-14 top-0 right-0 h-16  justify-end  ">
+        <div className="container mx-auto px-6 py-3 flex  items-center justify-end ">
+          <InstructorAccount />
+        </div>
+      </div>
     </>
   );
 };

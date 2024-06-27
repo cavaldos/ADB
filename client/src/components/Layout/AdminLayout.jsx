@@ -3,6 +3,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate, useLocation } from "react-router-dom";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import AdminRouter from "../../routes/Admin";
+import { AdminAccount } from "../AccountCpn";
+import Bread from "../Breadcrum";
 const NavbarItem = ({ name, togglemenu, icon, path }) => {
   const navigate = useNavigate();
   const handleClick = (path) => {
@@ -50,6 +52,8 @@ const Sidebar = ({ togglemenu }) => {
 };
 
 const Header = ({ togglemenu, toggleSidebar }) => {
+  const location = useLocation();
+
   return (
     <div className="fixed top-0 left-0 right-0 flex items-center justify-between p-4 bg-white shadow z-50 h-headerh ">
       <div className="flex items-center">
@@ -60,21 +64,13 @@ const Header = ({ togglemenu, toggleSidebar }) => {
             <MenuOpenIcon className="text-2xl" />
           )}
         </button>
-        <div className="bg-slate-200">
+        <div className="flex">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm text-gray-500">Dashboard / Tables</p>
+          <Bread className={"pt-1"} />
         </div>
       </div>
-      <div className="flex items-center space-x-4 bg-slate-300">
-        <input
-          type="text"
-          placeholder="Type to search..."
-          className="p-2 border border-gray-300 rounded-md"
-        />
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-          <span>Thomas Anree</span>
-        </div>
+      <div className="flex items-center space-x-4 mr-4">
+        <AdminAccount />
       </div>
     </div>
   );

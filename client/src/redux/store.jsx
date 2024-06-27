@@ -1,4 +1,5 @@
 import countSlice from "./features/countSlice";
+import authSlice from "./features/authSlice";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
   persistStore,
@@ -15,11 +16,11 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage,
-  whitelist: ["count", "user", "stateData"],
+  whitelist: ["count", "auth"],
 };
 const rootReducer = combineReducers({
   count: countSlice,
-  
+  auth: authSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

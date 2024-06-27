@@ -44,6 +44,9 @@ const Buttons = ({ name, path }) => {
     navigate(path);
   };
   const isActive = location.pathname === path;
+  if(name===null){
+    return <div></div>
+  }
   return (
     <button
       onClick={handleClick}

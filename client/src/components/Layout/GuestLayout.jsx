@@ -11,12 +11,15 @@ const ButtonItem = ({ name, path }) => {
     navigate(path);
   };
   const isActive = location.pathname === path;
+   if (name === null) {
+     return <div></div>;
+   }
   return (
     <button
       onClick={handleClick}
       className={`py-1 px-1 ease-in-out	text-gray-700 hover:text-blue-600 ${
         isActive
-          ? "text-[#0156d1] border-b-2 border-[#0156d1]  "
+          ? "text-[#0156d1] border-b-2 border-[#0156d1]"
           : "text-gray-600  hover:text-[#3e78c9]"
       }`}
     >
