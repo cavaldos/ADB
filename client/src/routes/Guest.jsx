@@ -1,25 +1,26 @@
-// khach hang
-
 import { lazy } from "react";
-
 const GuestLayout = lazy(() => import("~/components/Layout/GuestLayout"));
+
 const HomeGuest = lazy(() => import("~/pages/guest/index"));
-const DevPage = lazy(() => import("~/pages/guest/dev"));
 const SignIn = lazy(() => import("~/pages/auth/signIn"));
+const SignUp = lazy(() => import("~/pages/auth/signUp"));
 const GuestRouter = [
   {
+    name: "Home",
     path: "/",
     component: HomeGuest,
     Layout: GuestLayout,
   },
   {
-    path: "/dev",
-    component: DevPage,
+    name: "Sign In",
+    path: "/signin",
+    component: SignIn,
     Layout: GuestLayout,
   },
   {
-    path: "/signin",
-    component: SignIn,
+    name: "Sign Up",
+    path: "/signup",
+    component: SignUp,
     Layout: GuestLayout,
   },
 ];

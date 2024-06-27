@@ -48,7 +48,7 @@ function SignIn() {
             id="password"
             autoComplete="current-password"
           />
-          <Link href="#" variant="body2">
+          <Link className="cursor-pointer"  variant="body2">
             Forgot password?
           </Link>
           <Button
@@ -93,9 +93,7 @@ function SignIn() {
           <Typography component="h1" variant="body2" align="center">
             New to Coursera? <Link href="#">Sign up</Link>
           </Typography>
-          <Link href="#" variant="body2" align="center">
-            Log in with your organization
-          </Link>
+          
         </Box>
       </Box>
     </Container>

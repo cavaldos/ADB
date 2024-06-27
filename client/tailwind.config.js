@@ -21,6 +21,7 @@ export default {
         info: "#0DCAF0",
         blue: "#1577FF",
         ret: "red",
+        test:"#fecaca",
         grin: "#24A65F",
         'grey': "#ACACAC",
         '#4B4B4B':"#4B4B4B",
@@ -67,6 +68,12 @@ export default {
       },
       backgroundImage: {
         'radial-gradient': 'radial-gradient(123.88% 123.88% at 50% 11.94%, #5855E8 5.73%, #1577FF 100%)',
+      },
+      margin: {
+        'headerh': '70px',
+      },
+      height: {
+        'headerh': '70px',
       },
     },
   },

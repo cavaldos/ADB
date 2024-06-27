@@ -13,8 +13,8 @@ const NotfoundError = lazy(() => import("~/components/err"));
 
 function App() {
   const VerifyRoure = () => {
-    return GuestRouter;
     return StudentRouter;
+    return GuestRouter;
     return InstructorRouter;
     return AdminRouter;
   };
