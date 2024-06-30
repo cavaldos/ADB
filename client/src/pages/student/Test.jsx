@@ -1,150 +1,237 @@
-const Test = () => {
-  return (
-    <>
-      <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-6 max-w-[1000px]">
-        <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
-          <a href="#" class="shrink-0 md:order-1">
-            <img
-              class="h-20 w-20 dark:hidden"
-              src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg"
-              alt="imac image"
-            />
-            <img
-              class="hidden h-20 w-20 dark:block"
-              src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front-dark.svg"
-              alt="imac image"
-            />
-          </a>
+import React, { useState } from "react";
+import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowDown } from "react-icons/io";
+const Lecture = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-          <label for="counter-input" class="sr-only">
-            Choose quantity:
-          </label>
-          <div class="flex items-center justify-between md:order-3 md:justify-end">
-            <div class="flex items-center">
-              <button
-                type="button"
-                id="decrement-button"
-                data-input-counter-decrement="counter-input"
-                class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-              >
-                <svg
-                  class="h-2.5 w-2.5 text-gray-900 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 18 2"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M1 1h16"
-                  />
-                </svg>
-              </button>
-              <input
-                type="text"
-                id="counter-input"
-                data-input-counter
-                class="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white"
-                placeholder=""
-                value="2"
-                required
-              />
-              <button
-                type="button"
-                id="increment-button"
-                data-input-counter-increment="counter-input"
-                class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-              >
-                <svg
-                  class="h-2.5 w-2.5 text-gray-900 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 18 18"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 1v16M1 9h16"
-                  />
-                </svg>
-              </button>
-            </div>
-            <div class="text-end md:order-4 md:w-32">
-              <p class="text-base font-bold text-gray-900 dark:text-white">
-                $1,499
-              </p>
+  const toggleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto mt-6 p-1 ">
+      <div className="border-[1px] border-[#929599] rounded-[5px] overflow-hidden hover:bg-[#F0F7FF] hover:border-sky-700">
+        <div
+          className="bg-blue-50 cursor-pointer p-4 flex justify-start gap-3 items-center "
+          onClick={toggleOpen}
+        >
+          <span>{isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}</span>
+          <span className="text-lg font-semibold text-gray-900 ">
+            Making Predictions
+          </span>
+        </div>
+        <div
+          style={{
+            maxHeight: isOpen ? "1000px" : "0px",
+            transition: "max-height 0.4s ease-in-out",
+          }}
+          className={` overflow-hidden bg-white border-t`}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-lg font-semibold text-gray-900">
+                  Making Predictions Before You Listen
+                </p>
+                <p className="text-gray-600">Video • 2 min</p>
+              </div>
+              <div className="text-green-500">✔</div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-          <div class="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
-            <a
-              href="#"
-              class="text-base font-medium text-gray-900 hover:underline dark:text-white"
-            >
-              PC system All in One APPLE iMac (2023) mqrq3ro/a, Apple M3, 24"
-              Retina 4.5K, 8GB, SSD 256GB, 10-core GPU, Keyboard layout INT
-            </a>
+const VideoCom = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-            <div class="flex items-center gap-4">
-              <button
-                type="button"
-                class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
-              >
-                <svg
-                  class="me-1.5 h-5 w-5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z"
-                  />
-                </svg>
-                Add to Favorites
-              </button>
+  const toggleOpen = () => {
+    setIsOpen(!isOpen);
+  };
 
-              <button
-                type="button"
-                class="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500"
-              >
-                <svg
-                  class="me-1.5 h-5 w-5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18 17.94 6M18 18 6.06 6"
-                  />
-                </svg>
-                Remove
+  return (
+    <div className="max-w-4xl mx-auto mt-6 p-1">
+      <div className="border-[1px] border-[#929599] rounded-[5px] overflow-hidden hover:bg-[#F0F7FF] hover:border-sky-700">
+        <div
+          className="bg-blue-50 cursor-pointer p-4 flex justify-start gap-3 items-center"
+          onClick={toggleOpen}
+        >
+          <span>{isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}</span>
+          <span className="text-lg font-semibold text-gray-900">Video</span>
+        </div>
+        <div
+          style={{
+            maxHeight: isOpen ? "1000px" : "0px",
+            transition: "max-height 0.4s ease-in-out",
+          }}
+          className="overflow-hidden bg-white border-t"
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-lg font-semibold text-gray-900">
+                  Making Predictions Before You Listen
+                </p>
+                <p className="text-gray-600">Video • 2 min</p>
+              </div>
+              <div className="text-green-500">✔</div>
+            </div>
+            <div className="mt-4">
+              <iframe
+                className="w-full min-h-[400px]"
+                // src="https://drive.google.com/file/d/1B9KwdIpO96IaxaQbsoFTfxdZ97TFuwfT/view?usp=sharing"
+                src="https://www.youtube.com/embed/bU98q1wNCzA"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+const VideoC = ({ videoUrl }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const getEmbedUrl = (url) => {
+    if (url.includes("youtube.com")) {
+      const videoId = url.split("v=")[1];
+      return `https://www.youtube.com/embed/${videoId}`;
+    } else if (url.includes("drive.google.com")) {
+      const fileId = url.split("/d/")[1].split("/")[0];
+      return `https://drive.google.com/file/d/${fileId}/preview`;
+    }
+    return url;
+  };
+
+  const embedUrl = getEmbedUrl(videoUrl);
+
+  return (
+    <div className="max-w-4xl mx-auto mt-6 p-1">
+      <div className="border-[1px] border-[#929599] rounded-[5px] overflow-hidden hover:bg-[#F0F7FF] hover:border-sky-700">
+        <div
+          className="bg-blue-50 cursor-pointer p-4 flex justify-start gap-3 items-center"
+          onClick={toggleOpen}
+        >
+          <span>{isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}</span>
+          <span className="text-lg font-semibold text-gray-900">Video</span>
+        </div>
+        <div
+          style={{
+            maxHeight: isOpen ? "1000px" : "0px",
+            transition: "max-height 0.4s ease-in-out",
+          }}
+          className="overflow-hidden bg-white border-t"
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-lg font-semibold text-gray-900">
+                  Making Predictions Before You Listen
+                </p>
+                <p className="text-gray-600">Video • 2 min</p>
+              </div>
+              <div className="text-green-500">✔</div>
+            </div>
+            <div className="mt-4">
+              <iframe
+                className="w-full min-h-[400px]"
+                src={embedUrl}
+                title="Video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+const CollapsibleSection = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto mt-6 p-1 ">
+      <div className="border-[1px] border-[#929599] rounded-[5px] overflow-hidden hover:bg-[#F0F7FF] hover:border-sky-700">
+        <div
+          className="cursor-pointer p-4 flex justify-start gap-3 items-center"
+          onClick={toggleOpen}
+        >
+          <span>{isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}</span>
+          <span className="text-lg font-semibold text-gray-900">
+            Making Predictions
+          </span>
+        </div>
+        <div
+          style={{
+            maxHeight: isOpen ? "100%" : "0px",
+            transition: "max-height 0.5s ease-in-out",
+          }}
+          className={` ease-in-out overflow-hidden bg-white border-t`}
+        >
+          <div className="p-6 overflow-auto">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-lg font-semibold text-gray-900">
+                  Making Predictions Before You Listen
+                </p>
+                <p className="text-gray-600">Video • 2 min</p>
+              </div>
+              <div className="text-green-500">✔</div>
+            </div>
+            <Lecture />
+
+            <VideoCom />
+            kk
+            <VideoC videoUrl={"https://www.youtube.com/watch?v=bU98q1wNCzA"} />
+            <VideoC videoUrl="https://drive.google.com/file/d/1B9KwdIpO96IaxaQbsoFTfxdZ97TFuwfT/view?usp=sharing" />
+
+            <div className="mt-4">
+              <p className="text-lg font-semibold text-gray-900">
+                Prepare for Predicting and Review the Lesson
+              </p>
+              <p className="text-gray-600">Reading • 30 min</p>
+            </div>
+            <div className="mt-4">
+              <p className="text-lg font-semibold text-gray-900">
+                Making Predictions
+              </p>
+              <p className="text-gray-600">Practice Quiz • 2 questions</p>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                Resume
               </button>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
-
+const Test = () => {
+  return (
+    <div className="mb-10">
+      <h1>Tessdfsadt</h1>
+      <CollapsibleSection />
+    </div>
+  );
+};
 export default Test;

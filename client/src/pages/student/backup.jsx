@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { MdClose, MdOpenInFull } from "react-icons/md";
-
 
 const ChatHeader = () => {
   return (
@@ -67,47 +65,6 @@ const MessageInput = ({ onSendMessage }) => {
     </form>
   );
 };
-const FloatingComponent = () => {
-  const [isVisible, setIsVisible] = useState(true);
-
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
-  };
-
-  return (
-    <>
-      <div
-        className={`fixed bottom-0 right-0 w-[600px] h-[600px] bg-gray-300 text-white p-4 m-2 rounded-md shadow-lg z-50 transition-all duration-300 ${
-          isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        style={{
-          transform: isVisible ? "translateY(0)" : "translateY(100%)",
-        }}
-      >
-        <div className="flex justify-between items-center">
-          <span>Always on Top Component</span>
-          <button onClick={toggleVisibility} className="text-white">
-            <MdClose size={24} className="text-black" />
-          </button>
-        </div>
-
-        <div className="mt-4">
-          <button className="bg-white text-blue-500 px-4 py-2 rounded-lg text-black">
-            Action
-          </button>
-        </div>
-      </div>
-      {!isVisible && (
-        <button
-          onClick={toggleVisibility}
-          className="fixed bottom-4 right-4 bg-black text-white p-2 rounded-full shadow-lg z-50"
-        >
-          <MdOpenInFull size={24} />
-        </button>
-      )}
-    </>
-  );
-};
 const ChatApp = () => {
   const [messages, setMessages] = useState([
     { id: 1, text: "Hey, how's your day going?", sender: "me" },
@@ -152,7 +109,6 @@ const ChatApp = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 w-[500px]">
-      <FloatingComponent />
       <ChatHeader />
       <MessageList messages={messages} />
       <MessageInput onSendMessage={handleSendMessage} />

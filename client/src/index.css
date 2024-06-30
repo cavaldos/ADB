@@ -36,3 +36,7 @@ body {
   max-width: 960px;
   margin: 0 auto;
 }
+
+.transition-max-height {
+  transition: max-height 0.35s ease-in-out;
+}

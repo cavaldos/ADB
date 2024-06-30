@@ -6,6 +6,7 @@ const GuestPage = () => {
   return (
     <>
       <section className="container mx-auto p-4 flex items-center justify-between bg-slate-400">
+        <h1>asfsdf</h1>
         <div>
           <h1 className="text-4xl font-bold">Learn without limits</h1>
           <p className="mt-4 text-lg text-gray-700">

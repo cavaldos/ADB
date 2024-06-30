@@ -9,6 +9,8 @@ const Cart = lazy(() => import("~/pages/student/Cart"));
 const Learning = lazy(() => import("~/pages/student/Learning"));
 const CourseDetail = lazy(() => import("~/pages/student/CourseDetail"));
 const Chats = lazy(() => import("~/pages/student/Chats"));
+const LearnProcess = lazy(() => import("~/pages/student/LearnProcess"));
+import Test from "../pages/student/test";
 const StudentRouter = [
   {
     name: "Home",
@@ -49,11 +51,17 @@ const StudentRouter = [
     Layout: StudentLayout,
   },
   {
-    name: null,
-    path: "/chatdd",
-    component: Chats,
+    name: "LearnProcess",
+    path: "/learn-process",
+    component: LearnProcess,
     Layout: StudentLayout,
   },
+  {
+    name: "Test",
+    path: "/test",
+    component: Test,
+    Layout: StudentLayout,
+  }
 ];
 
 export default StudentRouter;
