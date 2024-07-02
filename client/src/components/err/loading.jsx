@@ -1,20 +1,17 @@
 import React from "react";
-import { LoadingOutlined } from "@ant-design/icons";
-import { Spin } from "antd";
+import { CircularProgress, Box } from "@mui/material";
+
 const Loading = () => {
-    return (
-     <div className=" flex justify-center h-[500px] items-center">
-         <Spin
-           indicator={
-             <LoadingOutlined
-               style={{
-                 fontSize: 60
-               }}
-               spin
-             />
-           }
-         />
-     </div>
-    );
-}
+  return (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="500px"
+    >
+      <CircularProgress size={60} />
+    </Box>
+  );
+};
+
 export default Loading;

@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { StudentRouter } from "../../routes";
 import { StudentAccount } from "../AccountCpn";
+import ChatApp from "../../pages/student/Float";
 const Search = () => {
   return (
     <>
@@ -35,7 +36,6 @@ const Search = () => {
   );
 };
 
-
 const Buttons = ({ name, path }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -44,8 +44,8 @@ const Buttons = ({ name, path }) => {
     navigate(path);
   };
   const isActive = location.pathname === path;
-  if(name===null){
-    return <div></div>
+  if (name === null) {
+    return <></>;
   }
   return (
     <button
@@ -86,7 +86,10 @@ const StudentLayout = ({ children }) => {
       <header className="bg-gray-200 fixed w-full h-[100px]">
         <Navbar />
       </header>
-      <main className="flex-1 mt-32 overflow-y-auto ">{children}</main>
+      <main className="flex-1 mt-32 overflow-y-auto ">
+        {children}
+        <ChatApp />
+      </main>
     </div>
   );
 };

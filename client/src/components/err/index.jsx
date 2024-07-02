@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Result } from "antd";
+import { Button, Typography, Container, Box } from "@mui/material";
+
 const NotfoundError = () => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(5);
@@ -24,28 +25,23 @@ const NotfoundError = () => {
   };
 
   return (
-    <div className="error flex justify-center flex-col ">
-      <Result
-        status="404"
-        title={<h1 className=" text-6xl">404</h1>}
-        subTitle={
-          <div className="mx-auto">
-            Redirecting to home in{" "}
-            <p className="text-red-700 text-lg"> {countdown} </p>
-            seconds...
-          </div>
-        }
-        extra={
-          <Button
-            type="primary"
-            className="bg-blue-600 "
-            onClick={handleMoveHome}
-          >
-            Back Home
-          </Button>
-        }
-      />
-    </div>
+    <Container className="flex flex-col items-center justify-center h-screen">
+      <Box textAlign="center">
+        <Typography variant="h1" component="div" gutterBottom>
+          404
+        </Typography>
+        <Typography variant="h5" color="textSecondary" paragraph>
+          Redirecting to home in{" "}
+          <Typography component="span" color="error">
+            {countdown}
+          </Typography>{" "}
+          seconds...
+        </Typography>
+        <Button variant="contained" color="primary" onClick={handleMoveHome}>
+          Back Home
+        </Button>
+      </Box>
+    </Container>
   );
 };
 

@@ -7,6 +7,7 @@ export default defineConfig({
   entry: "./src/index.js",
   server: {
     host: "0.0.0.0", // default: 'localhost'
+  
   },
   preview: {
     port: 8080,

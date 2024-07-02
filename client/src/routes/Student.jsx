@@ -10,6 +10,9 @@ const Learning = lazy(() => import("~/pages/student/Learning"));
 const CourseDetail = lazy(() => import("~/pages/student/CourseDetail"));
 const Chats = lazy(() => import("~/pages/student/Chats"));
 const LearnProcess = lazy(() => import("~/pages/student/LearnProcess"));
+const BankAccount = lazy(() => import("~/pages/guest/BankAccount"));
+const Profile = lazy(() => import("~/pages/guest/Profile"));
+const Image = lazy(() => import("~/pages/student/image"));
 import Test from "../pages/student/test";
 const StudentRouter = [
   {
@@ -57,11 +60,29 @@ const StudentRouter = [
     Layout: StudentLayout,
   },
   {
+    name: null,
+    path: "/bank",
+    component: BankAccount,
+    Layout: null,
+  },
+  {
+    name: "Profile",
+    path: "/profile",
+    component: Profile,
+    Layout: StudentLayout,
+  },
+  {
+    name: "Image",
+    path: "/image",
+    component: Image,
+    Layout: StudentLayout,
+  },
+  {
     name: "Test",
     path: "/test",
     component: Test,
     Layout: StudentLayout,
-  }
+  },
 ];
 
 export default StudentRouter;

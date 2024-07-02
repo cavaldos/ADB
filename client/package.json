@@ -11,13 +11,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cloudinary/react": "^1.13.0",
+    "@cloudinary/url-gen": "^1.19.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.20",
     "@mui/material": "^5.15.20",
     "@popperjs/core": "^2.11.8",
     "@reduxjs/toolkit": "^1.9.5",
-    "antd": "^5.11.1",
     "axios": "^1.6.2",
     "js-cookie": "^3.0.5",
     "moment": "^2.29.4",
@@ -31,7 +32,8 @@
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
     "socket.io-client": "^4.7.5",
-    "swr": "^2.2.2"
+    "swr": "^2.2.2",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
