@@ -35,10 +35,12 @@ function generateSQL(procedureName, data, count) {
                 fakeData[key] = faker.datatype.number({ min: 1, max: 10 });
             } else if (data[key] === 'TopicID') {
                 fakeData[key] = faker.datatype.number({ min: 1, max: 10 });
-            } else if (data[key] === 'QuestionContent') {
-                fakeData[key] = faker.lorem.sentence();
-            } else if (data[key] === 'AnswerText') {
-                fakeData[key] = faker.lorem.words(2);
+            } else if (data[key] === 'Content') {
+                fakeData[key] = faker.lorem.paragraph();
+            } else if (data[key] === 'Page') {
+                fakeData[key] = faker.datatype.number({ min: 1, max: 10 });
+            } else if (data[key] === 'LessonDocumentID') {
+                fakeData[key] = i + 1; // Giả sử LessonDocumentID tăng dần từ 1 đến count
             }
         }
 
@@ -49,16 +51,15 @@ function generateSQL(procedureName, data, count) {
             }
         }
 
-        // Tạo câu lệnh SQL cho create_lesson_test
-        if (procedureName === 'create_lesson_test') {
+        // Tạo câu lệnh SQL cho create_lesson_document
+        if (procedureName === 'create_lesson_document') {
             const sql = `EXEC ${procedureName} '${fakeData.Title}', ${fakeData.Duration}, '${fakeData.ComplexityLevel}', ${fakeData.CourseID}, ${fakeData.TopicID};`;
             sqlStatements.push(sql);
         }
 
-        // Tạo câu lệnh SQL cho create_question
-        if (procedureName === 'create_question') {
-            const lessonTestID = i + 1; // Giả sử LessonTestID tăng dần từ 1 đến count
-            const sql = `EXEC ${procedureName} '${fakeData.QuestionContent}', '${fakeData.Title}', ${lessonTestID}, '${fakeData.AnswerText}', '${fakeData.AnswerText}', '${fakeData.AnswerText}', '${fakeData.AnswerText}';`;
+        // Tạo câu lệnh SQL cho add_page_document
+        if (procedureName === 'add_page_document') {
+            const sql = `EXEC ${procedureName} ${fakeData.LessonDocumentID}, '${fakeData.Content}', ${fakeData.Page};`;
             sqlStatements.push(sql);
         }
     }
@@ -66,8 +67,8 @@ function generateSQL(procedureName, data, count) {
     return sqlStatements;
 }
 
-// Dữ liệu đầu vào cho create_lesson_test
-const dataLessonTest = {
+// Dữ liệu đầu vào cho create_lesson_document
+const dataLessonDocument = {
     Title: 'Title',
     Duration: 'Duration',
     ComplexityLevel: 'ComplexityLevel',
@@ -75,16 +76,16 @@ const dataLessonTest = {
     TopicID: 'TopicID'
 };
 
-// Dữ liệu đầu vào cho create_question
-const dataQuestion = {
-    QuestionContent: 'QuestionContent',
-    Title: 'Title',
-    AnswerText: 'AnswerText'
+// Dữ liệu đầu vào cho add_page_document
+const dataPageDocument = {
+    LessonDocumentID: 'LessonDocumentID',
+    Content: 'Content',
+    Page: 'Page'
 };
 
 // Tên procedures
-const procedureNameLessonTest = 'create_lesson_test';
-const procedureNameQuestion = 'create_question';
+const procedureNameLessonDocument = 'create_lesson_document';
+const procedureNamePageDocument = 'add_page_document';
 
 // Số lượng câu lệnh cần tạo
 const count = 100;
@@ -95,28 +96,28 @@ for (let i = 1; i <= 10; i++) {
     courseData.push(`INSERT INTO [Course] (Title, Subtitle, Description, Language, Image, Price, Status, CreateTime, CategoryID, InstructorID) VALUES ('Course Title ${i}', 'Subtitle ${i}', 'Description ${i}', 'EN', 'image${i}.jpg', ${faker.datatype.number({ min: 10, max: 100 })}, 'Free', GETDATE(), ${faker.datatype.number({ min: 1, max: 10 })}, ${faker.datatype.number({ min: 1, max: 10 })});`);
 }
 
-// Tạo các câu lệnh SQL cho create_lesson_test
-const sqlStatementsLessonTest = generateSQL(procedureNameLessonTest, dataLessonTest, count);
+// Tạo các câu lệnh SQL cho create_lesson_document
+const sqlStatementsLessonDocument = generateSQL(procedureNameLessonDocument, dataLessonDocument, count);
 
-// Tạo các câu lệnh SQL cho create_question
-const sqlStatementsQuestion = generateSQL(procedureNameQuestion, dataQuestion, count);
+// Tạo các câu lệnh SQL cho add_page_document
+const sqlStatementsPageDocument = generateSQL(procedureNamePageDocument, dataPageDocument, count);
 
 // In ra các câu lệnh SQL
-console.log(sqlStatementsLessonTest);
-console.log(sqlStatementsQuestion);
+console.log(sqlStatementsLessonDocument);
+console.log(sqlStatementsPageDocument);
 
 // Lưu dữ liệu vào file
 const dir = './fakedata';
 if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
 }
-const filePathLessonTest = path.join(dir, 'lessonTestData.sql');
-const filePathQuestion = path.join(dir, 'questionData.sql');
+const filePathLessonDocument = path.join(dir, 'lessonDocumentData.sql');
+const filePathPageDocument = path.join(dir, 'pageDocumentData.sql');
 const filePathCourse = path.join(dir, 'courseData.sql');
-fs.writeFileSync(filePathLessonTest, sqlStatementsLessonTest.join('\n'), 'utf-8');
-fs.writeFileSync(filePathQuestion, sqlStatementsQuestion.join('\n'), 'utf-8');
+fs.writeFileSync(filePathLessonDocument, sqlStatementsLessonDocument.join('\n'), 'utf-8');
+fs.writeFileSync(filePathPageDocument, sqlStatementsPageDocument.join('\n'), 'utf-8');
 fs.writeFileSync(filePathCourse, courseData.join('\n'), 'utf-8');
 
-console.log(`Fake data for lesson tests generated and saved to ${filePathLessonTest}`);
-console.log(`Fake data for questions generated and saved to ${filePathQuestion}`);
+console.log(`Fake data for lesson documents generated and saved to ${filePathLessonDocument}`);
+console.log(`Fake data for page documents generated and saved to ${filePathPageDocument}`);
 console.log(`Fake data for courses generated and saved to ${filePathCourse}`);

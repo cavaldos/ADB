@@ -20,6 +20,7 @@ BEGIN
             PRINT 'Topic already exists.';
         END
     COMMIT TRANSACTION;
+
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -115,27 +116,41 @@ IF OBJECT_ID('create_category', 'P') IS NOT NULL
     DROP PROCEDURE create_category;
 GO
 CREATE PROCEDURE create_category
-    @Name varchar(20),
+    @CategoryName varchar(20),
     @CategoryDescription nvarchar(500),
     @ParentCategoryID integer = NULL
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
-        IF NOT EXISTS (SELECT 1 FROM [Category] WHERE Name = @Name AND ParentCategoryID = @ParentCategoryID)
+        BEGIN TRANSACTION;
+
+        -- Check if the parent category exists if ParentCategoryID is provided
+        IF @ParentCategoryID IS NOT NULL AND NOT EXISTS (SELECT 1 FROM [Category] WHERE CategoryID = @ParentCategoryID)
+        BEGIN
+            PRINT 'Parent category does not exist.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Check if the category already exists
+        IF NOT EXISTS (SELECT 1 FROM [Category] WHERE Name = @CategoryName AND ParentCategoryID = @ParentCategoryID)
         BEGIN
             INSERT INTO [Category] (Name, CategoryDescription, ParentCategoryID)
-            VALUES (@Name, @CategoryDescription, @ParentCategoryID);
+            VALUES (@CategoryName, @CategoryDescription, @ParentCategoryID);
             PRINT 'Category created successfully.';
         END
         ELSE
         BEGIN
             PRINT 'Category already exists.';
         END
-    COMMIT TRANSACTION;
+
+        COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
         PRINT 'Error occurred while creating category.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -148,8 +163,8 @@ IF OBJECT_ID('update_category', 'P') IS NOT NULL
 GO
 CREATE PROCEDURE update_category
     @CategoryID integer,
-    @Name varchar(20),
-    @CategoryDescription nvarchar(500),
+    @Name varchar(20) = NULL,
+    @CategoryDescription nvarchar(500) = NULL,
     @ParentCategoryID integer
 AS
 BEGIN
@@ -237,7 +252,7 @@ BEGIN
 END;
 GO
 
--- 9. Create the procedure to create a new course
+-- 9. Create the procedure to create course
 IF OBJECT_ID('create_course', 'P') IS NOT NULL
     DROP PROCEDURE create_course;
 GO
@@ -343,11 +358,11 @@ BEGIN
     END CATCH
 END;
 GO
--- 11. Create the procedure to delete course
-IF OBJECT_ID('createChat', 'P') IS NOT NULL
-    DROP PROCEDURE createChat;
+-- 11. Create the procedure to create chat
+IF OBJECT_ID('create_chat', 'P') IS NOT NULL
+    DROP PROCEDURE create_chat;
 GO
-CREATE PROCEDURE createChat
+CREATE PROCEDURE create_chat
     @ChatContent nvarchar(250),
     @SendChatID integer,
     @ReceiveChatID integer
@@ -359,8 +374,8 @@ BEGIN
         INSERT INTO [Chat] (ChatContent, SendTime, SendChatID, ReceiveChatID)
         VALUES (@ChatContent, GETDATE(), @SendChatID, @ReceiveChatID);
 
-        PRINT 'Chat created successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Chat created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -369,7 +384,7 @@ BEGIN
     END CATCH
 END;
 GO
---EXEC CREATECHAT 'Heleqrtqertlo', 6, 4;
+--EXEC create_chat 'Heleqrtqertlo', 6, 4;
 
 -- 12. Create the procedure to get all chat
 IF OBJECT_ID('get_all_chat', 'P') IS NOT NULL
@@ -440,8 +455,8 @@ BEGIN
         ELSE
         BEGIN
             PRINT 'You can only delete your own chat messages.';
-        END
     COMMIT TRANSACTION;
+        END
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -485,13 +500,11 @@ BEGIN
         INSERT INTO [LessonVideo] (LessonsID, URL)
         VALUES (@LessonsID, @URL);
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Lesson and lesson video created successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Lesson and lesson video created successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while creating lesson and lesson video.';
         PRINT ERROR_MESSAGE();
@@ -533,8 +546,8 @@ BEGIN
         SET URL = @URL
         WHERE LessonVideoID = @LessonVideoID;
 
-        PRINT 'Lesson video updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Lesson video updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -579,13 +592,11 @@ BEGIN
         INSERT INTO [LessonDocument] (LessonsID)
         VALUES (@LessonsID);
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Lesson document created successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Lesson document created successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while creating lesson document.';
         PRINT ERROR_MESSAGE();
@@ -630,8 +641,8 @@ BEGIN
         INSERT INTO [PageDocument] (Content, Page, LessonDocumentID)
         VALUES (@Content, @Page, @LessonDocumentID);
 
-        PRINT 'Page document added successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Page document added successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -675,8 +686,8 @@ BEGIN
         SET Content = @Content, Page = @Page, LessonDocumentID = @LessonDocumentID
         WHERE PageDocumentID = @PageDocumentID;
 
-        PRINT 'Page document updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Page document updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -718,13 +729,11 @@ BEGIN
         INSERT INTO [LessonTest] (LessonsID)
         VALUES (@LessonsID);
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Lesson test created successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Lesson test created successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while creating lesson test.';
         PRINT ERROR_MESSAGE();
@@ -773,13 +782,11 @@ BEGIN
                (@Answer2, CASE WHEN @Answer2 = @CorrectAnswer THEN 1 ELSE 0 END, @QuestionID),
                (@Answer3, CASE WHEN @Answer3 = @CorrectAnswer THEN 1 ELSE 0 END, @QuestionID);
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Question and answers created successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Question and answers created successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while creating question and answers.';
         PRINT ERROR_MESSAGE();
@@ -828,8 +835,8 @@ BEGIN
             UpdatedTime = GETDATE()
         WHERE LessonsID = @LessonsID;
 
-        PRINT 'Lesson updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Lesson updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -865,13 +872,11 @@ BEGIN
         -- Delete the lesson
         DELETE FROM [Lessons] WHERE LessonsID = @LessonsID;
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Lesson and related entries deleted successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Lesson and related entries deleted successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while deleting lesson.';
         PRINT ERROR_MESSAGE();
@@ -938,13 +943,11 @@ BEGIN
             IsCorrect = CASE WHEN @Answer3 = @CorrectAnswer THEN 1 ELSE 0 END
         WHERE AnswerID = @AnswerID3;
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Question and answers updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Question and answers updated successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while updating question and answers.';
         PRINT ERROR_MESSAGE();
@@ -978,13 +981,11 @@ BEGIN
         -- Delete the question
         DELETE FROM [Question] WHERE QuestionID = @QuestionID;
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Question and associated answers deleted successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Question and associated answers deleted successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while deleting question and answers.';
         PRINT ERROR_MESSAGE();
@@ -1027,8 +1028,8 @@ BEGIN
         ORDER BY 
             q.QuestionID, a.AnswerID;
 
-        PRINT 'Questions and answers retrieved successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Questions and answers retrieved successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1067,8 +1068,8 @@ BEGIN
         INSERT INTO [LessonsProcess] (LessonsID, LearnProcessID, Status, StartTime)
         VALUES (@LessonsID, @LearnProcessID, 'InProcess', GETDATE());
 
-        PRINT 'Lesson process started successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Lesson process started successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1101,8 +1102,8 @@ BEGIN
             EndTime = GETDATE()
         WHERE LessonsProcessID = @LessonsProcessID;
 
-        PRINT 'Lesson process marked as done successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Lesson process marked as done successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1142,8 +1143,8 @@ BEGIN
         INSERT INTO [LearnProcess] (StudentID, CourseID, Status)
         VALUES (@StudentID, @CourseID, 0);  -- Assuming 0 means InProcess
 
-        PRINT 'Learn process started successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Learn process started successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1194,8 +1195,8 @@ BEGIN
             CourseID = @CourseID
         WHERE LearnProcessID = @LearnProcessID;
 
-        PRINT 'Learn process updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Learn process updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1236,8 +1237,8 @@ BEGIN
         INSERT INTO [ForumMessage] (MessageContent, SendTime, UserID, DiscussionForumID)
         VALUES (@MessageContent, GETDATE(), @UserID, @DiscussionForumID);
 
-        PRINT 'Forum message created successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Forum message created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1247,7 +1248,7 @@ BEGIN
 END;
 GO
 
--- 31. Create the procedure delete_message_forum
+-- 31. Create the procedure delete message forum
 IF OBJECT_ID('delete_message_forum', 'P') IS NOT NULL
     DROP PROCEDURE delete_message_forum;
 GO
@@ -1268,8 +1269,8 @@ BEGIN
         -- Delete the forum message
         DELETE FROM [ForumMessage] WHERE ForumMessageID = @ForumMessageID;
 
-        PRINT 'Forum message deleted successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Forum message deleted successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1280,7 +1281,7 @@ END;
 GO
 -----------
 
--- 32. Create the procedure create_admin
+-- 32. Create the procedure create admin
 IF OBJECT_ID('create_admin', 'P') IS NOT NULL
     DROP PROCEDURE create_admin;
 GO
@@ -1324,13 +1325,11 @@ BEGIN
         INSERT INTO [Admin] (UserID)
         VALUES (@UserID);
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Admin created successfully.';
-    COMMIT TRANSACTION;
+        COMMIT TRANSACTION;
+    PRINT 'Admin created successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while creating admin.';
         PRINT ERROR_MESSAGE();
@@ -1339,7 +1338,7 @@ END;
 GO
 
 
--- 33. Create the procedure create_student
+-- 33. Create the procedure create instructor
 IF OBJECT_ID('create_instructor', 'P') IS NOT NULL
     DROP PROCEDURE create_instructor;
 GO
@@ -1349,15 +1348,20 @@ CREATE PROCEDURE create_instructor
     @Email varchar(50),
     @FullName varchar(50),
     @Phone varchar(20),
-    @Address varchar(100)
+    @Address varchar(100),
+    @Level nvarchar(255) = 'Beginner', -- Add default value for Level
+    @Status nvarchar(255) = 'Pending'  -- Add default value for Status
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
+        -- Start a transaction
+        BEGIN TRANSACTION;
+
         -- Check if the username already exists
         IF EXISTS (SELECT 1 FROM [User] WHERE UserName = @UserName)
         BEGIN
             PRINT 'Username already exists.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
@@ -1365,10 +1369,9 @@ BEGIN
         IF EXISTS (SELECT 1 FROM [User] WHERE Email = @Email)
         BEGIN
             PRINT 'Email already exists.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
-
-        
 
         DECLARE @UserID integer;
 
@@ -1381,16 +1384,20 @@ BEGIN
 
         -- Insert into Instructor table
         INSERT INTO [Instructor] (UserID, Level, Status)
-        VALUES (@UserID, 'Beginner', null);
+        VALUES (@UserID, @Level, @Status);
 
+        -- Commit the transaction
         COMMIT TRANSACTION;
 
         PRINT 'Instructor created successfully.';
-    COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        ROLLBACK TRANSACTION;
+        -- Rollback the transaction if an error occurs
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
         PRINT 'Error occurred while creating instructor.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1447,13 +1454,11 @@ BEGIN
             UpdateTime = GETDATE()
         WHERE UserID = @UserID;
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Admin updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Admin updated successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while updating admin.';
         PRINT ERROR_MESSAGE();
@@ -1462,7 +1467,8 @@ END;
 GO
 
 
--- 35. Create the procedure create_student
+-- 35. Create the procedure create student
+
 IF OBJECT_ID('create_student', 'P') IS NOT NULL
     DROP PROCEDURE create_student;
 GO
@@ -1477,11 +1483,14 @@ CREATE PROCEDURE create_student
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
+        -- Start a transaction
+        BEGIN TRANSACTION;
+
         -- Check if the username already exists
         IF EXISTS (SELECT 1 FROM [User] WHERE UserName = @UserName)
         BEGIN
             PRINT 'Username already exists.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
@@ -1489,10 +1498,9 @@ BEGIN
         IF EXISTS (SELECT 1 FROM [User] WHERE Email = @Email)
         BEGIN
             PRINT 'Email already exists.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
-
-        
 
         DECLARE @UserID integer;
 
@@ -1507,19 +1515,24 @@ BEGIN
         INSERT INTO [Student] (UserID, SchoolYear)
         VALUES (@UserID, @SchoolYear);
 
+        -- Commit the transaction
         COMMIT TRANSACTION;
 
         PRINT 'Student created successfully.';
-    COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        ROLLBACK TRANSACTION;
+        -- Rollback the transaction if an error occurs
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
         PRINT 'Error occurred while creating student.';
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
+
 --- 36. Create the procedure update_student
 IF OBJECT_ID('update_student', 'P') IS NOT NULL
     DROP PROCEDURE update_student;
@@ -1576,13 +1589,11 @@ BEGIN
         SET SchoolYear = @SchoolYear
         WHERE UserID = @UserID;
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Student updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Student updated successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
         ROLLBACK TRANSACTION;
         PRINT 'Error occurred while updating student.';
         PRINT ERROR_MESSAGE();
@@ -1590,7 +1601,7 @@ BEGIN
 END;
 GO
 
--- 37. Create the procedure create_course
+-- 37. Create the procedure update instructor
 IF OBJECT_ID('update_instructor', 'P') IS NOT NULL
     DROP PROCEDURE update_instructor;
 GO
@@ -1648,10 +1659,9 @@ BEGIN
             Status = @Status
         WHERE UserID = @UserID;
 
-        COMMIT TRANSACTION;
 
-        PRINT 'Instructor updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Instructor updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1693,8 +1703,8 @@ BEGIN
         INSERT INTO [Review] (Comment, Rating, CreatedDate, StudentID, CourseID)
         VALUES (@Comment, @Rating, GETDATE(), @StudentID, @CourseID);
 
-        PRINT 'Review created successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Review created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1730,8 +1740,8 @@ BEGIN
             CreatedDate = GETDATE() -- Updating the created date to current date and time
         WHERE ReviewID = @ReviewID;
 
-        PRINT 'Review updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Review updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1743,7 +1753,7 @@ GO
 
 
 
--- 40. Create the procedure add_to_cart
+-- 40. Create the procedure add to cart
 IF OBJECT_ID('add_to_cart', 'P') IS NOT NULL
     DROP PROCEDURE add_to_cart;
 GO
@@ -1792,8 +1802,8 @@ BEGIN
         INSERT INTO [CartDetail] (CartID, CourseID)
         VALUES (@CartID, @CourseID);
 
-        PRINT 'Course added to cart successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Course added to cart successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1826,8 +1836,8 @@ BEGIN
         SET CartStatus = @CartStatus
         WHERE CartID = @CartID;
 
-        PRINT 'Cart status updated successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Cart status updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1859,8 +1869,9 @@ BEGIN
         DELETE FROM [CartDetail]
         WHERE CartID = @CartID AND CourseID = @CourseID;
 
-        PRINT 'Cart detail removed successfully.';
     COMMIT TRANSACTION;
+
+        PRINT 'Cart detail removed successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1901,8 +1912,8 @@ BEGIN
         INSERT INTO [TaxReport] (CreateDate, TaxCode, TaxSettingID, InstructorID)
         VALUES (GETDATE(), @TaxCode, @TaxSettingID, @InstructorID);
 
-        PRINT 'Tax report created successfully.';
     COMMIT TRANSACTION;
+    PRINT 'Tax report created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1917,38 +1928,50 @@ GO
 IF OBJECT_ID('create_invoice', 'P') IS NOT NULL
     DROP PROCEDURE create_invoice;
 GO
+
 CREATE PROCEDURE create_invoice
     @StudentID integer,
     @TransferID integer = NULL
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
-        -- Check if the student exists
+        -- Bắt đầu giao dịch
+        BEGIN TRANSACTION;
+
+        -- Kiểm tra xem sinh viên có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [Student] WHERE StudentID = @StudentID)
         BEGIN
             PRINT 'Student does not exist.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
-      
-        INSERT INTO [Invoice] (InvoiceDate, Status, TransferID, StudentID)
-        VALUES (GETDATE(), 'Unpaied', @TransferID, @StudentID);
+
+        -- Tạo một hóa đơn mới với trạng thái ban đầu là 'Unpaid'
+        INSERT INTO [Invoice] (InvoiceDate, Status, TransferID, StudentID, TotalAmount)
+        VALUES (GETDATE(), 'Unpaid', @TransferID, @StudentID, 0);
+
+        -- Commit giao dịch
+        COMMIT TRANSACTION;
 
         PRINT 'Invoice created successfully.';
-    COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
+        -- Rollback giao dịch nếu có lỗi xảy ra
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
         PRINT 'Error occurred while creating invoice.';
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
-
 -- 45. Create the procedure add_invoice_detail
 IF OBJECT_ID('add_invoice_detail', 'P') IS NOT NULL
     DROP PROCEDURE add_invoice_detail;
 GO
+
 CREATE PROCEDURE add_invoice_detail
     @InvoiceID integer,
     @DiscountCode varchar(20) = NULL,
@@ -1956,29 +1979,33 @@ CREATE PROCEDURE add_invoice_detail
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
+        -- Bắt đầu giao dịch
+        BEGIN TRANSACTION;
+
         DECLARE @Price float;
         DECLARE @DiscountID integer = NULL;
         DECLARE @DiscountPrice float = 0;
         DECLARE @DiscountPercentage float = 0;
         DECLARE @CurrentTotalAmount float;
 
-        -- Check if the invoice exists
+        -- Kiểm tra sự tồn tại của hóa đơn
         IF NOT EXISTS (SELECT 1 FROM [Invoice] WHERE InvoiceID = @InvoiceID)
         BEGIN
             PRINT 'Invoice does not exist.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Check if the course exists and get its price
+        -- Kiểm tra sự tồn tại của khóa học và lấy giá của nó
         SELECT @Price = Price FROM [Course] WHERE CourseID = @CourseID;
         IF @Price IS NULL
         BEGIN
             PRINT 'Course does not exist.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Check if the discount code exists and is valid
+        -- Kiểm tra sự tồn tại và tính hợp lệ của mã giảm giá
         IF @DiscountCode IS NOT NULL
         BEGIN
             SELECT @DiscountID = DiscountID, @DiscountPercentage = Percentage
@@ -1987,10 +2014,10 @@ BEGIN
 
             IF @DiscountID IS NOT NULL
             BEGIN
-                -- Calculate the discount price
+                -- Tính giá giảm giá
                 SET @DiscountPrice = @Price * (1 - @DiscountPercentage / 100);
 
-                -- Update the quantity of the discount
+                -- Cập nhật số lượng mã giảm giá
                 UPDATE [Discount]
                 SET Quantity = Quantity - 1
                 WHERE DiscountID = @DiscountID;
@@ -2006,11 +2033,11 @@ BEGIN
             SET @DiscountPrice = @Price;
         END
 
-        -- Insert a new invoice detail
+        -- Thêm chi tiết hóa đơn mới
         INSERT INTO [InvoiceDetail] (InvoiceID, Price, DiscountPrice, DiscountID, CourseID)
         VALUES (@InvoiceID, @Price, @DiscountPrice, @DiscountID, @CourseID);
 
-        -- Update the total amount in the invoice
+        -- Cập nhật tổng số tiền trong hóa đơn
         SELECT @CurrentTotalAmount = TotalAmount FROM [Invoice] WHERE InvoiceID = @InvoiceID;
         SET @CurrentTotalAmount = @CurrentTotalAmount + @DiscountPrice;
 
@@ -2018,17 +2045,23 @@ BEGIN
         SET TotalAmount = @CurrentTotalAmount
         WHERE InvoiceID = @InvoiceID;
 
+        -- Commit giao dịch
+        COMMIT TRANSACTION;
+
         PRINT 'Invoice detail added and total amount updated successfully.';
-    COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
+        -- Rollback giao dịch nếu có lỗi xảy ra
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
         PRINT 'Error occurred while adding invoice detail.';
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
-
 
 
 -- 46. Create the procedure update_total_amount
@@ -2060,8 +2093,8 @@ BEGIN
         SET TotalAmount = @NewTotalAmount
         WHERE InvoiceID = @InvoiceID;
 
-        PRINT 'Total amount updated successfully.';
-    COMMIT TRANSACTION;
+        COMMIT TRANSACTION;
+    PRINT 'Total amount updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -2468,7 +2501,7 @@ BEGIN
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
-
+GO
 
 -- 54. Create the procedure create education
 IF OBJECT_ID('create_education', 'P') IS NOT NULL
