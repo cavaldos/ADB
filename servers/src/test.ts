@@ -1,17 +1,15 @@
-
+// import DataConnect from "./utils/DataConnect";
 async function main() {
   try {
-    const query =
-      "INSERT INTO [Account] ([id], [company], [username], [password]) VALUES (@id, @company, @username, @password);";
-    const params = {
-      "@id": 1467,
-      "@company": "Compandy dsgfdafa",
-      "@username": "usedsfsdfsdfnafad",
-      "@password": "passwodfsrd",
-    };
-    console.log(query, params);
-    // const result = await Database.executeWithParams(query, params);
-    // console.log("Insert Product Result:", result);
+    // const query = `use [COURSERA3] INSERT INTO Admin (UserID)
+    //         VALUES (3); `;
+    // const query2 = `select *from [User] WHERE [User].UserID = 4;`;
+    const query = `SELECT * from chat
+`;
+    // const params = "";
+
+    // const result = await DataConnect.execute(query);
+    // console.log(result);
   } catch (error: any) {
     console.error(`Error: ${error.message}`);
   }

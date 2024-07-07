@@ -26,7 +26,7 @@ const startSocketServer = (port: number) => {
 
     socket.on("message", (msg: Message) => {
       const { senderId, receiverId } = msg;
-      console.log("Message received:", msg);
+      console.log("Message received:", msg, senderId);
       try {
         const receiverSocketId = users.get(receiverId);
         if (receiverSocketId) {

@@ -1,29 +1,15 @@
 import Database from "./DataConnect";
 
 class DatabaseService {
-  constructor() {}
-  async execute(query: string): Promise<any> {
+  constructor() {
+  }
+  // check connection
+  async checkConnection(): Promise<any> {
     try {
       await Database.open();
-      const result = await Database.execute(query);
-      return result;
-    } catch (error) {
-      throw error;
-    } finally {
-      await Database.close();
-    }
+    } catch (error: any) {}
   }
-  async executeParams(query: string, values: any[]): Promise<any> {
-    try {
-      await Database.open();
-      const result = await Database.executeWithParams(query, values);
-      return result;
-    } catch (error) {
-      throw error;
-    } finally {
-      await Database.close();
-    }
-  }
+
 }
 
 export default new DatabaseService();

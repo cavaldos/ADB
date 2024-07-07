@@ -26,7 +26,7 @@ const startSocketServer = (port: number) => {
 
     socket.on("message", (msg: Message) => {
       const { senderId, receiverId } = msg;
-      console.log("Message received:", msg);
+      console.log("Message received:", msg, senderId);
       try {
         const receiverSocketId = users.get(receiverId);
         if (receiverSocketId) {
@@ -49,7 +49,7 @@ const startSocketServer = (port: number) => {
     });
   });
 
-  console.log(`💬 Socket.io server running at http://localhost:${port}`);
+  console.log(`\n 💬 Socket.io server running at http://localhost:${port}`);
   // Hàm kiểm tra kết nối và log
   const checkConnections = () => {
     if (hasConnection) {

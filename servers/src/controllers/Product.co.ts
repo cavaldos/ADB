@@ -3,8 +3,10 @@ import { Request, Response } from "express";
 const ProductController = {
   async createProduct(req: Request, res: Response) {
     try {
+      console.log("createProduct");
       const { name, price, description } = req.body;
       console.log(name, price, description);
+      console.log("createProduct",name, price, description);
       return res.status(201).json("product created");
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
