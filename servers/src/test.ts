@@ -1,15 +1,14 @@
-// import DataConnect from "./utils/DataConnect";
+import DataConnect from "./utils/DataConnect";
+import TaskTimer from "./utils/TaskTimer";
+import CategoryRepo from "./repositories/category.repo";
 async function main() {
   try {
-    // const query = `use [COURSERA3] INSERT INTO Admin (UserID)
-    //         VALUES (3); `;
-    // const query2 = `select *from [User] WHERE [User].UserID = 4;`;
-    const query = `SELECT * from chat
-`;
-    // const params = "";
 
-    // const result = await DataConnect.execute(query);
-    // console.log(result);
+    const timer = new TaskTimer();
+    
+    const categories = await CategoryRepo.getAllCategory();
+    timer.stop();
+    console.log(categories[0]);
   } catch (error: any) {
     console.error(`Error: ${error.message}`);
   }

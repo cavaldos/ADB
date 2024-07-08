@@ -4,11 +4,12 @@ const config: SqlConfig = {
   user: "sa",
   password: "password123@",
   server: "113.173.16.55",
-  database: "master", // Ensure the default database is 'master'
-  port: 1445,
+  database: "ADB", // Ensure the default database is 'master'
+  port: 1448,
   options: {
-    encrypt: true,
+    encrypt: false,
     trustServerCertificate: true,
+    enableArithAbort: true,
   },
   pool: {
     max: 150,

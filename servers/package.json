@@ -45,6 +45,7 @@
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "mssql": "^11.0.0",
+    "portfinder": "^1.0.32",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {

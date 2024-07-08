@@ -7,6 +7,7 @@ import DataService from "./utils/DataService";
 
 DataService.checkConnection();
 const app = express();
+import "./test";
 
 app.use(
   cors({
@@ -22,4 +23,3 @@ app.use(routers);
 export default app;
 
 
-import "./test";
