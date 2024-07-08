@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { InstructorController } from "../controllers";
 const InstructorRouter = Router();
-InstructorRouter.post("/p", InstructorController.createProduct);
+InstructorRouter.post("/get_all_course", InstructorController.getAllCourses);
 
 export default InstructorRouter;

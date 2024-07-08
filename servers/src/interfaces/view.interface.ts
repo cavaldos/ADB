@@ -129,7 +129,9 @@ export interface VW_Course {
   Status: "Hide" | "Free" | "Plus";
   CreateTime: Date;
   CategoryID: number;
+  CategoryName: string;
   InstructorID: number;
+  InstructorName: string;
 }
 
 export interface VW_CourseHistory {
@@ -149,7 +151,7 @@ export interface VW_CourseHistory {
 
 export interface VW_Category {
   CategoryID: number;
-  Name: string;
+  CategoryName: string;
   CategoryDescription: string;
   ParentCategoryID: number;
 }
@@ -198,8 +200,8 @@ export interface VW_Review {
   CourseID: number;
 }
 
-export interface VW_Notifications {
-  NotificationID: number;
+export interface VW_Notify {
+  NotifyID: number;
   CreatedDate: Date;
   Message: string;
   LearnProcessID: number | null;

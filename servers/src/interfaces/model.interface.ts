@@ -148,7 +148,7 @@ export interface CourseHistory {
 
 export interface Category {
   CategoryID: number;
-  Name: string;
+  CategoryName: string;
   CategoryDescription: string;
   ParentCategoryID: number;
 }
@@ -197,8 +197,8 @@ export interface Review {
   CourseID: number;
 }
 
-export interface Notifications {
-  NotificationID: number;
+export interface Notify {
+  NotifyID: number;
   CreatedDate: Date;
   Message: string;
   LearnProcessID: number | null;

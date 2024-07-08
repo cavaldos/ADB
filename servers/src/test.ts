@@ -4,18 +4,12 @@ import CategoryRepo from "./repositories/category.repo";
 async function main() {
   try {
     const timer = new TaskTimer();
+    const query = `Select *  from Category ca join Instructor i on ca.CategoryID = i.InstructorID   join Course co on co.InstructorID = i.InstructorID where i.InstructorID = 9`;
 
-    const categories = await CategoryRepo.getAllCategory();
-    const categories2 = await CategoryRepo.getCategoryById(1);
-    await CategoryRepo.createCategory(
-      "Electrsdfodfgdsdfgdfgfndsfsgfdics",
-      "Electronfsaddfdfggfdfsadafdfidc devices",
-      ""
-    );
+    // await DataConnect.execute(query);
 
     timer.stop();
-    console.log(categories2);
-    console.log(categories);
+    console.log("Categories: ", timer.getDuration());
   } catch (error: any) {
     console.error(`Error: ${error.message}`);
   }

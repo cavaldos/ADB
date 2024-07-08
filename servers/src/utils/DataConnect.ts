@@ -3,9 +3,9 @@ import sql, { ConnectionPool, config as SqlConfig, IResult } from "mssql";
 const config: SqlConfig = {
   user: "sa",
   password: "password123@",
-  server: "113.173.16.55",
-  database: "ADB", // Ensure the default database is 'master'
-  port: 1448,
+  server: "localhost",
+  database: "master", // Ensure the default database is 'master'
+  port: 1447,
   options: {
     encrypt: false,
     trustServerCertificate: true,
@@ -69,9 +69,11 @@ class DataConnect {
       }
       const request = this.pool.request();
       for (const [key, value] of Object.entries(params)) {
+        console.log(key, value);
         request.input(key.replace("@", ""), value); // Remove '@' before adding to request
       }
       const fullQuery = `USE ${config.database}; ${query}`;
+      console.log(fullQuery);
       const result: IResult<any> = await request.query(fullQuery);
       return result.recordset;
     } catch (error: any) {
