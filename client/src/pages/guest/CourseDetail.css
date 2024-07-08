@@ -1,0 +1,404 @@
+/* Existing CSS */
+
+.course-header-content { 
+  padding-left: 200px; 
+  padding-right: 200px;
+}
+
+.course-header {
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+.course-header h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.course-header p {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.rating {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.rating span {
+  color: #ffb400;
+}
+
+.author, .update-info {
+  font-size: 14px;
+  color: #bbb;
+}
+
+.course-content {
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 20px;
+  padding-left: 200px; 
+  padding-right: 200px;
+}
+
+.course-description { 
+  width: 68%;
+}
+
+.course-price { 
+  width: 30%;
+}
+
+.video-wrapper {
+  width: 100%;
+  height: 300px; /* Bạn có thể tùy chỉnh chiều cao ở đây */
+  margin-bottom: 20px;
+}
+
+.video-wrapper iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.lesson-description {
+  width: 80%;
+  padding: 20px;
+}
+
+.border-course-description { 
+  border: 1px solid #ccc;
+  padding: 20px;
+}
+
+.lesson-description h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.content-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.lesson-description ul {
+  list-style: none;
+  padding: 0;
+}
+
+.lesson-description ul.left, .lesson-description ul.right {
+  width: 45%;
+}
+
+.lesson-description li {
+  margin-bottom: 10px;
+}
+
+.price {
+  font-size: 24px;
+  color: #e74c3c;
+  margin-bottom: 20px;
+}
+
+.add-to-cart, .buy-now {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+
+.add-to-cart {
+  background-color: #8e44ad;
+  color: #fff;
+}
+
+.buy-now {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.guarantee {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.course-includes h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.course-includes ul {
+  list-style: none;
+  padding: 0;
+}
+
+.course-includes li {
+  margin-bottom: 10px;
+}
+
+.course-section {
+  margin-bottom: 10px; /* Khoảng cách dưới mỗi phần tử */
+}
+
+.course-content-page { 
+  padding-top: 30px;
+}
+
+.course-section { 
+  padding-top: 20px; 
+  padding-bottom: 20px;
+  border: 1px solid #ccc; 
+  margin: 0; 
+  cursor: pointer;
+}
+
+.course-description { 
+  width: 100%;
+}
+
+.course-section-header {
+  display: flex;
+  align-items: center;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+  margin-left: 8px; /* Khoảng cách giữa mũi tên và nội dung */
+}
+
+.header-title {
+  text-align: left;
+}
+
+.header-info {
+  margin-left: auto;
+  white-space: nowrap; /* Giữ nội dung trên một dòng */
+}
+
+.course-requirement {
+  margin-top: 20px;
+}
+
+/* New CSS for Show More/Less functionality */
+.description-content.collapsed {
+  max-height: 150px; /* Adjust height as needed */
+  overflow: hidden;
+  position: relative;
+}
+
+.description-content.expanded {
+  max-height: none;
+}
+
+.toggle-description-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 10px 0;
+  text-align: center;
+  width: 100%;
+  display: block;
+  margin-top: 10px; /* Space between the description and the button */
+}
+
+/* Recommendations Section */
+.recommendations {
+  margin-top: 30px;
+}
+
+.course-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.course-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  padding: 15px 0;
+}
+
+.course-item img {
+  width: 100px;
+  height: 100px;
+  margin-right: 15px;
+}
+
+.course-info {
+  flex: 1;
+}
+
+.course-info h3 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.course-meta {
+  font-size: 12px;
+  color: #666;
+  margin: 5px 0;
+}
+
+.course-meta .badge {
+  background-color: #f0ad4e;
+  color: white;
+  padding: 2px 5px;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.course-rating {
+  font-size: 14px;
+  color: #888;
+  margin: 5px 0;
+}
+
+.course-price {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.course-price .current-price {
+  color: #e74c3c;
+}
+
+.course-price .original-price {
+  text-decoration: line-through;
+  color: #bbb;
+  margin-left: 10px;
+}
+
+.wishlist-button {
+  font-size: 20px;
+  color: #bbb;
+  cursor: pointer;
+}
+
+.toggle-button {
+  background: none;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+.frequently-bought-together {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.frequently-bought-together h2 {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.course-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.course-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.course-item img {
+  width: 100px;
+  height: 100px;
+  margin-right: 15px;
+}
+
+.course-info {
+  flex: 1;
+}
+
+.course-info h3 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.course-info p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.course-rating {
+  font-size: 14px;
+  color: #888;
+}
+
+.course-rating .badge {
+  background-color: #f0ad4e;
+  color: white;
+  padding: 2px 5px;
+  border-radius: 3px;
+  margin-left: 5px;
+}
+
+.course-price {
+  font-size: 14px;
+  text-align: right;
+}
+
+.course-price .current-price {
+  color: #e74c3c;
+}
+
+.course-price .original-price {
+  text-decoration: line-through;
+  color: #bbb;
+  margin-left: 10px;
+}
+
+.plus-icon {
+  font-size: 24px;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.total-price {
+  font-size: 16px;
+  margin: 20px 0;
+  text-align: right;
+}
+
+.total-price .original-total-price {
+  text-decoration: line-through;
+  color: #bbb;
+  margin-left: 10px;
+}
+
+.add-all-to-cart {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #9b59b6;
+  color: white;
+  font-size: 16px;
+  border: none;
+  cursor: point
+}

@@ -13,6 +13,7 @@ const LearnProcess = lazy(() => import("~/pages/student/LearnProcess"));
 const BankAccount = lazy(() => import("~/pages/guest/BankAccount"));
 const Profile = lazy(() => import("~/pages/guest/Profile"));
 const Image = lazy(() => import("~/pages/student/image"));
+const SaleOrder = lazy(() => import("../components/testcomponent/SaleOrder"));
 import Test from "../pages/student/test";
 const StudentRouter = [
   {
@@ -75,6 +76,12 @@ const StudentRouter = [
     name: "Image",
     path: "/image",
     component: Image,
+    Layout: StudentLayout,
+  },
+  {
+    name: "SaleOrder",
+    path: "/saleorder",
+    component: SaleOrder,
     Layout: StudentLayout,
   },
   {
