@@ -166,7 +166,7 @@ GO
 
 CREATE TABLE [Category] (
   [CategoryID] integer PRIMARY KEY IDENTITY(1, 1),
-  [Name] varchar(20),
+  [CategoryName] varchar(20) UNIQUE,
   [CategoryDescription] nvarchar(500),
   [ParentCategoryID] integer
 )
@@ -222,8 +222,8 @@ CREATE TABLE [Review] (
 )
 GO
 
-CREATE TABLE [Notifications] (
-  [NotificationID] integer PRIMARY KEY IDENTITY(1, 1),
+CREATE TABLE [Notify] (
+  [NotifyID] integer PRIMARY KEY IDENTITY(1, 1),
   [CreatedDate] datetime NOT NULL,
   [Message] nvarchar(500),
   [LearnProcessID] integer DEFAULT (null),
@@ -417,13 +417,13 @@ GO
 ALTER TABLE [Review] ADD FOREIGN KEY ([CourseID]) REFERENCES [Course] ([CourseID])
 GO
 
-ALTER TABLE [Notifications] ADD FOREIGN KEY ([LearnProcessID]) REFERENCES [LearnProcess] ([LearnProcessID])
+ALTER TABLE [Notify] ADD FOREIGN KEY ([LearnProcessID]) REFERENCES [LearnProcess] ([LearnProcessID])
 GO
 
-ALTER TABLE [Notifications] ADD FOREIGN KEY ([SendUserID]) REFERENCES [User] ([UserID])
+ALTER TABLE [Notify] ADD FOREIGN KEY ([SendUserID]) REFERENCES [User] ([UserID])
 GO
 
-ALTER TABLE [Notifications] ADD FOREIGN KEY ([ReceiveUserID]) REFERENCES [User] ([UserID])
+ALTER TABLE [Notify] ADD FOREIGN KEY ([ReceiveUserID]) REFERENCES [User] ([UserID])
 GO
 
 ALTER TABLE [DiscussionForum] ADD FOREIGN KEY ([CourseID]) REFERENCES [Course] ([CourseID])

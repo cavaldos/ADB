@@ -11,22 +11,26 @@ const path = require('path');
  */
 function generateSQL(procedureName, data, count) {
     const sqlStatements = [];
+    const uniqueCategories = new Set();
 
     for (let i = 0; i < count; i++) {
+        let fakeCategoryName, fakeCategoryDescription;
+
         // Tạo dữ liệu giả từ đối tượng đầu vào sử dụng Faker.js
-        const fakeData = {};
-        for (const key in data) {
-            if (data[key] === 'name') {
-                fakeData[key] = faker.commerce.department().substring(0, 20);
-            } else if (data[key] === 'categoryDescription') {
-                fakeData[key] = faker.lorem.paragraph().substring(0, 500);
-            } else if (data[key] === 'parentCategoryID') {
-                fakeData[key] = faker.datatype.boolean() ? faker.datatype.number({ min: 1, max: 50 }) : 'NULL';
-            }
-        }
+        do {
+            fakeCategoryName = faker.commerce.department().substring(0, 20);
+            fakeCategoryDescription = faker.lorem.paragraph().substring(0, 500);
+        } while (uniqueCategories.has(fakeCategoryName + fakeCategoryDescription));
+
+        uniqueCategories.add(fakeCategoryName + fakeCategoryDescription);
+
+        const fakeData = {
+            CategoryName: fakeCategoryName,
+            CategoryDescription: fakeCategoryDescription
+        };
 
         // Tạo câu lệnh SQL
-        const sql = `EXEC ${procedureName} '${fakeData.CategoryName}', '${fakeData.CategoryDescription}', ${fakeData.ParentCategoryID};`;
+        const sql = `EXEC ${procedureName} '${fakeData.CategoryName}', '${fakeData.CategoryDescription}';`;
         sqlStatements.push(sql);
     }
 
@@ -35,16 +39,15 @@ function generateSQL(procedureName, data, count) {
 
 // Dữ liệu đầu vào
 const data = {
-    CategoryName: 'name',
-    CategoryDescription: 'categoryDescription',
-    ParentCategoryID: 'parentCategoryID'
+    CategoryName: 'CategoryName',
+    CategoryDescription: 'CategoryDescription'
 };
 
 // Tên procedure
 const procedureName = 'create_category';
 
 // Số lượng câu lệnh cần tạo
-const count = 100;
+const count = 1000;
 
 // Tạo các câu lệnh SQL
 const sqlStatements = generateSQL(procedureName, data, count);

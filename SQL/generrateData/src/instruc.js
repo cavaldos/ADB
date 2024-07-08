@@ -67,7 +67,7 @@ const data = {
 const procedureName = 'create_instructor';
 
 // Số lượng câu lệnh cần tạo
-const count = 100;
+const count = 1000;
 
 // Tạo các câu lệnh SQL
 const sqlStatements = generateSQL(procedureName, data, count);

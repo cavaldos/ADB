@@ -133,16 +133,23 @@ BEGIN
         END
 
         -- Check if the category already exists
-        IF NOT EXISTS (SELECT 1 FROM [Category] WHERE Name = @CategoryName AND ParentCategoryID = @ParentCategoryID)
-        BEGIN
-            INSERT INTO [Category] (Name, CategoryDescription, ParentCategoryID)
-            VALUES (@CategoryName, @CategoryDescription, @ParentCategoryID);
-            PRINT 'Category created successfully.';
-        END
-        ELSE
+        IF EXISTS (SELECT 1 FROM [Category] WHERE CategoryName = @CategoryName AND ParentCategoryID = @ParentCategoryID)
         BEGIN
             PRINT 'Category already exists.';
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
+        -- Check if the category already exists
+        IF EXISTS (SELECT 1 FROM [Category] WHERE CategoryName = @CategoryName )
+        BEGIN
+            PRINT 'Category already exists.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+        -- Insert the new category if it does not exist
+        INSERT INTO [Category] (CategoryName, CategoryDescription, ParentCategoryID)
+        VALUES (@CategoryName, @CategoryDescription, @ParentCategoryID);
+        PRINT 'Category created successfully.';
 
         COMMIT TRANSACTION;
     END TRY
@@ -157,13 +164,14 @@ BEGIN
 END;
 GO
 
+
 -- 6. Create the procedure to update category
 IF OBJECT_ID('update_category', 'P') IS NOT NULL
     DROP PROCEDURE update_category;
 GO
 CREATE PROCEDURE update_category
     @CategoryID integer,
-    @Name varchar(20) = NULL,
+    @CategoryName varchar(20) = NULL,
     @CategoryDescription nvarchar(500) = NULL,
     @ParentCategoryID integer
 AS
@@ -173,7 +181,7 @@ BEGIN
         IF EXISTS (SELECT 1 FROM [Category] WHERE CategoryID = @CategoryID)
         BEGIN
             UPDATE [Category]
-            SET Name = @Name,
+            SET CategoryName = @CategoryName,
                 CategoryDescription = @CategoryDescription,
                 ParentCategoryID = @ParentCategoryID
             WHERE CategoryID = @CategoryID
@@ -290,10 +298,10 @@ BEGIN
 END;
 GO
 -- 10. Create the procedure to update course
-IF OBJECT_ID('updateCourse', 'P') IS NOT NULL
-    DROP PROCEDURE updateCourse;
+IF OBJECT_ID('update_ourse', 'P') IS NOT NULL
+    DROP PROCEDURE update_ourse;
 GO
-CREATE PROCEDURE updateCourse
+CREATE PROCEDURE update_ourse
     @CourseID integer,
     @Title varchar(255),
     @Subtitle varchar(255),
@@ -1404,7 +1412,7 @@ BEGIN
 END;
 GO
 
--- 34. Create the procedure update_admin
+-- 34. Create the procedure update admin
 IF OBJECT_ID('update_admin', 'P') IS NOT NULL
     DROP PROCEDURE update_admin;
 GO
@@ -1533,7 +1541,7 @@ BEGIN
 END;
 GO
 
---- 36. Create the procedure update_student
+--- 36. Create the procedure update student
 IF OBJECT_ID('update_student', 'P') IS NOT NULL
     DROP PROCEDURE update_student;
 GO
@@ -1714,7 +1722,7 @@ BEGIN
 END;
 GO
 
--- 39. Create the procedure update_review
+-- 39. Create the procedure update review
 IF OBJECT_ID('update_review', 'P') IS NOT NULL
     DROP PROCEDURE update_review;
 GO
@@ -2588,3 +2596,96 @@ BEGIN
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
+
+
+-- 56. Create the procedure create delete course
+IF OBJECT_ID('delete_course', 'P') IS NOT NULL
+    DROP PROCEDURE delete_course;
+GO
+CREATE PROCEDURE delete_course
+    @CourseID integer
+AS
+BEGIN
+    BEGIN TRY
+        -- Start a transaction
+        BEGIN TRANSACTION;
+
+        -- Check if the course exists
+        IF NOT EXISTS (SELECT 1 FROM [Course] WHERE CourseID = @CourseID)
+        BEGIN
+            PRINT 'Course does not exist.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Delete the course
+        DELETE FROM [Course]
+        WHERE CourseID = @CourseID;
+
+        -- Commit the transaction
+        COMMIT TRANSACTION;
+
+        PRINT 'Course deleted successfully.';
+    END TRY
+    BEGIN CATCH
+        -- Rollback the transaction if an error occurs
+        ROLLBACK TRANSACTION;
+
+        PRINT 'Error occurred while deleting course.';
+        PRINT ERROR_MESSAGE();
+    END CATCH
+END;
+
+-- 57. Create the procedure create notify
+IF OBJECT_ID('create_notify', 'P') IS NOT NULL
+    DROP PROCEDURE create_notify;
+GO
+
+CREATE PROCEDURE create_notify
+    @Message nvarchar(500),
+    @LearnProcessID integer = NULL,
+    @SendUserID integer,
+    @ReceiveUserID integer
+AS
+BEGIN
+    BEGIN TRY
+        -- Bắt đầu giao dịch
+        BEGIN TRANSACTION;
+
+        -- Kiểm tra xem người dùng gửi có tồn tại không
+        IF NOT EXISTS (SELECT 1 FROM [User] WHERE UserID = @SendUserID)
+        BEGIN
+            PRINT 'Send user does not exist.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Kiểm tra xem người dùng nhận có tồn tại không
+        IF NOT EXISTS (SELECT 1 FROM [User] WHERE UserID = @ReceiveUserID)
+        BEGIN
+            PRINT 'Receive user does not exist.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Thêm một thông báo mới vào bảng Notify
+        INSERT INTO [Notify] (CreatedDate, Message, LearnProcessID, SendUserID, ReceiveUserID)
+        VALUES (GETDATE(), @Message, @LearnProcessID, @SendUserID, @ReceiveUserID);
+
+        -- Commit giao dịch
+        COMMIT TRANSACTION;
+
+        PRINT 'Notification created successfully.';
+    END TRY
+    BEGIN CATCH
+        -- Rollback giao dịch nếu có lỗi xảy ra
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
+        PRINT 'Error occurred while creating notification.';
+        PRINT ERROR_MESSAGE();
+    END CATCH
+END;
+GO
