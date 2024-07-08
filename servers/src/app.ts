@@ -2,7 +2,7 @@ import express, { json } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
-import routers from "./routes";
+import routers from "./api/routes";
 import DataService from "./utils/DataService";
 
 DataService.checkConnection();

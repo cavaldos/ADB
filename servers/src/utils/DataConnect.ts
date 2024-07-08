@@ -73,7 +73,7 @@ class DataConnect {
       }
       const fullQuery = `USE ${config.database}; ${query}`;
       const result: IResult<any> = await request.query(fullQuery);
-      return result.recordsets;
+      return result.recordset;
     } catch (error: any) {
       throw new Error(`Query failed: ${error.message}`);
     }
@@ -98,7 +98,7 @@ class DataConnect {
       }
       try {
         const result: IResult<any> = await request.execute(procedureName);
-        return result.recordsets;
+        return result.recordset;
       } catch (error) {
         throw error;
       }
