@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { VW_Course } from "../../interfaces/view.interface";
 import UserService from "../services/User.sv";
 import CourseRepo from "../../repositories/course.repo";
+import BankAccountRepo from "../../repositories/bankAccount.repo";
 const GlobalController = {
   //1. get all courses with pagination
   async getAllCourses(req: Request, res: Response) {
@@ -144,6 +145,120 @@ const GlobalController = {
         message: `Error: ${error.message}`,
         status: 500,
         data: null,
+      });
+    }
+  },
+
+  // 6.create bank account
+  async createBankAccount(req: Request, res: Response) {
+    try {
+      const {
+        userID,
+        accountNumber,
+        accountHolderName,
+        accountBalance,
+        bankName,
+      } = req.body;
+      const result = await BankAccountRepo.createBankAccount(
+        userID,
+        accountNumber,
+        accountHolderName,
+        accountBalance,
+        bankName
+      );
+      return res.status(200).json({
+        message: `Create bank account for UserID: ${userID}`,
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+
+  // 7. update bank account
+  async updateBankAccount(req: Request, res: Response) {
+    try {
+      const {
+        bankAccountID,
+        accountNumber,
+        accountHolderName,
+        accountBalance,
+        bankName,
+        userID,
+      } = req.body;
+      const result = await BankAccountRepo.updateBankAccount(
+        bankAccountID,
+        accountNumber,
+        accountHolderName,
+        accountBalance,
+        bankName,
+        userID
+      );
+      return res.status(200).json({
+        message: `Update bank account for UserID: ${userID}`,
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+  // 8. transfer money
+  async transferMoney(req: Request, res: Response) {
+    try {
+      const { bankAccountID, amount, type } = req.body;
+      const result = await BankAccountRepo.transferMoney(
+        bankAccountID,
+        amount,
+        type
+      );
+      return res.status(200).json({
+        message: `Transfer money for bank account: ${bankAccountID}`,
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+  // 9.  Create Transfer Course
+  async createTransferCourse(req: Request, res: Response) {
+    try {
+      const {
+        courseID,
+        amount,
+        transferDescription,
+        bankBeneficiaryID,
+        bankOrderingID,
+      } = req.body;
+      await BankAccountRepo.createTransferCourse(
+        courseID,
+        amount,
+        transferDescription,
+        bankBeneficiaryID,
+        bankOrderingID
+      );
+      return res.status(200).json({
+        message: `Transfer course: ${courseID} to instructor: ${bankBeneficiaryID}`,
+        status: 200,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
       });
     }
   },

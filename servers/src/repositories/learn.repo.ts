@@ -1,6 +1,6 @@
 import DataConnect from "../utils/DataConnect";
 
-const LessonRepo = {
+const LearnRepo = {
   // 28 strart learn process
   async startLearnProcess(courseID: number, studentID: number) {
     try {
@@ -35,4 +35,4 @@ const LessonRepo = {
     }
   },
 };
-export default LessonRepo;
+export default LearnRepo;

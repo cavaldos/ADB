@@ -2,16 +2,8 @@ import { Request, Response } from "express";
 
 const GuestController = {
   async createProduct(req: Request, res: Response) {
+    console.log(req.body);
     res.send("Create Product");
-  },
-  async updateProduct(req: Request, res: Response) {
-    res.send("Update Product");
-  },
-  async deleteProduct(req: Request, res: Response) {
-    res.send("Delete Product");
-  },
-  async getProducts(req: Request, res: Response) {
-    res.send("Get Products");
   },
 };
 

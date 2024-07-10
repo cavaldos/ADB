@@ -39,24 +39,40 @@ const LessonRepo = {
       throw new Error(`Error updating lesson video: ${error.message}`);
     }
   },
-  // 3. get app lessons video
+  // 3. get all lessons video
   async getAllLessonsVideo(courseID: number) {
     try {
-      const query = `SELECT * FROM LessonVideo WHERE CourseID = @courseID;`;
+      const query = `SELECT c.CourseID, ls.LessonsID,lvd.LessonVideoID,ls.Title,lvd.URL,ls.Duration,
+                      ls.ComplexityLevel,ls.CreatedTime,ls.UpdatedTime,ls.LessonType,
+                      ls.TopicID,tp.TopicName FROM LessonVideo lvd
+                      JOIN Lessons ls ON ls.LessonsID = lvd.LessonsID
+                      JOIN Topic tp ON tp.TopicID = ls.TopicID
+                      join Course c on c.CourseID = ls.CourseID
+                      WHERE c.CourseID = @courseID;`;
       return await DataConnect.executeWithParams(query, { courseID });
     } catch (error: any) {
       throw new Error(`Error fetching lesson video: ${error.message}`);
     }
   },
   // 4. get lesson video by id
-  async getLessonsVideobyID(courseID: number) {
+  async getLessonsVideoByID(lessonID: number) {
     try {
-      const query = `SELECT * FROM LessonVideo WHERE CourseID = @courseID;`;
-      return await DataConnect.executeWithParams(query, { courseID });
+      const query = `SELECT c.CourseID, ls.LessonsID,lvd.LessonVideoID,ls.Title,lvd.URL,ls.Duration,
+                      ls.ComplexityLevel,ls.CreatedTime,ls.UpdatedTime,ls.LessonType,
+                      ls.TopicID,tp.TopicName FROM LessonVideo lvd
+                      JOIN Lessons ls ON ls.LessonsID = lvd.LessonsID
+                      JOIN Topic tp ON tp.TopicID = ls.TopicID
+                      join Course c on c.CourseID = ls.CourseID
+                      WHERE ls.LessonsID = @LessonID;`;
+
+      return await DataConnect.executeWithParams(query, { lessonID });
     } catch (error: any) {
       throw new Error(`Error fetching lesson video: ${error.message}`);
     }
   },
+
+  //---------------------------------
+
   // 4. Create Lesson Document
   async createLessonDocument(
     title: string,
@@ -98,7 +114,18 @@ const LessonRepo = {
       throw new Error(`Error adding page to document: ${error.message}`);
     }
   },
+  //5 .1 delete page
+  async deletePageDocument(pageDocumentID: number) {
+    try {
+      const query = `DELETE FROM PageDocument WHERE PageDocumentID = @PageDocumentID;`;
 
+      return await DataConnect.executeWithParams(query, {
+        PageDocumentID: pageDocumentID,
+      });
+    } catch (error: any) {
+      throw new Error(`Error deleting page document: ${error.message}`);
+    }
+  },
   // 6. Update Page Document
   // neu nhu content bang rong thi se xoa page, sua proc
   async updatePageDocument(
@@ -125,12 +152,46 @@ const LessonRepo = {
   async getAllLessonsDocument(courseID: number) {
     // tra ve danh sach cac page
     try {
-      const query = `SELECT * FROM LessonDocument WHERE CourseID = @courseID;`;
+      const query = `SELECT c.CourseID, ls.LessonsID,ld.LessonDocumentID,ls.Title,ls.Duration,
+                      ls.ComplexityLevel,ls.CreatedTime,ls.UpdatedTime,ls.LessonType,
+                      ls.TopicID,tp.TopicName FROM LessonDocument ld
+                      JOIN Lessons ls ON ls.LessonsID = ld.LessonsID
+                      JOIN Topic tp ON tp.TopicID = ls.TopicID
+                      join Course c on c.CourseID = ls.CourseID
+                      WHERE c.CourseID = @courseID;`;
       return await DataConnect.executeWithParams(query, { courseID });
     } catch (error: any) {
       throw new Error(`Error fetching lesson document: ${error.message}`);
     }
   },
+  // 7. get all lessons document by id
+  async getLessonDocumentByID(lessonID: number) {
+    // tra ve danh sach cac page
+
+    try {
+      const query = `SELECT c.CourseID, ls.LessonsID,ld.LessonDocumentID,ls.Title,ls.Duration,
+                      ls.ComplexityLevel,ls.CreatedTime,ls.UpdatedTime,ls.LessonType,
+                      ls.TopicID,tp.TopicName FROM LessonDocument ld
+                      JOIN Lessons ls ON ls.LessonsID = ld.LessonsID
+                      JOIN Topic tp ON tp.TopicID = ls.TopicID
+                      join Course c on c.CourseID = ls.CourseID
+                      WHERE ls.LessonsID = @lessonID;`;
+      return await DataConnect.executeWithParams(query, { lessonID });
+    } catch (error: any) {
+      throw new Error(`Error fetching lesson document: ${error.message}`);
+    }
+  },
+  // 7.1 get all page
+  async getAllPagesDocument(lessonDocumentID: number) {
+    try {
+      const query = `SELECT * FROM PageDocument WHERE LessonDocumentID = @lessonDocumentID;`;
+      return await DataConnect.executeWithParams(query, { lessonDocumentID });
+    } catch (error: any) {
+      throw new Error(`Error fetching page document: ${error.message}`);
+    }
+  },
+
+  //====================================================
 
   // 8. create lesson test
   async createLessonTest(
@@ -185,7 +246,8 @@ const LessonRepo = {
   async updateQuestionToTest(
     questionID: number,
     lessonTestID: number,
-    question: string,
+    questionContent: string,
+    title: string,
     option1: string,
     option2: string,
     option3: string,
@@ -195,8 +257,9 @@ const LessonRepo = {
       const proc = "update_question_lessontest";
       const params = {
         QuestionID: questionID,
+        QuestionContent: questionContent,
+        Title: title,
         LessonTestID: lessonTestID,
-        Title: question,
         Answer1: option1,
         Answer2: option2,
         Answer3: option3,
@@ -211,19 +274,32 @@ const LessonRepo = {
   // 10. get all lessons test
   async getAllLessonsTest(courseID: number) {
     //err
+
     try {
-      const query = `SELECT * FROM LessonTest WHERE CourseID = @courseID;`;
+      const query = `SELECT c.CourseID, ls.LessonsID,lt.LessonTestID,ls.Title,ls.Duration,
+                      ls.ComplexityLevel,ls.CreatedTime,ls.UpdatedTime,ls.LessonType,
+                      ls.TopicID,tp.TopicName FROM LessonTest lt
+                      JOIN Lessons ls ON ls.LessonsID = lt.LessonsID
+                      JOIN Topic tp ON tp.TopicID = ls.TopicID
+                      join Course c on c.CourseID = ls.CourseID
+                      WHERE c.CourseID = @courseID;`;
       return await DataConnect.executeWithParams(query, { courseID });
     } catch (error: any) {
       throw new Error(`Error fetching lesson test: ${error.message}`);
     }
   },
-  // 10. get all lessons test by id
-  async getLessonsTestbyID(courseID: number) {
+  // 10. get  lessons test by id
+  async getLessonTestByID(lessonID: number) {
     //err
     try {
-      const query = `SELECT * FROM LessonTest WHERE CourseID = @courseID;`;
-      return await DataConnect.executeWithParams(query, { courseID });
+      const query = `SELECT c.CourseID, ls.LessonsID,lt.LessonTestID,ls.Title,ls.Duration,
+                      ls.ComplexityLevel,ls.CreatedTime,ls.UpdatedTime,ls.LessonType,
+                      ls.TopicID,tp.TopicName FROM LessonTest lt
+                      JOIN Lessons ls ON ls.LessonsID = lt.LessonsID
+                      JOIN Topic tp ON tp.TopicID = ls.TopicID
+                      join Course c on c.CourseID = ls.CourseID
+                      WHERE ls.LessonsID = @LessonID;`;
+      return await DataConnect.executeWithParams(query, { lessonID });
     } catch (error: any) {
       throw new Error(`Error fetching lesson test: ${error.message}`);
     }
@@ -240,7 +316,7 @@ const LessonRepo = {
       throw new Error(`Error deleting lesson: ${error.message}`);
     }
   },
-
+  //============================================
   // 12. Start Lesson Process
   async startLessonProcess(lessonsID: number, learnProcessID: number) {
     try {

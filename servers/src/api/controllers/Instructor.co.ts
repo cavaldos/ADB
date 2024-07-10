@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import DataConnect from "../../utils/DataConnect";
 import { VW_Course, VW_CourseHistory } from "../../interfaces/view.interface";
 import CourseRepo from "../../repositories/course.repo";
 

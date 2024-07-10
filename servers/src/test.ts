@@ -4,7 +4,7 @@ async function main() {
   try {
     const timer = new TaskTimer();
 
-    const result = await UserService.getInstructorByID(1);
+    await UserService.getInstructorByID(1);
     // console.log("Instructor: ", result);
 
     timer.stop();
