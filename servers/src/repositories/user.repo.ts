@@ -168,6 +168,7 @@ const UserRepo = {
       throw new Error(`Error updating instructor: ${error.message}`);
     }
   },
+  //7
 };
 
 export default UserRepo;

@@ -1,12 +1,11 @@
-import DataConnect from "./utils/DataConnect";
 import TaskTimer from "./utils/TaskTimer";
-import CategoryRepo from "./repositories/category.repo";
+import UserService from "./api/services/User.sv";
 async function main() {
   try {
     const timer = new TaskTimer();
-    const query = `Select *  from Category ca join Instructor i on ca.CategoryID = i.InstructorID   join Course co on co.InstructorID = i.InstructorID where i.InstructorID = 9`;
 
-    // await DataConnect.execute(query);
+    const result = await UserService.getInstructorByID(1);
+    // console.log("Instructor: ", result);
 
     timer.stop();
     console.log("Categories: ", timer.getDuration());

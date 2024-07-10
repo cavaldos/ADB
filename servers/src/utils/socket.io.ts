@@ -53,7 +53,7 @@ const startSocketServer = async (port: number) => {
     });
 
     console.log(
-      `\n 💬 Socket.io server running at http://localhost:${freePort}`
+      `  💬   Socket.io server running at http://localhost:${freePort} \n`
     );
     // Hàm kiểm tra kết nối và log
     const checkConnections = () => {

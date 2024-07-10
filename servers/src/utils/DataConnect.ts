@@ -3,8 +3,8 @@ import sql, { ConnectionPool, config as SqlConfig, IResult } from "mssql";
 const config: SqlConfig = {
   user: "sa",
   password: "password123@",
-  server: "localhost",
-  database: "master", // Ensure the default database is 'master'
+  server: "113.173.16.55",
+  database: "Course", // Ensure the default database is 'master'
   port: 1447,
   options: {
     encrypt: false,
@@ -50,7 +50,7 @@ class DataConnect {
       const request = this.pool.request();
       const fullQuery = `USE ${config.database}; ${query}`;
       const result: IResult<any> = await request.query(fullQuery);
-      return result.recordsets;
+      return result.recordset;
     } catch (error: any) {
       throw new Error(`Query failed: ${error.message}`);
     }
@@ -69,11 +69,9 @@ class DataConnect {
       }
       const request = this.pool.request();
       for (const [key, value] of Object.entries(params)) {
-        console.log(key, value);
-        request.input(key.replace("@", ""), value); // Remove '@' before adding to request
+        request.input(key, value); // Directly use the key
       }
       const fullQuery = `USE ${config.database}; ${query}`;
-      console.log(fullQuery);
       const result: IResult<any> = await request.query(fullQuery);
       return result.recordset;
     } catch (error: any) {

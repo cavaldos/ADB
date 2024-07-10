@@ -20,7 +20,7 @@ portfinder
         `\n  🚀  ➜ Local:    `,
         color.blue(`http://localhost:${PORT}`)
       );
-      console.log(`  🚀  ➜ Network:  `, color.green(`http://${IP}:${PORT}\n`));
+      console.log(`  🚀  ➜ Network:  `, color.green(`http://${IP}:${PORT}`));
     });
 
     server.on("error", (error: any) => {

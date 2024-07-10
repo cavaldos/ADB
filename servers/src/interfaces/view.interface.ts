@@ -17,7 +17,7 @@ export interface VW_LessonsList {
   LessonType: string;
   CourseID: number;
   TopicID: number;
-  LesssonList : VW_LessonsProcess[];
+  LesssonList: VW_LessonsProcess[];
 }
 
 export interface VW_Question {
@@ -78,21 +78,55 @@ export interface VW_User {
 }
 
 export interface VW_Admin {
-  AdminID: number;
   UserID: number;
+  UserName: string;
+  Password: string;
+  Email: string;
+  FullName: string;
+  Phone: string;
+  Address: string;
+  Role: "Admin";
+  CreatedTime: Date;
+  UpdateTime: Date;
+  //
+  AdminID: number;
 }
 
 export interface VW_Student {
+  UserID: number;
+  UserName: string;
+  Password: string;
+  Email: string;
+  FullName: string;
+  Phone: string;
+  Address: string;
+  Role: "Student";
+  CreatedTime: Date;
+  UpdateTime: Date;
+  //
   StudentID: number;
   SchoolYear: string;
-  UserID: number;
+  Education: VW_Education[];
 }
 
 export interface VW_Instructor {
+  UserID: number;
+  UserName: string;
+  Password: string;
+  Email: string;
+  FullName: string;
+  Phone: string;
+  Address: string;
+  Role: "Instructor";
+  CreatedTime: Date;
+  UpdateTime: Date;
+  //
   InstructorID: number;
   Level: "Beginner" | "Intermediate" | "Advanced";
   Status: "Pending" | "Done";
-  UserID: number;
+  Company: VW_Company[];
+  Certificate: VW_Certificate[];
+  Education: VW_Education[];
 }
 
 export interface VW_Education {
@@ -135,6 +169,7 @@ export interface VW_Course {
 }
 
 export interface VW_CourseHistory {
+  length: number;
   CourseHistoryID: number;
   Title: string;
   Subtitle: string;
