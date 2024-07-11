@@ -168,6 +168,7 @@ const InstructorController = {
       });
     }
   },
+  
 };
 
 export default InstructorController;

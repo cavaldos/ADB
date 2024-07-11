@@ -40,7 +40,7 @@ const ForumRepo = {
         DiscussionForumID: forumMessageID,
         UserID: userID,
       };
-      return await DataConnect.executeWithParams(proc, params);
+      return await DataConnect.executeProcedure(proc, params);
     } catch (error: any) {
       throw new Error(`Error starting learn process: ${error.message}`);
     }

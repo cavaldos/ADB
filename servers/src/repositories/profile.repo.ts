@@ -45,7 +45,7 @@ const ProfileRepo = {
   async deleteCertificate(certificateID: number) {
     try {
       const proc =
-        "delete from certificate where CertificateID = @CertificateID";
+        "delete from Certificate where CertificateID = @CertificateID";
       const params = {
         CertificateID: certificateID,
       };
@@ -110,7 +110,7 @@ const ProfileRepo = {
   // 7. delete Education
   async deleteEducation(educationID: number) {
     try {
-      const proc = "delete from education where EducationID = @EducationID";
+      const proc = "delete from Education where EducationID = @EducationID";
       const params = {
         EducationID: educationID,
       };
