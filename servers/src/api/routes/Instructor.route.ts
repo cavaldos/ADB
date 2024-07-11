@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { InstructorController, LessonController } from "../controllers";
-import LessonService from "../services/Lesson.sv";
 const InstructorRouter = Router();
 //1.
 InstructorRouter.post("/create_course", InstructorController.createCourse);
@@ -103,7 +102,11 @@ InstructorRouter.post(
   "/get_lesson_test_by_id",
   LessonController.getLessonsTestByID
 );
-
+//21. get all Question test by lessonTestID
+InstructorRouter.post(
+  "/get_all_question_test_by_id",
+  LessonController.getAllQuestionsByTest
+);
 //========
 //21. get all Lesson by courseID
 InstructorRouter.post(

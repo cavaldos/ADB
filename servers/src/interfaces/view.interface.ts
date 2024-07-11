@@ -20,6 +20,23 @@ export interface VW_LessonsList {
   LesssonList: VW_LessonsProcess[];
 }
 
+export interface VW_Lesson {
+  CourseID: number;
+  LessonsID: number;
+  LessonVideoID?: number;
+  LessonDocumentID?: number;
+  LessonTestID?: number;
+  Title: string;
+  URL?: string;
+  Duration: number;
+  ComplexityLevel: string;
+  CreatedTime: string;
+  UpdatedTime: string;
+  LessonType: string;
+  TopicID: number;
+  TopicName: string;
+}
+
 export interface VW_Question {
   QuestionID: number;
   QuestionContent: string;

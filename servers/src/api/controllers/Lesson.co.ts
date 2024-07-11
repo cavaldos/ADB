@@ -245,10 +245,11 @@ const LessonController = {
   // 11. Add Question to Lesson Test
   async addQuestionToTest(req: Request, res: Response) {
     try {
-      const { lessonTestID, question, option1, option2, option3, answer } =
+      const { lessonTestID,title, question, option1, option2, option3, answer } =
         req.body;
       await LessonRepo.addQuestionToTest(
         lessonTestID,
+        title,
         question,
         option1,
         option2,
@@ -338,7 +339,26 @@ const LessonController = {
       });
     }
   },
-
+  // 14.1 Get all questions by lessonTestID
+  async getAllQuestionsByTest(req: Request, res: Response) {
+    try {
+      const { lessonTestID } = req.body;
+      const questions = await LessonRepo.getAllQuestionsTest(
+        Number(lessonTestID)
+      );
+      return res.status(200).json({
+        message: "All questions fetched successfully",
+        status: 200,
+        data: questions,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+  //=============================
   // 15. Delete Lesson
   async deleteLesson(req: Request, res: Response) {
     try {

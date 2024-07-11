@@ -1,5 +1,7 @@
 import DataConnect from "../utils/DataConnect";
 
+import _ from "lodash";
+
 const LessonRepo = {
   // 1. Create Lesson Video
   async createLessonVideo(
@@ -219,6 +221,7 @@ const LessonRepo = {
   async addQuestionToTest(
     lessonTestID: number,
     question: string,
+    title: string,
     option1: string,
     option2: string,
     option3: string,
@@ -228,7 +231,7 @@ const LessonRepo = {
       const proc = "add_question_lessontest";
       const params = {
         QuestionContent: question,
-        Title: question,
+        Title: title,
         LessonTestID: lessonTestID,
         Answer1: option1,
         Answer2: option2,
@@ -304,6 +307,44 @@ const LessonRepo = {
       throw new Error(`Error fetching lesson test: ${error.message}`);
     }
   },
+  // 10.1 get all questions test
+  async getAllQuestionsTest(lessonTestID: number) {
+    try {
+      const query = `SELECT 
+                    q.LessonTestID,
+                    q.QuestionID,
+                    q.QuestionContent,
+                    q.Title,
+                    a.AnswerID,
+                    a.AnswerText,
+                    a.IsCorrect
+                FROM Question q
+                JOIN Answer a ON q.QuestionID = a.QuestionID
+                WHERE q.LessonTestID = @lessonTestID
+                ORDER BY q.QuestionID, a.AnswerID;`;
+      const data = await DataConnect.executeWithParams(query, {lessonTestID});
+
+      const groupedData = _.chain(data)
+        .groupBy("QuestionID")
+        .map((value, key) => ({
+          QuestionID: parseInt(key),
+          LessonTestID: value[0].LessonTestID,
+          QuestionContent: value[0].QuestionContent,
+          Title: value[0].Title,
+          Answers: value.map((ans) => ({
+            AnswerID: ans.AnswerID,
+            AnswerText: ans.AnswerText,
+            IsCorrect: ans.IsCorrect,
+          })),
+        }))
+        .value();
+
+      return groupedData;
+    } catch (error: any) {
+      throw new Error(`Error fetching questions test: ${error.message}`);
+    }
+  },
+  //==============================
   // 11. Delete Lesson
   async deleteLesson(lessonsID: number) {
     try {
