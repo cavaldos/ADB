@@ -22,5 +22,14 @@ PublicRouter.post("/update_bank_account", GlobalController.updateBankAccount);
 PublicRouter.post("/transfer_money", GlobalController.transferMoney);
 // 9. create transfer course
 PublicRouter.post("/create_transfer_course", GlobalController.createTransferCourse);
+// 10. get bank account by userID
+PublicRouter.post("/get_bank_account", GlobalController.getBankAccountByUserID);
+// 11. get all transfer course
+PublicRouter.post("/get_all_transfer", GlobalController.getAllTransfer);
 
+
+// 12. chat
+PublicRouter.post("/create_chat", GlobalController.createChat);
+// 13. get chat by userID
+PublicRouter.post("/get_all_chat", GlobalController.getAllChat);
 export default PublicRouter;

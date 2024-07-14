@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { VW_Course, VW_CourseHistory } from "../../interfaces/view.interface";
 import CourseRepo from "../../repositories/course.repo";
-
+import CategoryRepo from "../../repositories/category.repo";
+import TaxRepo from "../../repositories/tax.repo";
 const InstructorController = {
   //1. create a new course
   async createCourse(req: Request, res: Response) {
@@ -168,7 +169,213 @@ const InstructorController = {
       });
     }
   },
-  
+  //6. get all Category
+  async getAllCategory(res: Response) {
+    try {
+      const result = await CategoryRepo.getAllCategory();
+      return res.status(200).json({
+        message: "Get all category",
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+  //7. get category by ID
+  async getCategoryByID(req: Request, res: Response) {
+    try {
+      const { categoryID } = req.body;
+      const result = await CategoryRepo.getCategoryById(categoryID);
+      if (result.length === 0) {
+        return res.status(404).json({
+          message: "Category not found",
+          status: 404,
+          data: null,
+        });
+      }
+      return res.status(200).json({
+        message: "Get category by ID",
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+  //8. create category
+  async createCategory(req: Request, res: Response) {
+    try {
+      const { name, description, parentCategoryID } = req.body;
+      await CategoryRepo.createCategory(name, description, parentCategoryID);
+      return res.status(201).json({
+        message: "Category created successfully",
+        status: 201,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+
+  //9. update category
+  async updateCategory(req: Request, res: Response) {
+    try {
+      const { categoryID, name, description, parentCategoryID } = req.body;
+      await CategoryRepo.updateCategory(
+        categoryID,
+        name,
+        description,
+        parentCategoryID
+      );
+      return res.status(200).json({
+        message: "Category updated successfully",
+        status: 200,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+  //10. delete category
+  async deleteCategory(req: Request, res: Response) {
+    try {
+      const { categoryID } = req.body;
+      await CategoryRepo.deleteCategory(categoryID);
+      return res.status(200).json({
+        message: "Category deleted successfully",
+        status: 200,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+
+  // 11. create Discount
+  async createDiscount(req: Request, res: Response) {
+    try {
+      const { percentage, quantity, courseID, expiredDate } = req.body;
+      await CategoryRepo.createDiscount(
+        percentage,
+        quantity,
+        courseID,
+        expiredDate
+      );
+      return res.status(201).json({
+        message: "Discount created successfully",
+        status: 201,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+  // update Discount
+  async updateDiscount(req: Request, res: Response) {
+    try {
+      const { discountID, percentage, quantity, expiredDate } = req.body;
+      await CategoryRepo.updateDiscount(
+        discountID,
+        percentage,
+        quantity,
+        expiredDate
+      );
+      return res.status(200).json({
+        message: "Discount updated successfully",
+        status: 200,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+  // delete Discount
+  async deleteDiscount(req: Request, res: Response) {
+    try {
+      const { discountID } = req.body;
+      await CategoryRepo.deleteDiscount(discountID);
+      return res.status(200).json({
+        message: "Discount deleted successfully",
+        status: 200,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+  //4. get all discounts
+  async getAllDiscounts(req:Request ,res: Response) {
+    try {
+      const { courseID } = req.body;
+      const result = await CategoryRepo.getAllDiscounts(courseID);
+      return res.status(200).json({
+        message: "Get all discounts",
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+  //tax
+  //1. create tax report
+  async createTaxReport(req: Request, res: Response) {
+    try {
+      const { instructorID } = req.body;
+      await TaxRepo.createTaxReport(instructorID);
+      return res.status(201).json({
+        message: "Tax report created successfully",
+        status: 201,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+  //2 get tax report by instructorID
+  async getTaxReport(req: Request, res: Response) {
+    try {
+      const { instructorID } = req.body;
+      const result = await TaxRepo.getTaxReport(instructorID);
+      return res.status(200).json({
+        message: "Get tax report by instructorID",
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
 };
 
 export default InstructorController;

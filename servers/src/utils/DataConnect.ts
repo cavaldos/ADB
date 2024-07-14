@@ -3,9 +3,10 @@ import sql, { ConnectionPool, config as SqlConfig, IResult } from "mssql";
 const config: SqlConfig = {
   user: "sa",
   password: "password123@",
-  server: "113.173.16.55",
-  database: "Course", // Ensure the default database is 'master'
-  port: 1447,
+  // server: "113.173.16.55",
+  server: "localhost",
+  database: "ADB", // Ensure the default database is 'master'
+  port: 1444,
   options: {
     encrypt: false,
     trustServerCertificate: true,
@@ -28,7 +29,7 @@ class DataConnect {
       }
       if (!this.pool.connected) {
         await this.pool.connect();
-        console.log("Connected to SQL Server 🎉");
+        console.log(`\t Connected to SQL Server at ${config.server} ${config.database} ${config.port} 🎉`);
       }
     } catch (error: any) {
       this.pool = null;

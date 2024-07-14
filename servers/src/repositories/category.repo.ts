@@ -10,10 +10,10 @@ const CategoryRepo = {
       throw new Error(`Error fetching categories: ${error.message}`);
     }
   },
-  async getCategoryById(id: number) {
+  async getCategoryById(categoryID: number) {
     try {
       const query = `SELECT * FROM Category WHERE CategoryID = @id;`;
-      return await DataConnect.executeWithParams(query, { id });
+      return await DataConnect.executeWithParams(query, { categoryID });
     } catch (error: any) {
       throw new Error(`Error fetching category: ${error.message}`);
     }
@@ -46,18 +46,18 @@ const CategoryRepo = {
   // AS
   // 3. update category
   async updateCategory(
-    CategoryID: number,
-    CategoryName: string,
-    CategoryDescription: string,
-    ParentCategoryID: number
+    categoryID: number,
+    categoryName: string,
+    categoryDescription: string,
+    parentCategoryID: number
   ) {
     try {
       const proc = "update_category";
       const params = {
-        CategoryID,
-        CategoryName,
-        CategoryDescription,
-        ParentCategoryID,
+        CategoryID: categoryID,
+        CategoryName: categoryName,
+        CategoryDescription: categoryDescription,
+        ParentCategoryID: parentCategoryID,
       };
       return await DataConnect.executeProcedure(proc, params);
     } catch (error: any) {
@@ -76,7 +76,7 @@ const CategoryRepo = {
       throw new Error(`Error deleting category: ${error.message}`);
     }
   },
-
+  ////===============================
   //5. create Discount
   async createDiscount(
     percentage: number,
@@ -130,6 +130,16 @@ const CategoryRepo = {
       return await DataConnect.executeProcedure(proc, params);
     } catch (error: any) {
       throw new Error(`Error deleting discount: ${error.message}`);
+    }
+  },
+
+  //8. get all discount
+  async getAllDiscounts(courseID: number) {
+    try {
+      const query = `SELECT * FROM Discount WHERE CourseID = @courseID;`;
+      return await DataConnect.executeWithParams(query, { courseID });
+    } catch (error: any) {
+      throw new Error(`Error fetching discounts: ${error.message}`);
     }
   },
 };

@@ -1,6 +1,14 @@
 import { Router } from "express";
 import { AdminController } from "../controllers";
 const AdminRouter = Router();
-AdminRouter.post("/p", AdminController.createProduct);
+
+
+// 1. create tax setting
+AdminRouter.post("/create_tax_setting", AdminController.createTaxSetting);
+// 2. update tax setting
+AdminRouter.post("/update_tax_setting", AdminController.updateTaxSetting);
+// 3. get all tax setting
+AdminRouter.post("/get_all_tax_setting", AdminController.getAllTaxSetting);
+
 
 export default AdminRouter;

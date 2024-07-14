@@ -3,11 +3,11 @@ import DataConnect from "../utils/DataConnect";
 const BankAccountRepo = {
   // 1. Create bank account
   async createBankAccount(
+    userID: number,
     accountNumber: string,
     accountHolderName: string,
     accountBalance: number,
-    bankName: string,
-    userID: number
+    bankName: string
   ) {
     try {
       const proc = "create_bank_account";
@@ -18,6 +18,7 @@ const BankAccountRepo = {
         BankName: bankName,
         UserID: userID,
       };
+
       return await DataConnect.executeProcedure(proc, params);
     } catch (error: any) {
       throw new Error(`Error starting learn process: ${error.message}`);
@@ -34,7 +35,7 @@ const BankAccountRepo = {
     userID: number
   ) {
     try {
-      const proc = "create_bank_account";
+      const proc = "update_bank_account";
       const params = {
         BankAccountID: bankAccountID,
         AccountNumber: accountNumber,
@@ -52,7 +53,7 @@ const BankAccountRepo = {
   // 3. Transfer Money
   async transferMoney(bankAccountID: number, amount: number, type: string) {
     try {
-      const proc = "create_bank_account";
+      const proc = "transfer_money";
       const params = {
         BankAccountID: bankAccountID,
         Amount: amount,
@@ -65,7 +66,6 @@ const BankAccountRepo = {
   },
   // 4. Create Transfer Course
   async createTransferCourse(
-    userID: number,
     amount: number,
     transferDescription: string,
     bankBeneficiaryID: number,
@@ -74,7 +74,6 @@ const BankAccountRepo = {
     try {
       const proc = "create_transfer_course";
       const params = {
-        UserID: userID,
         Amount: amount,
         TransferDescription: transferDescription,
         BankBeneficiaryID: bankBeneficiaryID,
@@ -85,8 +84,28 @@ const BankAccountRepo = {
       throw new Error(`Error starting learn process: ${error.message}`);
     }
   },
-
-  //
+  // get bank account by userID
+  async getBankAccountByUserID(userID: number) {
+    try {
+      const query = `SELECT ba.BankAccountID,ba.AccountHolderName,ba.AccountBalance,ba.BankName,u.UserName,u.FullName,u.Role 
+                      from BankAccount  ba
+                      JOIN [User] u ON ba.UserID = [u].UserID
+                      WHERE u.UserID = @userID;`;
+      const result = await DataConnect.executeWithParams(query, { userID });
+      return result;
+    } catch (error: any) {
+      throw new Error(`Error fetching bank account: ${error.message}`);
+    }
+  },
+  // get all transfer 
+  async getAllTransfer() {
+    try {
+      const query = `SELECT * FROM Transfer;`;
+      return await DataConnect.execute(query);
+    } catch (error: any) {
+      throw new Error(`Error fetching transfer: ${error.message}`);
+    }
+  },
 };
 
 export default BankAccountRepo;

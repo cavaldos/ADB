@@ -3,6 +3,8 @@ import { VW_Course } from "../../interfaces/view.interface";
 import UserService from "../services/User.sv";
 import CourseRepo from "../../repositories/course.repo";
 import BankAccountRepo from "../../repositories/bankAccount.repo";
+import ChatRepo from "../../repositories/chat.repo";
+import _ from "lodash";
 const GlobalController = {
   //1. get all courses with pagination
   async getAllCourses(req: Request, res: Response) {
@@ -159,6 +161,7 @@ const GlobalController = {
         accountBalance,
         bankName,
       } = req.body;
+
       const result = await BankAccountRepo.createBankAccount(
         userID,
         accountNumber,
@@ -166,6 +169,7 @@ const GlobalController = {
         accountBalance,
         bankName
       );
+
       return res.status(200).json({
         message: `Create bank account for UserID: ${userID}`,
         status: 200,
@@ -173,7 +177,7 @@ const GlobalController = {
       });
     } catch (error: any) {
       return res.status(500).json({
-        message: `Error: ${error.message}`,
+        message: `Errors: ${error.message}`,
         status: 500,
         data: null,
       });
@@ -237,28 +241,99 @@ const GlobalController = {
   // 9.  Create Transfer Course
   async createTransferCourse(req: Request, res: Response) {
     try {
-      const {
-        courseID,
-        amount,
-        transferDescription,
-        bankBeneficiaryID,
-        bankOrderingID,
-      } = req.body;
+      const { amount, transferDescription, bankBeneficiaryID, bankOrderingID } =
+        req.body;
       await BankAccountRepo.createTransferCourse(
-        courseID,
         amount,
         transferDescription,
         bankBeneficiaryID,
         bankOrderingID
       );
       return res.status(200).json({
-        message: `Transfer course: ${courseID} to instructor: ${bankBeneficiaryID}`,
+        message: `Transfer course for UserID: ${bankOrderingID}`,
         status: 200,
       });
     } catch (error: any) {
       return res.status(500).json({
         message: `Error: ${error.message}`,
         status: 500,
+      });
+    }
+  },
+  // 10. get bank account by userID
+  async getBankAccountByUserID(req: Request, res: Response) {
+    try {
+      const { userID } = req.body;
+      const result = await BankAccountRepo.getBankAccountByUserID(userID);
+      return res.status(200).json({
+        message: `Get bank account by UserID: ${userID}`,
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+
+  // 11. get all get all transfer
+  async getAllTransfer(req: Request, res: Response) {
+    try {
+      const { invoiceID } = req.body;
+      const result = await BankAccountRepo.getAllTransfer();
+      return res.status(200).json({
+        message: `Get all transfer`,
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+
+  // 12.create chat
+  async createChat(req: Request, res: Response) {
+    try {
+      const { chatContent, sendChatID, receiveChatID } = req.body;
+      await ChatRepo.createChat(chatContent, sendChatID, receiveChatID);
+      return res.status(200).json({
+        message: `Create chat ${chatContent} from ${sendChatID} to ${receiveChatID}`,
+        status: 200,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+  // 13. get all chat
+  async getAllChat(req: Request, res: Response) {
+    try {
+      const { sendChatID, receiveChatID } = req.body;
+      const sendResult = await ChatRepo.getAllChat(sendChatID, receiveChatID);
+      const receiveResult = await ChatRepo.getAllChat(
+        receiveChatID,
+        sendChatID
+      );
+      const result = _.unionBy(sendResult, receiveResult, "ChatID");
+      return res.status(200).json({
+        message: `Get all chat`,
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
       });
     }
   },

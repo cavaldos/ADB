@@ -117,4 +117,39 @@ InstructorRouter.post(
 //20. Delete lesson
 InstructorRouter.post("/delete_lesson", LessonController.deleteLesson);
 
+
+//=====================Category=========================
+//1. create category
+InstructorRouter.post("/create_category", InstructorController.createCategory);
+//2. update category
+InstructorRouter.post("/update_category", InstructorController.updateCategory);
+//3. delete category
+InstructorRouter.post("/delete_category", InstructorController.deleteCategory);
+//4. get all categories
+InstructorRouter.post(
+  "/get_all_categories",
+  InstructorController.getAllCategory
+);
+//5. get category by ID
+InstructorRouter.post("/get_category_by_id", InstructorController.getCategoryByID);
+
+//=====================Discount=========================
+//1. create discount
+InstructorRouter.post("/create_discount", InstructorController.createDiscount);
+//2. update discount
+InstructorRouter.post("/update_discount", InstructorController.updateDiscount);
+//3. delete discount
+InstructorRouter.post("/delete_discount", InstructorController.deleteDiscount);
+//4. get all discounts
+InstructorRouter.post(
+  "/get_all_discounts",
+  InstructorController.getAllDiscounts
+);
+
+// create tax report
+InstructorRouter.post("/create_tax_report", InstructorController.createTaxReport);
+// get tax report by instructorID
+InstructorRouter.post("/get_tax_report", InstructorController.getTaxReport);
+
+
 export default InstructorRouter;
