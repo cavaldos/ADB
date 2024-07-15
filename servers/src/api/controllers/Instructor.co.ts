@@ -170,21 +170,23 @@ const InstructorController = {
     }
   },
   //6. get all Category
-  async getAllCategory(res: Response) {
-    try {
-      const result = await CategoryRepo.getAllCategory();
-      return res.status(200).json({
-        message: "Get all category",
-        status: 200,
-        data: result,
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        message: `Error: ${error.message}`,
-        status: 500,
-        data: null,
-      });
-    }
+  async getAllCategory(req: Request,res: Response) {
+   try {
+    const result = await CategoryRepo.getAllCategory();
+    console.log(req.body);
+    return res.status(200).json({
+      message: "Get all category",
+      status: 200,
+      data: result,
+    });
+  } catch (error: any) {
+    // Handle any errors and return a 500 status
+    return res.status(500).json({
+      message: `Error: ${error.message}`,
+      status: 500,
+      data: null,
+    });
+  }
   },
   //7. get category by ID
   async getCategoryByID(req: Request, res: Response) {

@@ -46,9 +46,10 @@ const AdminController = {
     }
   },
   // get all tax setting
-  async getAllTaxSetting(res: Response) {
+  async getAllTaxSetting(req:Request,res: Response) {
     try {
       const result = await TaxRepo.getAllTaxSetting();
+      console.log(req.body);
       return res.status(200).json({
         message: `Tax settings fetched successfully`,
         status: 200,

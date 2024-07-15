@@ -23,7 +23,8 @@ app.use(json());
 app.use(helmet());
 app.use(morgan("tiny"));
 app.use(routers);
-app.get("/helloword", (req, res) => {
+app.get("/hello", (req, res) => {
+  console.log(req.body);
   res.send("Hello World");
 });
 export default app;

@@ -5,8 +5,8 @@ const config: SqlConfig = {
   password: "password123@",
   // server: "113.173.16.55",
   server: "localhost",
-  database: "ADB", // Ensure the default database is 'master'
-  port: 1444,
+  database: "adbNguyen", // Ensure the default database is 'master'
+  port: 1447,
   options: {
     encrypt: false,
     trustServerCertificate: true,

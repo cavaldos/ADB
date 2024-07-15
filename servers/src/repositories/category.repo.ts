@@ -12,7 +12,7 @@ const CategoryRepo = {
   },
   async getCategoryById(categoryID: number) {
     try {
-      const query = `SELECT * FROM Category WHERE CategoryID = @id;`;
+      const query = `SELECT * FROM Category WHERE CategoryID = @categoryID;`;
       return await DataConnect.executeWithParams(query, { categoryID });
     } catch (error: any) {
       throw new Error(`Error fetching category: ${error.message}`);
