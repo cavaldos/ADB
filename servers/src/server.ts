@@ -18,7 +18,7 @@ portfinder
     const server = app.listen(PORT, host, () => {
       console.log(
         `\n  🚀  ➜ Local:    `,
-        color.blue(`http://localhost:${PORT}`)
+        color.blue(`http://${process.env.HOSTING}:${PORT}`)
       );
       console.log(`  🚀  ➜ Network:  `, color.green(`http://${IP}:${PORT}`));
     });

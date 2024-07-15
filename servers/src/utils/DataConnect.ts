@@ -35,7 +35,7 @@ class DataConnect {
         console.log(
           `\n  🚀  ➜ Connected to SQL Server at  `,
           color.yellow(
-            `http://localhost:${config.server} < ${config.database} > < ${config.port} > `
+            `${config.server} < ${config.database} > < ${config.port} > `
           )
         );
       }
