@@ -47,7 +47,7 @@ const data = {
 const procedureName = 'create_category';
 
 // Số lượng câu lệnh cần tạo
-const count = 1000;
+const count = 10000;
 
 // Tạo các câu lệnh SQL
 const sqlStatements = generateSQL(procedureName, data, count);

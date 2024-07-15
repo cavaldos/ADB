@@ -168,7 +168,7 @@ CREATE TABLE [Category] (
   [CategoryID] integer PRIMARY KEY IDENTITY(1, 1),
   [CategoryName] varchar(20) UNIQUE,
   [CategoryDescription] nvarchar(500),
-  [ParentCategoryID] integer
+  [ParentCategoryID] integer DEFAULT (null)
 )
 GO
 
@@ -264,7 +264,13 @@ CREATE TABLE [Transfer] (
   [TransferDescription] nvarchar(500),
   [BankBeneficiaryID] integer,
   [BankOrderingID] integer,
-  [UserID] integer
+  [TransferTotalID] integer DEFAULT (null)
+)
+GO
+
+CREATE TABLE [TransferTotal] (
+  [TransferTotalID] integer PRIMARY KEY IDENTITY(1, 1),
+  [InvoiceID] integer
 )
 GO
 
@@ -273,7 +279,7 @@ CREATE TABLE [BankAccount] (
   [AccountNumber] varchar(20) UNIQUE,
   [AccountHolderName] varchar(20),
   [AccountBalance] float,
-  [BankName] varchar(10) UNIQUE,
+  [BankName] varchar(10),
   [UserID] integer
 )
 GO
@@ -312,7 +318,7 @@ GO
 
 CREATE TABLE [TaxSetting] (
   [TaxSettingID] integer PRIMARY KEY IDENTITY(1, 1),
-  [TaxPercentage] float DEFAULT (0.1),
+  [TaxPercentage] float DEFAULT (10),
   [EffectiveDate] datetime,
   [UpdateDate] datetime
 )
@@ -447,7 +453,10 @@ GO
 ALTER TABLE [Transfer] ADD FOREIGN KEY ([BankOrderingID]) REFERENCES [BankAccount] ([BankAccountID])
 GO
 
-ALTER TABLE [Transfer] ADD FOREIGN KEY ([UserID]) REFERENCES [User] ([UserID])
+ALTER TABLE [Transfer] ADD FOREIGN KEY ([TransferTotalID]) REFERENCES [TransferTotal] ([TransferTotalID])
+GO
+
+ALTER TABLE [TransferTotal] ADD FOREIGN KEY ([InvoiceID]) REFERENCES [Invoice] ([InvoiceID])
 GO
 
 ALTER TABLE [BankAccount] ADD FOREIGN KEY ([UserID]) REFERENCES [User] ([UserID])

@@ -40,9 +40,9 @@ function generateSQL(procedureName, data, count) {
             } else if (data[key] === 'Status') {
                 fakeData[key] = faker.helpers.arrayElement(['Hide', 'Free', 'Plus']);
             } else if (data[key] === 'CategoryID') {
-                fakeData[key] = faker.datatype.number({ min: 1, max: 35 });
+                fakeData[key] = faker.datatype.number({ min: 1, max: 22 });
             } else if (data[key] === 'InstructorID') {
-                fakeData[key] = faker.datatype.number({ min: 1, max: 9000 });
+                fakeData[key] = faker.datatype.number({ min: 1, max: 1000 });
             }
         }
 
@@ -78,7 +78,7 @@ const data = {
 const procedureName = 'create_course';
 
 // Số lượng câu lệnh cần tạo
-const count = 100000;
+const count = 5000;
 
 // Tạo các câu lệnh SQL
 const sqlStatements = generateSQL(procedureName, data, count);

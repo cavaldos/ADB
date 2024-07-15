@@ -200,6 +200,10 @@ BEGIN
     END CATCH
 END;
 GO
+
+
+
+
 -- 7. Create the procedure to delete category
 IF OBJECT_ID('delete_category', 'P') IS NOT NULL
     DROP PROCEDURE delete_category;
@@ -209,18 +213,29 @@ CREATE PROCEDURE delete_category
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
+        BEGIN TRANSACTION;
+        
+        -- Kiểm tra xem danh mục có tồn tại không
         IF EXISTS (SELECT 1 FROM [Category] WHERE CategoryID = @CategoryID)
         BEGIN
-            DELETE FROM [Category]
-            WHERE CategoryID = @CategoryID;
-            PRINT 'Category deleted successfully.';
+            -- Kiểm tra xem danh mục có được sử dụng trong bảng Course không
+            IF EXISTS (SELECT 1 FROM [Course] WHERE CategoryID = @CategoryID)
+            BEGIN
+                PRINT 'Category is being used in Course table and cannot be deleted.';
+            END
+            ELSE
+            BEGIN
+                DELETE FROM [Category]
+                WHERE CategoryID = @CategoryID;
+                PRINT 'Category deleted successfully.';
+            END
         END
         ELSE
         BEGIN
             PRINT 'Category does not exist.';
         END
-    COMMIT TRANSACTION;
+
+        COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -277,31 +292,48 @@ CREATE PROCEDURE create_course
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
-        IF NOT EXISTS (SELECT 1 FROM [Course] WHERE Title = @Title AND InstructorID = @InstructorID)
+        BEGIN TRANSACTION;
+        
+        -- Check if InstructorID exists
+        IF NOT EXISTS (SELECT 1 FROM [Instructor] WHERE InstructorID = @InstructorID)
         BEGIN
-            INSERT INTO [Course] (Title, Subtitle, Description, Language, Image, Price, Status, CreateTime, CategoryID, InstructorID)
-            VALUES (@Title, @Subtitle, @Description, @Language, @Image, @Price, @Status, GETDATE(), @CategoryID, @InstructorID);
-            PRINT 'Course created successfully.';
+            RAISERROR ('InstructorID does not exist.', 16, 1);
+            RETURN;
         END
-        ELSE
+        
+        -- Check if CategoryID exists
+        IF NOT EXISTS (SELECT 1 FROM [Category] WHERE CategoryID = @CategoryID)
         BEGIN
-            PRINT 'This course has already been created by you.';
+            RAISERROR ('CategoryID does not exist.', 16, 1);
+            RETURN;
         END
-    COMMIT TRANSACTION;
+        
+        -- Check if the course already exists for the given title and instructor
+        IF EXISTS (SELECT 1 FROM [Course] WHERE Title = @Title AND InstructorID = @InstructorID)
+        BEGIN
+            RAISERROR ('This course has already been created by you.', 16, 1);
+            RETURN;
+        END
+        
+        -- Insert new course
+        INSERT INTO [Course] (Title, Subtitle, Description, Language, Image, Price, Status, CreateTime, CategoryID, InstructorID)
+        VALUES (@Title, @Subtitle, @Description, @Language, @Image, @Price, @Status, GETDATE(), @CategoryID, @InstructorID);
+        
+        COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        PRINT 'Error occurred while creating course.';
+        RAISERROR ('Error occurred while creating course: %s', 16, 1);
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
+
 -- 10. Create the procedure to update course
-IF OBJECT_ID('update_ourse', 'P') IS NOT NULL
-    DROP PROCEDURE update_ourse;
+IF OBJECT_ID('update_course', 'P') IS NOT NULL
+    DROP PROCEDURE update_course;
 GO
-CREATE PROCEDURE update_ourse
+CREATE PROCEDURE update_course
     @CourseID integer,
     @Title varchar(255),
     @Subtitle varchar(255),
@@ -314,14 +346,22 @@ CREATE PROCEDURE update_ourse
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
+        BEGIN TRANSACTION;
+        
         DECLARE @OldTitle varchar(255),
                 @OldSubtitle varchar(255),
                 @OldDescription nvarchar(max),
                 @OldLanguage varchar(20),
                 @OldImage varchar(50),
                 @OldPrice float,
-                @OldStatus nvarchar(20);
+                @OldStatus nvarchar(20),
+                @NewTitle varchar(255),
+                @NewSubtitle varchar(255),
+                @NewDescription nvarchar(max),
+                @NewLanguage varchar(20),
+                @NewImage varchar(50),
+                @NewPrice float,
+                @NewStatus nvarchar(20);
 
         -- Get the current course information
         SELECT @OldTitle = Title, @OldSubtitle = Subtitle, @OldDescription = Description, 
@@ -329,35 +369,44 @@ BEGIN
         FROM [Course]
         WHERE CourseID = @CourseID;
 
+        -- Set new values only if they are provided, otherwise use old values
+        SET @NewTitle = ISNULL(NULLIF(@Title, ''), @OldTitle);
+        SET @NewSubtitle = ISNULL(NULLIF(@Subtitle, ''), @OldSubtitle);
+        SET @NewDescription = ISNULL(NULLIF(@Description, ''), @OldDescription);
+        SET @NewLanguage = ISNULL(NULLIF(@Language, ''), @OldLanguage);
+        SET @NewImage = ISNULL(NULLIF(@Image, ''), @OldImage);
+        SET @NewPrice = ISNULL(NULLIF(@Price, 0), @OldPrice);
+        SET @NewStatus = ISNULL(NULLIF(@Status, ''), @OldStatus);
+
         -- Check if any information has changed
-        IF @OldTitle <> @Title OR @OldSubtitle <> @Subtitle OR @OldDescription <> @Description OR
-           @OldLanguage <> @Language OR @OldImage <> @Image OR @OldPrice <> @Price OR @OldStatus <> @Status
+        IF @OldTitle <> @NewTitle OR @OldSubtitle <> @NewSubtitle OR @OldDescription <> @NewDescription OR
+           @OldLanguage <> @NewLanguage OR @OldImage <> @NewImage OR @OldPrice <> @NewPrice OR @OldStatus <> @NewStatus
         BEGIN
             -- Insert into CourseHistory
             INSERT INTO [CourseHistory] (Title, Subtitle, Description, Language, Image, Price, Status, 
-                                         UpdateTime, CourseID, HistoryMessage,Version)
+                                         UpdateTime, CourseID, HistoryMessage, Version)
             VALUES (@OldTitle, @OldSubtitle, @OldDescription, @OldLanguage, @OldImage, @OldPrice, @OldStatus, 
-                    GETDATE(), @CourseID,@HistoryMessage, (SELECT ISNULL(MAX(Version), 0) + 1 FROM CourseHistory WHERE CourseID = @CourseID));
+                    GETDATE(), @CourseID, @HistoryMessage, (SELECT ISNULL(MAX(Version), 0) + 1 FROM CourseHistory WHERE CourseID = @CourseID));
 
             -- Update the course information
             UPDATE [Course]
-            SET Title = @Title,
-                Subtitle = @Subtitle,
-                Description = @Description,
-                Language = @Language,
-                Image = @Image,
-                Price = @Price,
-                Status = @Status
+            SET Title = @NewTitle,
+                Subtitle = @NewSubtitle,
+                Description = @NewDescription,
+                Language = @NewLanguage,
+                Image = @NewImage,
+                Price = @NewPrice,
+                Status = @NewStatus
             WHERE CourseID = @CourseID;
 
             PRINT 'Course updated successfully.';
         END
         ELSE
         BEGIN
-            
             PRINT 'Information has not been changed.';
         END
-    COMMIT TRANSACTION;
+        
+        COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -406,17 +455,17 @@ BEGIN
     BEGIN TRY
     BEGIN TRANSACTION;
         SELECT 
-            c.ChatID AS idchat,
-            u1.UserID AS idmessage,
-            c.ChatContent AS chatcontent,
+            c.ChatID AS ChatID,
+            u1.UserID AS SenderID,
+            c.ChatContent AS ChatContent,
             c.SendTime AS time,
-            u1.FullName AS sender_name,
-            u2.FullName AS receiver_name
+            u1.FullName AS SenderName,
+            u2.FullName AS ReceiverName
         FROM 
             [Chat] c
-        JOIN 
+        full JOIN 
             [User] u1 ON c.SendChatID = u1.UserID
-        JOIN 
+        full JOIN 
             [User] u2 ON c.ReceiveChatID = u2.UserID
         WHERE 
             c.SendChatID = @SendChatID AND c.ReceiveChatID = @ReceiveChatID
@@ -433,10 +482,10 @@ END;
 GO
 
 -- 13. Create the procedure delete chat
-IF OBJECT_ID('deleteChat', 'P') IS NOT NULL
-    DROP PROCEDURE deleteChat;
+IF OBJECT_ID('delete_chat', 'P') IS NOT NULL
+    DROP PROCEDURE delete_chat;
 GO
-CREATE PROCEDURE deleteChat
+CREATE PROCEDURE delete_chat
     @ChatID integer,
     @UserID integer
 AS
@@ -664,7 +713,7 @@ GO
 --     @Content = 'This is the codntsfdefntd ofddc the 999first page.',
 --     @Page = 2;
 
--- 18. Create the procedure update page document
+-- 18. Create the procedure update page document --err
 IF OBJECT_ID('update_page_document', 'P') IS NOT NULL
     DROP PROCEDURE update_page_document;
 GO
@@ -676,26 +725,39 @@ CREATE PROCEDURE update_page_document
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
+        BEGIN TRANSACTION;
+
         -- Check if the page document exists
         IF NOT EXISTS (SELECT 1 FROM [PageDocument] WHERE PageDocumentID = @PageDocumentID)
         BEGIN
             PRINT 'Page document does not exist.';
             RETURN;
         END
-        -- Check if the page number already exists for the given lesson document (excluding the current page document)
-        IF EXISTS (SELECT 1 FROM [PageDocument] WHERE LessonDocumentID = @LessonDocumentID AND Page = @Page AND PageDocumentID <> @PageDocumentID)
-        BEGIN
-            PRINT 'Page number already exists for this lesson document.';
-            RETURN;
-        END
-        -- Update the page document
-        UPDATE [PageDocument]
-        SET Content = @Content, Page = @Page, LessonDocumentID = @LessonDocumentID
-        WHERE PageDocumentID = @PageDocumentID;
 
-    COMMIT TRANSACTION;
-    PRINT 'Page document updated successfully.';
+        -- If Content is empty or NULL, delete the page document
+        IF @Content IS NULL OR LTRIM(RTRIM(@Content)) = ''
+        BEGIN
+            DELETE FROM [PageDocument] WHERE PageDocumentID = @PageDocumentID;
+            PRINT 'Page document deleted successfully.';
+        END
+        ELSE
+        BEGIN
+            -- Check if the page number already exists for the given lesson document (excluding the current page document)
+            IF EXISTS (SELECT 1 FROM [PageDocument] WHERE LessonDocumentID = @LessonDocumentID AND Page = @Page AND PageDocumentID <> @PageDocumentID)
+            BEGIN
+                PRINT 'Page number already exists for this lesson document.';
+                RETURN;
+            END
+            
+            -- Update the page document
+            UPDATE [PageDocument]
+            SET Content = @Content, Page = @Page, LessonDocumentID = @LessonDocumentID
+            WHERE PageDocumentID = @PageDocumentID;
+
+            PRINT 'Page document updated successfully.';
+        END
+
+        COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -706,7 +768,8 @@ END;
 GO
 
 
--- 19. Create the procedure delete page document
+
+-- 19. Create the procedure create lesson test
 IF OBJECT_ID('create_lesson_test', 'P') IS NOT NULL
     DROP PROCEDURE create_lesson_test;
 GO
@@ -758,10 +821,10 @@ GO
 
 
 -- 20. Create the procedure add question to lesson test
-IF OBJECT_ID('create_question', 'P') IS NOT NULL
-    DROP PROCEDURE create_question;
+IF OBJECT_ID('add_question_lessontest', 'P') IS NOT NULL
+    DROP PROCEDURE add_question_lessontest;
 GO
-CREATE PROCEDURE create_question
+CREATE PROCEDURE add_question_lessontest
     @QuestionContent nvarchar(500),
     @Title varchar(255),
     @LessonTestID integer,
@@ -802,7 +865,7 @@ BEGIN
 END;
 GO
 
--- EXEC create_question 
+-- EXEC add_question_lessontest 
 --     @QuestionContent = 'What is the capital of France?',
 --     @Title = 'Geography Question',
 --     @LessonTestID = 1,
@@ -811,7 +874,61 @@ GO
 --     @Answer3 = 'Berlin',
 --     @CorrectAnswer = 'Paris';
 
--- 21. Create the procedure update question
+
+-- 21. Create the procedure update question lessontest
+IF OBJECT_ID('update_question_lessontest', 'P') IS NOT NULL
+    DROP PROCEDURE update_question_lessontest;
+GO
+CREATE PROCEDURE update_question_lessontest
+    @QuestionID integer,
+    @QuestionContent nvarchar(500),
+    @Title varchar(255),
+    @LessonTestID integer,
+    @Answer1 nvarchar(255),
+    @Answer2 nvarchar(255),
+    @Answer3 nvarchar(255),
+    @CorrectAnswer nvarchar(255)
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        -- Update the question entry
+        UPDATE [Question]
+        SET QuestionContent = @QuestionContent,
+            Title = @Title,
+            LessonTestID = @LessonTestID
+        WHERE QuestionID = @QuestionID;
+
+        -- Update answers
+        UPDATE [Answer]
+        SET AnswerText = @Answer1,
+            IsCorrect = CASE WHEN @Answer1 = @CorrectAnswer THEN 1 ELSE 0 END
+        WHERE QuestionID = @QuestionID AND AnswerText = @Answer1;
+
+        UPDATE [Answer]
+        SET AnswerText = @Answer2,
+            IsCorrect = CASE WHEN @Answer2 = @CorrectAnswer THEN 1 ELSE 0 END
+        WHERE QuestionID = @QuestionID AND AnswerText = @Answer2;
+
+        UPDATE [Answer]
+        SET AnswerText = @Answer3,
+            IsCorrect = CASE WHEN @Answer3 = @CorrectAnswer THEN 1 ELSE 0 END
+        WHERE QuestionID = @QuestionID AND AnswerText = @Answer3;
+
+        COMMIT TRANSACTION;
+        PRINT 'Question and answers updated successfully.';
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        PRINT 'Error occurred while updating question and answers.';
+        PRINT ERROR_MESSAGE();
+    END CATCH
+END;
+GO
+
+
+-- 22. Create the procedure update question
 IF OBJECT_ID('update_lesson', 'P') IS NOT NULL
     DROP PROCEDURE update_lesson;
 GO
@@ -855,7 +972,7 @@ END;
 GO
 
 
--- 22. Create the procedure delete lesson
+-- 23. Create the procedure delete lesson
 IF OBJECT_ID('delete_lesson', 'P') IS NOT NULL
     DROP PROCEDURE delete_lesson;
 GO
@@ -894,7 +1011,7 @@ GO
 
 
 
--- 23. Create the procedure update question
+-- 24. Create the procedure update question
 IF OBJECT_ID('update_question', 'P') IS NOT NULL
     DROP PROCEDURE update_question;
 GO
@@ -964,7 +1081,7 @@ END;
 GO
 
 
--- 24. Create the procedure delete question
+-- 25. Create the procedure delete question
 IF OBJECT_ID('delete_question', 'P') IS NOT NULL
     DROP PROCEDURE delete_question;
 GO
@@ -1002,7 +1119,7 @@ END;
 GO
 
 
--- 25. Create the procedure get lesson test questions  --err001
+-- 26. Create the procedure get lesson test questions  --err001
 IF OBJECT_ID('get_lesson_test_questions', 'P') IS NOT NULL
     DROP PROCEDURE get_lesson_test_questions;
 GO
@@ -1048,73 +1165,106 @@ END;
 GO
 
 
--- 26. Create the procedure start lessons process --err002
-IF OBJECT_ID('start_lessons_process', 'P') IS NOT NULL
-    DROP PROCEDURE start_lessons_process;
+-- 27. Create the procedure start lessons process --err002
+IF OBJECT_ID('start_lesson_process', 'P') IS NOT NULL
+    DROP PROCEDURE start_lesson_process;
 GO
-CREATE PROCEDURE start_lessons_process
-    @LessonsID integer,
+
+CREATE PROCEDURE start_lesson_process
+    @LessonProcessID integer,
     @LearnProcessID integer
 AS
 BEGIN 
     BEGIN TRY
-        -- Check if the lesson exists
-        IF NOT EXISTS (SELECT 1 FROM [Lessons] WHERE LessonsID = @LessonsID)
+        -- Bắt đầu giao dịch
+        BEGIN TRANSACTION;
+
+        -- Kiểm tra xem bài học có tồn tại không
+        IF NOT EXISTS (SELECT 1 FROM [LessonsProcess] WHERE LessonsProcessID = @LessonProcessID)
         BEGIN
-            PRINT 'Lesson does not exist.';
+            PRINT 'Lesson process does not exist.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Check if the learn process exists
+        -- Kiểm tra xem quá trình học có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [LearnProcess] WHERE LearnProcessID = @LearnProcessID)
         BEGIN
             PRINT 'Learn process does not exist.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Insert a new lesson process
-        INSERT INTO [LessonsProcess] (LessonsID, LearnProcessID, Status, StartTime)
-        VALUES (@LessonsID, @LearnProcessID, 'InProcess', GETDATE());
+        -- -- Kiểm tra xem bài học đã bắt đầu chưa
+        IF EXISTS (SELECT 1 FROM [LessonsProcess] WHERE LessonsProcessID = @LessonProcessID AND LearnProcessID = @LearnProcessID AND Status IN ('InProcess', 'Done'))
+        BEGIN
+            PRINT 'Lesson process already started.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
 
-    COMMIT TRANSACTION;
-    PRINT 'Lesson process started successfully.';
+        Print 'Lesson process started successfully. KKKKKKKK';
+        UPDATE [LessonsProcess]
+        SET Status = 'InProcess',
+            StartTime = GETDATE()
+        WHERE LessonsProcessID = @LessonProcessID AND LearnProcessID = @LearnProcessID;
+
+        -- Xác nhận giao dịch
+        COMMIT TRANSACTION;
+        PRINT 'Lesson process started successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
+        -- Hủy bỏ giao dịch nếu có lỗi xảy ra
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
         PRINT 'Error occurred while starting lesson process.';
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
 
--- 27. Create the procedure done lesson process
+
+-- 28. Create the procedure done lesson process
 IF OBJECT_ID('done_lesson_process', 'P') IS NOT NULL
     DROP PROCEDURE done_lesson_process;
 GO
+
 CREATE PROCEDURE done_lesson_process
     @LessonsProcessID integer
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
-        -- Check if the lesson process exists
+        -- Bắt đầu giao dịch
+        BEGIN TRANSACTION;
+
+        -- Kiểm tra xem quá trình bài học có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [LessonsProcess] WHERE LessonsProcessID = @LessonsProcessID)
         BEGIN
             PRINT 'Lesson process does not exist.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Update the lesson process to mark it as done
+        -- Cập nhật quá trình bài học để đánh dấu là đã hoàn thành
         UPDATE [LessonsProcess]
         SET Status = 'Done',
             EndTime = GETDATE()
         WHERE LessonsProcessID = @LessonsProcessID;
 
-    COMMIT TRANSACTION;
-    PRINT 'Lesson process marked as done successfully.';
+        -- Xác nhận giao dịch
+        COMMIT TRANSACTION;
+        PRINT 'Lesson process marked as done successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
+        -- Hủy bỏ giao dịch nếu có lỗi xảy ra
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
         PRINT 'Error occurred while marking lesson process as done.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1122,47 +1272,70 @@ END;
 GO
 
 
--- 28. Create the procedure start learn process
+
+-- 29. Create the procedure start learn process
+
 IF OBJECT_ID('start_learn_process', 'P') IS NOT NULL
     DROP PROCEDURE start_learn_process;
 GO
+
 CREATE PROCEDURE start_learn_process
     @StudentID integer,
     @CourseID integer
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
-        -- Check if the student exists
+        -- Bắt đầu giao dịch
+        BEGIN TRANSACTION;
+
+        -- Kiểm tra xem sinh viên có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [Student] WHERE StudentID = @StudentID)
         BEGIN
             PRINT 'Student does not exist.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Check if the course exists
+        -- Kiểm tra xem khóa học có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [Course] WHERE CourseID = @CourseID)
         BEGIN
             PRINT 'Course does not exist.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Insert a new learn process
+        -- Thêm một quá trình học mới
+        DECLARE @LearnProcessID integer;
         INSERT INTO [LearnProcess] (StudentID, CourseID, Status)
         VALUES (@StudentID, @CourseID, 0);  -- Assuming 0 means InProcess
 
-    COMMIT TRANSACTION;
-    PRINT 'Learn process started successfully.';
+        SET @LearnProcessID = SCOPE_IDENTITY();
+
+        -- Thêm các quá trình bài học với trạng thái là NotStarted
+        INSERT INTO [LessonsProcess] (LessonsID, LearnProcessID, Status)
+        SELECT l.LessonsID, @LearnProcessID, 'NotStarted'
+        FROM [Lessons] l
+        WHERE l.CourseID = @CourseID;
+
+        -- Xác nhận giao dịch
+        COMMIT TRANSACTION;
+        PRINT 'Learn process started successfully, and lesson processes created.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
+        -- Hủy bỏ giao dịch nếu có lỗi xảy ra
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
         PRINT 'Error occurred while starting learn process.';
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
 
--- 29. Create the procedure update learn process
+
+-- 30. Create the procedure update learn process
 IF OBJECT_ID('update_learn_process', 'P') IS NOT NULL
     DROP PROCEDURE update_learn_process;
 GO
@@ -1198,7 +1371,7 @@ BEGIN
 
         -- Update the learn process
         UPDATE [LearnProcess]
-        SET Status = @Status,
+        SET [Status] = @Status,
             StudentID = @StudentID,
             CourseID = @CourseID
         WHERE LearnProcessID = @LearnProcessID;
@@ -1215,7 +1388,7 @@ END;
 GO
 
 
--- 30. Create the procedure create_message_forum
+-- 31. Create the procedure create_message_forum
 IF OBJECT_ID('create_message_forum', 'P') IS NOT NULL
     DROP PROCEDURE create_message_forum;
 GO
@@ -1256,12 +1429,13 @@ BEGIN
 END;
 GO
 
--- 31. Create the procedure delete message forum
+-- 32. Create the procedure delete message forum
 IF OBJECT_ID('delete_message_forum', 'P') IS NOT NULL
     DROP PROCEDURE delete_message_forum;
 GO
 CREATE PROCEDURE delete_message_forum
     @ForumMessageID integer,
+    @DiscussionForumID integer,
     @UserID integer
 AS
 BEGIN
@@ -1274,6 +1448,13 @@ BEGIN
             RETURN;
         END
 
+        -- Check if the discussion forum exists
+        IF NOT EXISTS (SELECT 1 FROM [DiscussionForum] WHERE ForumID = @DiscussionForumID)
+        BEGIN
+            PRINT 'Discussion forum does not exist.';
+            RETURN;
+        END
+        
         -- Delete the forum message
         DELETE FROM [ForumMessage] WHERE ForumMessageID = @ForumMessageID;
 
@@ -1289,7 +1470,7 @@ END;
 GO
 -----------
 
--- 32. Create the procedure create admin
+-- 33. Create the procedure create admin
 IF OBJECT_ID('create_admin', 'P') IS NOT NULL
     DROP PROCEDURE create_admin;
 GO
@@ -1346,7 +1527,7 @@ END;
 GO
 
 
--- 33. Create the procedure create instructor
+-- 34. Create the procedure create instructor
 IF OBJECT_ID('create_instructor', 'P') IS NOT NULL
     DROP PROCEDURE create_instructor;
 GO
@@ -1412,7 +1593,7 @@ BEGIN
 END;
 GO
 
--- 34. Create the procedure update admin
+-- 35. Create the procedure update admin
 IF OBJECT_ID('update_admin', 'P') IS NOT NULL
     DROP PROCEDURE update_admin;
 GO
@@ -1475,7 +1656,7 @@ END;
 GO
 
 
--- 35. Create the procedure create student
+-- 36. Create the procedure create student
 
 IF OBJECT_ID('create_student', 'P') IS NOT NULL
     DROP PROCEDURE create_student;
@@ -1541,7 +1722,7 @@ BEGIN
 END;
 GO
 
---- 36. Create the procedure update student
+--- 37. Create the procedure update student
 IF OBJECT_ID('update_student', 'P') IS NOT NULL
     DROP PROCEDURE update_student;
 GO
@@ -1609,7 +1790,7 @@ BEGIN
 END;
 GO
 
--- 37. Create the procedure update instructor
+-- 38. Create the procedure update instructor
 IF OBJECT_ID('update_instructor', 'P') IS NOT NULL
     DROP PROCEDURE update_instructor;
 GO
@@ -1680,7 +1861,7 @@ END;
 GO
 
 
--- 38. Create the procedure create review
+-- 39. Create the procedure create review
 IF OBJECT_ID('create_review', 'P') IS NOT NULL
     DROP PROCEDURE create_review;
 GO
@@ -1722,7 +1903,7 @@ BEGIN
 END;
 GO
 
--- 39. Create the procedure update review
+-- 40. Create the procedure update review
 IF OBJECT_ID('update_review', 'P') IS NOT NULL
     DROP PROCEDURE update_review;
 GO
@@ -1761,7 +1942,7 @@ GO
 
 
 
--- 40. Create the procedure add to cart
+-- 41. Create the procedure add to cart
 IF OBJECT_ID('add_to_cart', 'P') IS NOT NULL
     DROP PROCEDURE add_to_cart;
 GO
@@ -1821,7 +2002,7 @@ BEGIN
 END;
 GO
 
--- 41. Create the procedure update_cart
+-- 42. Create the procedure update_cart
 IF OBJECT_ID('update_cart', 'P') IS NOT NULL
     DROP PROCEDURE update_cart;
 GO
@@ -1855,7 +2036,7 @@ BEGIN
 END;
 GO
 
--- 42. Create the procedure remove_cart_detail
+-- 43. Create the procedure remove_cart_detail
 IF OBJECT_ID('remove_cart_detail', 'P') IS NOT NULL
     DROP PROCEDURE remove_cart_detail;
 GO
@@ -1890,7 +2071,7 @@ END;
 GO
 
 
--- 43. Create the procedure create_tax_report  --err004
+-- 44. Create the procedure create_tax_report  --err004
 IF OBJECT_ID('create_tax_report', 'P') IS NOT NULL
     DROP PROCEDURE create_tax_report;
 GO
@@ -1931,15 +2112,14 @@ BEGIN
 END;
 GO
 
-
--- 44. Create the procedure create invoice
+-- 45. Create the procedure create invoice
 IF OBJECT_ID('create_invoice', 'P') IS NOT NULL
     DROP PROCEDURE create_invoice;
 GO
 
 CREATE PROCEDURE create_invoice
     @StudentID integer,
-    @TransferID integer = NULL
+    @CourseID integer
 AS
 BEGIN
     BEGIN TRY
@@ -1954,14 +2134,56 @@ BEGIN
             RETURN;
         END
 
-        -- Tạo một hóa đơn mới với trạng thái ban đầu là 'Unpaid'
-        INSERT INTO [Invoice] (InvoiceDate, Status, TransferID, StudentID, TotalAmount)
-        VALUES (GETDATE(), 'Unpaid', @TransferID, @StudentID, 0);
+        -- Kiểm tra xem sinh viên đã có hoá đơn 'Unpaid' chưa
+        DECLARE @InvoiceID integer;
+        SELECT @InvoiceID = InvoiceID
+        FROM [Invoice]
+        WHERE StudentID = @StudentID AND Status = 'Unpaied';
+
+        -- Nếu không có hoá đơn 'Unpaid', tạo hoá đơn mới
+        IF @InvoiceID IS NULL
+        BEGIN
+            INSERT INTO [Invoice] (InvoiceDate, Status, TransferID, StudentID, TotalAmount)
+            VALUES (GETDATE(), 'Unpaied', NULL, @StudentID, 0);
+
+            SET @InvoiceID = SCOPE_IDENTITY();
+        END
+        ELSE
+        BEGIN
+            -- Kiểm tra xem khoá học đã có trong chi tiết hoá đơn chưa
+            IF EXISTS (SELECT 1 FROM [InvoiceDetail] WHERE InvoiceID = @InvoiceID AND CourseID = @CourseID)
+            BEGIN
+                PRINT 'Course already exists in the unpaid invoice.';
+                ROLLBACK TRANSACTION;
+                RETURN;
+            END
+        END
+
+        -- Kiểm tra xem khoá học đã có trong giỏ hàng hoàn thành chưa
+        IF EXISTS (SELECT 1 FROM [CartDetail] cd
+                   JOIN [Cart] c ON cd.CartID = c.CartID
+                   WHERE c.StudentID = @StudentID AND cd.CourseID = @CourseID AND c.CartStatus = 'Done')
+        BEGIN
+            PRINT 'Course already exists in a completed cart.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Thêm khoá học vào chi tiết hoá đơn
+        INSERT INTO [InvoiceDetail] (InvoiceID, CourseID, Price, DiscountPrice)
+        SELECT @InvoiceID, @CourseID, c.Price, 0
+        FROM [Course] c
+        WHERE c.CourseID = @CourseID;
+
+        -- Tính tổng số tiền hoá đơn
+        UPDATE [Invoice]
+        SET TotalAmount = (SELECT SUM(Price - DiscountPrice) FROM [InvoiceDetail] WHERE InvoiceID = @InvoiceID)
+        WHERE InvoiceID = @InvoiceID;
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
 
-        PRINT 'Invoice created successfully.';
+        PRINT 'Invoice updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback giao dịch nếu có lỗi xảy ra
@@ -1970,93 +2192,99 @@ BEGIN
             ROLLBACK TRANSACTION;
         END
 
-        PRINT 'Error occurred while creating invoice.';
+        PRINT 'Error occurred while creating/updating invoice.';
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
--- 45. Create the procedure add_invoice_detail
-IF OBJECT_ID('add_invoice_detail', 'P') IS NOT NULL
-    DROP PROCEDURE add_invoice_detail;
+
+
+
+-- 46 Create the procedure apply discount
+IF OBJECT_ID('apply_discount', 'P') IS NOT NULL
+    DROP PROCEDURE apply_discount;
 GO
 
-CREATE PROCEDURE add_invoice_detail
-    @InvoiceID integer,
-    @DiscountCode varchar(20) = NULL,
-    @CourseID integer
+CREATE PROCEDURE apply_discount
+    @DiscountCode varchar(20),
+    @InvoiceDetailID integer
 AS
 BEGIN
     BEGIN TRY
         -- Bắt đầu giao dịch
         BEGIN TRANSACTION;
 
-        DECLARE @Price float;
-        DECLARE @DiscountID integer = NULL;
-        DECLARE @DiscountPrice float = 0;
-        DECLARE @DiscountPercentage float = 0;
-        DECLARE @CurrentTotalAmount float;
+        -- Kiểm tra mã giảm giá có hợp lệ và còn hạn sử dụng không
+        DECLARE @DiscountID integer, @Percentage float, @ExpiryDate datetime, @Quantity integer;
+        SELECT @DiscountID = DiscountID, @Percentage = Percentage, @ExpiryDate = ExpiryDate, @Quantity = Quantity
+        FROM [Discount]
+        WHERE [Code] = @DiscountCode;
 
-        -- Kiểm tra sự tồn tại của hóa đơn
-        IF NOT EXISTS (SELECT 1 FROM [Invoice] WHERE InvoiceID = @InvoiceID)
+        IF @DiscountID IS NULL
         BEGIN
-            PRINT 'Invoice does not exist.';
+            PRINT 'Invalid discount code.';
             ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Kiểm tra sự tồn tại của khóa học và lấy giá của nó
-        SELECT @Price = Price FROM [Course] WHERE CourseID = @CourseID;
-        IF @Price IS NULL
+        IF @ExpiryDate < GETDATE()
         BEGIN
-            PRINT 'Course does not exist.';
+            PRINT 'Discount code has expired.';
             ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Kiểm tra sự tồn tại và tính hợp lệ của mã giảm giá
-        IF @DiscountCode IS NOT NULL
+        IF @Quantity <= 0
         BEGIN
-            SELECT @DiscountID = DiscountID, @DiscountPercentage = Percentage
-            FROM [Discount]
-            WHERE Code = @DiscountCode AND ExpiryDate > GETDATE() AND Quantity > 0;
-
-            IF @DiscountID IS NOT NULL
-            BEGIN
-                -- Tính giá giảm giá
-                SET @DiscountPrice = @Price * (1 - @DiscountPercentage / 100);
-
-                -- Cập nhật số lượng mã giảm giá
-                UPDATE [Discount]
-                SET Quantity = Quantity - 1
-                WHERE DiscountID = @DiscountID;
-            END
-            ELSE
-            BEGIN
-                PRINT 'Discount code does not exist or is invalid. Applying the original price.';
-                SET @DiscountPrice = @Price;
-            END
-        END
-        ELSE
-        BEGIN
-            SET @DiscountPrice = @Price;
+            PRINT 'Discount code is out of quantity.';
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
-        -- Thêm chi tiết hóa đơn mới
-        INSERT INTO [InvoiceDetail] (InvoiceID, Price, DiscountPrice, DiscountID, CourseID)
-        VALUES (@InvoiceID, @Price, @DiscountPrice, @DiscountID, @CourseID);
+        -- Lấy giá của khoá học trong chi tiết hoá đơn
+        DECLARE @CourseID integer, @OriginalPrice float, @DiscountPrice float;
+        SELECT @CourseID = CourseID, @OriginalPrice = Price
+        FROM [InvoiceDetail]
+        WHERE InvoiceDetailID = @InvoiceDetailID;
 
-        -- Cập nhật tổng số tiền trong hóa đơn
-        SELECT @CurrentTotalAmount = TotalAmount FROM [Invoice] WHERE InvoiceID = @InvoiceID;
-        SET @CurrentTotalAmount = @CurrentTotalAmount + @DiscountPrice;
+        IF @CourseID IS NULL
+        BEGIN
+            PRINT 'Invalid invoice detail ID.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Tính toán lại giá sau khi áp dụng giảm giá
+        SET @DiscountPrice = @OriginalPrice * (1 - @Percentage / 100.0);
+
+        -- Cập nhật giá trong chi tiết hoá đơn và thêm mã giảm giá
+        UPDATE [InvoiceDetail]
+        SET DiscountPrice = @DiscountPrice, DiscountID = @DiscountID
+        WHERE InvoiceDetailID = @InvoiceDetailID;
+
+        -- Giảm số lượng discount đi 1
+        UPDATE [Discount]
+        SET Quantity = Quantity - 1
+        WHERE DiscountID = @DiscountID;
+
+        -- Tính tổng số tiền hoá đơn mới
+        DECLARE @InvoiceID integer;
+        SELECT @InvoiceID = InvoiceID
+        FROM [InvoiceDetail]
+        WHERE InvoiceDetailID = @InvoiceDetailID;
 
         UPDATE [Invoice]
-        SET TotalAmount = @CurrentTotalAmount
+        SET TotalAmount = (
+            SELECT SUM(Price - ISNULL(DiscountPrice, 0))
+            FROM [InvoiceDetail]
+            WHERE InvoiceID = @InvoiceID
+        )
         WHERE InvoiceID = @InvoiceID;
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
 
-        PRINT 'Invoice detail added and total amount updated successfully.';
+        PRINT 'Discount applied successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback giao dịch nếu có lỗi xảy ra
@@ -2065,55 +2293,76 @@ BEGIN
             ROLLBACK TRANSACTION;
         END
 
-        PRINT 'Error occurred while adding invoice detail.';
+        PRINT 'Error occurred while applying discount.';
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
 
 
--- 46. Create the procedure update_total_amount
-IF OBJECT_ID('update_total_amount', 'P') IS NOT NULL
-    DROP PROCEDURE update_total_amount;
+
+-- 47. Create the procedure delete invoice detail
+IF OBJECT_ID('delete_invoice_detail', 'P') IS NOT NULL
+    DROP PROCEDURE delete_invoice_detail;
 GO
-CREATE PROCEDURE update_total_amount
-    @InvoiceID integer
+
+CREATE PROCEDURE delete_invoice_detail
+    @InvoiceDetailID integer
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
-        DECLARE @NewTotalAmount float;
+        -- Bắt đầu giao dịch
+        BEGIN TRANSACTION;
 
-        -- Check if the invoice exists
-        IF NOT EXISTS (SELECT 1 FROM [Invoice] WHERE InvoiceID = @InvoiceID)
+        -- Kiểm tra xem InvoiceDetailID có tồn tại không
+        IF NOT EXISTS (SELECT 1 FROM [InvoiceDetail] WHERE InvoiceDetailID = @InvoiceDetailID)
         BEGIN
-            PRINT 'Invoice does not exist.';
+            PRINT 'Invoice detail does not exist.';
+            ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Calculate the new total amount
-        SELECT @NewTotalAmount = SUM(DiscountPrice)
+        -- Lấy InvoiceID từ InvoiceDetail
+        DECLARE @InvoiceID integer;
+        SELECT @InvoiceID = InvoiceID
         FROM [InvoiceDetail]
-        WHERE InvoiceID = @InvoiceID;
+        WHERE InvoiceDetailID = @InvoiceDetailID;
 
-        -- Update the total amount in the invoice
+        -- Xoá chi tiết hoá đơn
+        DELETE FROM [InvoiceDetail]
+        WHERE InvoiceDetailID = @InvoiceDetailID;
+
+        -- Tính tổng số tiền hoá đơn mới
         UPDATE [Invoice]
-        SET TotalAmount = @NewTotalAmount
+        SET TotalAmount = (
+            SELECT SUM(Price - ISNULL(DiscountPrice, 0))
+            FROM [InvoiceDetail]
+            WHERE InvoiceID = @InvoiceID
+        )
         WHERE InvoiceID = @InvoiceID;
 
+        -- Commit giao dịch
         COMMIT TRANSACTION;
-    PRINT 'Total amount updated successfully.';
+
+        PRINT 'Invoice detail deleted and total amount updated successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        PRINT 'Error occurred while updating total amount.';
+        -- Rollback giao dịch nếu có lỗi xảy ra
+        IF @@TRANCOUNT > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+        END
+
+        PRINT 'Error occurred while deleting invoice detail.';
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
 
 
--- 47. Create the procedure create bank account
+
+
+-- 48. Create the procedure create bank account
 IF OBJECT_ID('create_bank_account', 'P') IS NOT NULL
     DROP PROCEDURE create_bank_account;
 GO
@@ -2166,7 +2415,7 @@ GO
 
 
 
--- 48. Create the procedure update bank account (update account number, account holder name, account balance, bank name)
+-- 49. Create the procedure update bank account (update account number, account holder name, account balance, bank name)
 IF OBJECT_ID('update_bank_account', 'P') IS NOT NULL
     DROP PROCEDURE update_bank_account;
 GO
@@ -2225,7 +2474,7 @@ GO
 
 
 
--- 49. Create the procedure create history banking
+-- 50. Create the procedure create history banking
 IF OBJECT_ID('create_history_banking', 'P') IS NOT NULL
     DROP PROCEDURE create_history_banking;
 GO
@@ -2269,7 +2518,7 @@ END;
 GO
 
 
--- 50. Create the procedure transfer money
+-- 51. Create the procedure transfer money
 IF OBJECT_ID('transfer_money', 'P') IS NOT NULL
     DROP PROCEDURE transfer_money;
 GO
@@ -2348,12 +2597,12 @@ GO
 
 
 
--- 51. Create the procedure create transfer course
+-- 52. Create the procedure create transfer course
 IF OBJECT_ID('create_transfer_course', 'P') IS NOT NULL
     DROP PROCEDURE create_transfer_course;
 GO
 CREATE PROCEDURE create_transfer_course
-    @UserID integer,
+    @TransferTotalID integer = NULL,
     @Amount float,
     @TransferDescription nvarchar(255) = NULL,
     @BankBeneficiaryID integer = NULL,
@@ -2361,17 +2610,10 @@ CREATE PROCEDURE create_transfer_course
 AS
 BEGIN
     BEGIN TRY
-        -- Start a transaction
+        -- Start a transaction @UserID
         BEGIN TRANSACTION;
 
-        -- Check if the user exists
-        IF NOT EXISTS (SELECT 1 FROM [User] WHERE UserID = @UserID)
-        BEGIN
-            PRINT 'User does not exist.';
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-
+       
         -- Check if the beneficiary bank account exists (if provided)
         IF @BankBeneficiaryID IS NOT NULL AND NOT EXISTS (SELECT 1 FROM [BankAccount] WHERE BankAccountID = @BankBeneficiaryID)
         BEGIN
@@ -2401,8 +2643,8 @@ BEGIN
         END
 
         -- Insert a new transfer record
-        INSERT INTO [Transfer] (TransactionTime, Amount, TransferDescription, BankBeneficiaryID, BankOrderingID, UserID)
-        VALUES (GETDATE(), @Amount, @TransferDescription, @BankBeneficiaryID, @BankOrderingID, @UserID);
+        INSERT INTO [Transfer] (TransactionTime, Amount, TransferDescription, BankBeneficiaryID, BankOrderingID, TransferTotalID)
+        VALUES (GETDATE(), @Amount, @TransferDescription, @BankBeneficiaryID, @BankOrderingID, @TransferTotalID);
 
         -- Update the bank balances
         EXEC transfer_money @BankOrderingID, @Amount, 'Withdrawal';
@@ -2423,7 +2665,139 @@ BEGIN
 END;
 GO
 
--- 52. Create the procedure create certificate
+
+
+-- 53. Create the procedure process payment
+IF OBJECT_ID('process_payment', 'P') IS NOT NULL
+    DROP PROCEDURE process_payment;
+GO
+
+CREATE PROCEDURE process_payment
+    @InvoiceID integer
+AS
+BEGIN
+    BEGIN TRY
+        -- Start a transaction
+        BEGIN TRANSACTION;
+
+        -- Check if the invoice exists and is unpaid
+        IF NOT EXISTS (SELECT 1 FROM [Invoice] WHERE InvoiceID = @InvoiceID AND Status = 'UnPaied')
+        BEGIN
+            PRINT 'Invoice does not exist or is already paid.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- if hoa don da thanh thoan roi thi khong the thanh toan nua
+        IF EXISTS (SELECT 1 FROM [Invoice] WHERE InvoiceID = @InvoiceID AND Status = 'Paied')
+        BEGIN
+            PRINT 'Invoice is already paid.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Retrieve the total amount and student ID from the invoice
+        DECLARE @TotalAmount float, @StudentID integer;
+        SELECT @TotalAmount = TotalAmount, @StudentID = StudentID
+        FROM [Invoice]
+        WHERE InvoiceID = @InvoiceID;
+
+        -- Retrieve the bank account ID of the student
+        DECLARE @StudentBankAccountID integer;
+        SELECT @StudentBankAccountID = ba.BankAccountID
+        FROM [BankAccount] ba
+        JOIN [Student] s ON ba.UserID = s.UserID
+        WHERE s.StudentID = @StudentID;
+  
+        -- Check if the student has a bank account
+        IF @StudentBankAccountID IS NULL
+        BEGIN
+            PRINT 'Student does not have a bank account.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+         -- Create a TransferTotal entry for the invoice
+        DECLARE @TransferTotalIDnew integer;
+        INSERT INTO TransferTotal (InvoiceID)
+        VALUES (@InvoiceID);
+        SET @TransferTotalIDnew = SCOPE_IDENTITY();
+
+        -- Retrieve the course and instructor details from the invoice
+        DECLARE @CourseID integer, @InstructorID integer, @Amount float;
+
+        DECLARE course_cursor CURSOR FOR
+        SELECT id.CourseID, c.InstructorID, (id.Price - ISNULL(id.DiscountPrice, 0)) AS Amount
+        FROM [InvoiceDetail] id
+        JOIN [Course] c ON id.CourseID = c.CourseID
+        WHERE id.InvoiceID = @InvoiceID;
+
+        OPEN course_cursor;
+        FETCH NEXT FROM course_cursor INTO @CourseID, @InstructorID, @Amount;
+
+        WHILE @@FETCH_STATUS = 0
+        BEGIN
+            -- Retrieve the bank account ID of the instructor
+            DECLARE @InstructorBankAccountID integer;
+            SELECT @InstructorBankAccountID = ba.BankAccountID
+            FROM [BankAccount] ba
+            JOIN [Instructor] i ON ba.UserID = i.UserID
+            WHERE i.InstructorID = @InstructorID;
+
+            -- Check if the instructor has a bank account
+            IF @InstructorBankAccountID IS NULL
+            BEGIN
+                PRINT 'Instructor does not have a bank account.';
+                ROLLBACK TRANSACTION;
+                CLOSE course_cursor;
+                DEALLOCATE course_cursor;
+                RETURN;
+            END
+
+            -- Create a transfer from the student to the instructor
+            DECLARE @TransferDescription nvarchar(255);
+            SET @TransferDescription = 'Payment for course ' + CAST(@CourseID AS nvarchar(50));
+
+            EXEC create_transfer_course
+                @TransferTotalID = @TransferTotalIDnew,
+                @Amount = @Amount,
+                @TransferDescription = @TransferDescription,
+                @BankBeneficiaryID = @InstructorBankAccountID,
+                @BankOrderingID = @StudentBankAccountID;
+
+            FETCH NEXT FROM course_cursor INTO @CourseID, @InstructorID, @Amount;
+        END
+
+        CLOSE course_cursor;
+        DEALLOCATE course_cursor;
+
+        -- Update the invoice status to 'Paid'
+        UPDATE [Invoice]
+        SET Status = 'Paied'
+        WHERE InvoiceID = @InvoiceID;
+
+        -- Commit the transaction
+        COMMIT TRANSACTION;
+
+        RAISERROR('Payments processed successfully and invoice status updated to paid.', 0, 1) WITH NOWAIT;
+        PRINT 'Payments processed successfully and invoice status updated to paid.';
+    END TRY
+    BEGIN CATCH
+        -- Rollback the transaction if an error occurs
+        ROLLBACK TRANSACTION;
+
+        RAISERROR('Error occurred while processing payments.', 16, 1) WITH NOWAIT;
+        PRINT 'Error occurred while processing payments.';
+        PRINT ERROR_MESSAGE();
+    END CATCH
+END;
+GO
+
+
+
+
+
+--=====================================================
+-- 53. Create the procedure create certificate
 IF OBJECT_ID('create_certificate', 'P') IS NOT NULL
     DROP PROCEDURE create_certificate;
 GO
@@ -2466,7 +2840,7 @@ END;
 GO
 
 
--- 53. Create the procedure update certificate
+-- 54. Create the procedure update certificate
 IF OBJECT_ID('update_certificate', 'P') IS NOT NULL
     DROP PROCEDURE update_certificate;
 GO
@@ -2511,7 +2885,7 @@ BEGIN
 END;
 GO
 
--- 54. Create the procedure create education
+-- 55. Create the procedure create education
 IF OBJECT_ID('create_education', 'P') IS NOT NULL
     DROP PROCEDURE create_education;
 GO
@@ -2553,7 +2927,7 @@ BEGIN
 END;
 GO
 
--- 55. Create the procedure update education
+-- 56. Create the procedure update education
 IF OBJECT_ID('update_education', 'P') IS NOT NULL
     DROP PROCEDURE update_education;
 GO
@@ -2596,9 +2970,9 @@ BEGIN
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
+GO
 
-
--- 56. Create the procedure create delete course
+-- 57. Create the procedure create delete course
 IF OBJECT_ID('delete_course', 'P') IS NOT NULL
     DROP PROCEDURE delete_course;
 GO
@@ -2635,12 +3009,11 @@ BEGIN
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
-
--- 57. Create the procedure create notify
+GO
+-- 58. Create the procedure create notify
 IF OBJECT_ID('create_notify', 'P') IS NOT NULL
     DROP PROCEDURE create_notify;
 GO
-
 CREATE PROCEDURE create_notify
     @Message nvarchar(500),
     @LearnProcessID integer = NULL,
@@ -2689,3 +3062,308 @@ BEGIN
     END CATCH
 END;
 GO
+
+
+-- 59. Create the procedure create discount
+IF OBJECT_ID('create_discount', 'P') IS NOT NULL
+    DROP PROCEDURE create_discount;
+GO
+
+CREATE PROCEDURE create_discount
+    @Code varchar(20),
+    @Percentage float,
+    @ExpiryDate datetime = NULL,
+    @Quantity integer,
+    @CourseID integer
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        -- Kiểm tra xem mã giảm giá có bị trùng không
+        IF EXISTS (SELECT 1 FROM Discount WHERE Code = @Code)
+        BEGIN
+            RAISERROR ('Discount code already exists.', 16, 1);
+            RETURN;
+        END
+
+        BEGIN TRANSACTION;
+
+        -- Tạo ngày hết hạn tự động là 1 tuần kể từ ngày tạo
+        DECLARE @ExpiryDates datetime;
+        SET @ExpiryDates = DATEADD(WEEK, 1, GETDATE());
+
+        INSERT INTO Discount (Code, Percentage, ExpiryDate, Quantity, CourseID)
+        VALUES (@Code, @Percentage, @ExpiryDates, @Quantity, @CourseID);
+
+        DECLARE @NewDiscountID int;
+        SET @NewDiscountID = SCOPE_IDENTITY();
+
+        COMMIT TRANSACTION;
+
+        SELECT @NewDiscountID AS DiscountID;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+
+        DECLARE @ErrorMessage nvarchar(4000);
+        DECLARE @ErrorSeverity int;
+        DECLARE @ErrorState int;
+
+        SELECT 
+            @ErrorMessage = ERROR_MESSAGE(),
+            @ErrorSeverity = ERROR_SEVERITY(),
+            @ErrorState = ERROR_STATE();
+
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+    END CATCH
+END;
+GO
+
+-- 60. Create the procedure delete discount
+IF OBJECT_ID('delete_discount', 'P') IS NOT NULL
+    DROP PROCEDURE delete_discount;
+GO
+
+CREATE PROCEDURE delete_discount
+    @DiscountID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Kiểm tra xem mã giảm giá có tồn tại không
+        IF EXISTS (SELECT 1 FROM Discount WHERE DiscountID = @DiscountID)
+        BEGIN
+            DELETE FROM Discount
+            WHERE DiscountID = @DiscountID;
+            PRINT 'Discount deleted successfully.';
+        END
+        ELSE
+        BEGIN
+            PRINT 'Discount does not exist.';
+        END
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT 
+            @ErrorMessage = ERROR_MESSAGE(),
+            @ErrorSeverity = ERROR_SEVERITY(),
+            @ErrorState = ERROR_STATE();
+
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+    END CATCH
+END;
+GO
+
+-- 61. Create the procedure update discount
+IF OBJECT_ID('update_discount', 'P') IS NOT NULL
+    DROP PROCEDURE update_discount;
+GO
+
+CREATE PROCEDURE update_discount
+    @DiscountID INT,
+    @Percentage FLOAT,
+    @ExpiryDate DATETIME,
+    @Quantity INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Kiểm tra xem ngày hết hạn có lớn hơn ngày hiện tại không
+        IF @ExpiryDate <= GETDATE()
+        BEGIN
+            RAISERROR ('ExpiryDate must be greater than the current date.', 16, 1);
+            RETURN;
+        END
+
+        -- Kiểm tra xem mã giảm giá có tồn tại không
+        IF EXISTS (SELECT 1 FROM Discount WHERE DiscountID = @DiscountID)
+        BEGIN
+            -- Cập nhật mã giảm giá
+            UPDATE Discount
+            SET Percentage = @Percentage,
+                ExpiryDate = @ExpiryDate,
+                Quantity = @Quantity
+            WHERE DiscountID = @DiscountID;
+
+            PRINT 'Discount updated successfully.';
+        END
+        ELSE
+        BEGIN
+            PRINT 'Discount does not exist.';
+        END
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT 
+            @ErrorMessage = ERROR_MESSAGE(),
+            @ErrorSeverity = ERROR_SEVERITY(),
+            @ErrorState = ERROR_STATE();
+
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+    END CATCH
+END;
+GO
+
+
+-- 62. Create the procedure  create tax setting
+IF OBJECT_ID('create_tax_setting', 'P') IS NOT NULL
+    DROP PROCEDURE create_tax_setting;
+GO
+
+CREATE PROCEDURE create_tax_setting
+    @TaxPercentage float,
+    @EffectiveDate datetime
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Insert new tax setting
+        INSERT INTO TaxSetting (TaxPercentage, EffectiveDate, UpdateDate)
+        VALUES (@TaxPercentage, @EffectiveDate, GETDATE());
+
+        -- Commit the transaction
+        COMMIT TRANSACTION;
+
+        PRINT 'Tax setting created successfully.';
+    END TRY
+    BEGIN CATCH
+        -- Rollback the transaction if an error occurs
+        ROLLBACK TRANSACTION;
+
+        PRINT 'Error occurred while creating tax setting.';
+        PRINT ERROR_MESSAGE();
+    END CATCH
+END; 
+GO
+
+--  63. Create the procedure update tax setting
+IF OBJECT_ID('update_tax_setting', 'P') IS NOT NULL
+    DROP PROCEDURE update_tax_setting;
+GO
+
+CREATE PROCEDURE update_tax_setting
+    @TaxSettingID integer,
+    @TaxPercentage float,
+    @EffectiveDate datetime
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Kiểm tra xem TaxSettingID có tồn tại không
+        IF NOT EXISTS (SELECT 1 FROM TaxSetting WHERE TaxSettingID = @TaxSettingID)
+        BEGIN
+            PRINT 'Tax setting does not exist.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Kiểm tra xem TaxSettingID đã được sử dụng trong bảng khác chưa
+        IF EXISTS (SELECT 1 FROM TaxReport WHERE TaxSettingID = @TaxSettingID)
+        BEGIN
+            PRINT 'Tax setting has been referenced in another table and cannot be updated.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Update the tax setting
+        UPDATE TaxSetting
+        SET TaxPercentage = @TaxPercentage,
+            EffectiveDate = @EffectiveDate,
+            UpdateDate = GETDATE()
+        WHERE TaxSettingID = @TaxSettingID;
+
+        -- Commit the transaction
+        COMMIT TRANSACTION;
+
+        PRINT 'Tax setting updated successfully.';
+    END TRY
+    BEGIN CATCH
+        -- Rollback the transaction if an error occurs
+        ROLLBACK TRANSACTION;
+
+        PRINT 'Error occurred while updating tax setting.';
+        PRINT ERROR_MESSAGE();
+    END CATCH
+END;
+GO
+
+
+
+-- 64. Create the procedure update tax setting
+IF OBJECT_ID('create_tax_report', 'P') IS NOT NULL
+    DROP PROCEDURE create_tax_report;
+GO
+
+CREATE PROCEDURE create_tax_report
+    @InstructorID integer
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Kiểm tra xem InstructorID có tồn tại không
+        IF NOT EXISTS (SELECT 1 FROM Instructor WHERE InstructorID = @InstructorID)
+        BEGIN
+            PRINT 'Instructor does not exist.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Lấy TaxSettingID mới nhất
+        DECLARE @TaxSettingID integer;
+        SELECT TOP 1 @TaxSettingID = TaxSettingID
+        FROM TaxSetting
+        ORDER BY EffectiveDate DESC;
+
+        -- Kiểm tra xem có TaxSettingID nào không
+        IF @TaxSettingID IS NULL
+        BEGIN
+            PRINT 'No tax setting available.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Insert new tax report
+        DECLARE @TaxCode varchar(20);
+        SET @TaxCode = 'TAX-' + CAST(@TaxSettingID AS varchar) + '-' + CAST(@InstructorID AS varchar) + '-' + CAST(GETDATE() AS varchar);
+
+        INSERT INTO TaxReport (CreateDate, TaxCode, TaxSettingID, InstructorID)
+        VALUES (GETDATE(), @TaxCode, @TaxSettingID, @InstructorID);
+
+        -- Commit the transaction
+        COMMIT TRANSACTION;
+
+        PRINT 'Tax report created successfully.';
+    END TRY
+    BEGIN CATCH
+        -- Rollback the transaction if an error occurs
+        ROLLBACK TRANSACTION;
+
+        PRINT 'Error occurred while creating tax report.';
+        PRINT ERROR_MESSAGE();
+    END CATCH
+END;
+GO
+
+
+
