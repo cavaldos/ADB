@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import portfinder from "portfinder";
-
+import dotenv from "dotenv";
+dotenv.config();
 interface Message {
   content: string;
   senderId: string;
@@ -53,7 +54,7 @@ const startSocketServer = async (port: number) => {
     });
 
     console.log(
-      `  💬   Socket.io server running at http://localhost:${freePort} \n`
+      `  💬  ➜ Socket.io  http://${process.env.HOSTING}:${freePort} \n`
     );
     // Hàm kiểm tra kết nối và log
     const checkConnections = () => {
