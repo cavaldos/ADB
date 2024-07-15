@@ -1,12 +1,14 @@
 import sql, { ConnectionPool, config as SqlConfig, IResult } from "mssql";
-
+import color from "ansi-colors";
+import dotenv from "dotenv";
+dotenv.config();
 const config: SqlConfig = {
-  user: "sa",
-  password: "password123@",
-  // server: "113.173.16.55",
-  server: "localhost",
-  database: "adbNguyen", // Ensure the default database is 'master'
-  port: 1447,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  server: process.env.HOSTING || "localhost",
+  // server: "localhost",
+  database: process.env.DB_NAME,
+  port: parseInt(process.env.DB_PORT || "1433"),
   options: {
     encrypt: false,
     trustServerCertificate: true,
@@ -29,7 +31,13 @@ class DataConnect {
       }
       if (!this.pool.connected) {
         await this.pool.connect();
-        console.log(`\t Connected to SQL Server at ${config.server} ${config.database} ${config.port} 🎉`);
+       
+        console.log(
+          `\n  🚀  ➜ Connected to SQL Server at  `,
+          color.yellow(
+            `http://localhost:${config.server} < ${config.database} > < ${config.port} > `
+          )
+        );
       }
     } catch (error: any) {
       this.pool = null;

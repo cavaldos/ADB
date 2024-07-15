@@ -67,7 +67,7 @@ const InvoiceRepo = {
                       where s.StudentID = @studentID;`;
       const reslut = await DataConnect.executeWithParams(query, { studentID });
       const data = _.groupBy(reslut, "Status");
-      return reslut;
+      return data;
     } catch (error: any) {
       throw new Error(`Error fetching invoice: ${error.message}`);
     }

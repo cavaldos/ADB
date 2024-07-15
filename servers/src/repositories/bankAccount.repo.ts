@@ -98,8 +98,9 @@ const BankAccountRepo = {
     }
   },
   // get all transfer 
-  async getAllTransfer() {
+  async getAllTransfer(userID: number) {
     try {
+      console.log("userID", userID);
       const query = `SELECT * FROM Transfer;`;
       return await DataConnect.execute(query);
     } catch (error: any) {

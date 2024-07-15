@@ -282,8 +282,8 @@ const GlobalController = {
   // 11. get all get all transfer
   async getAllTransfer(req: Request, res: Response) {
     try {
-      const { invoiceID } = req.body;
-      const result = await BankAccountRepo.getAllTransfer();
+      const { userID } = req.body;
+      const result = await BankAccountRepo.getAllTransfer(userID);
       return res.status(200).json({
         message: `Get all transfer`,
         status: 200,

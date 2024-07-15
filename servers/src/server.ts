@@ -7,8 +7,8 @@ import portfinder from "portfinder";
 import dotenv from "dotenv";
 dotenv.config();
 const IP = getIPAddresses.IP();
-const PORTSOCKET: number = process.env.PORTSOCKET ? parseInt(process.env.PORTSOCKET) : 5006;
-const PORSERVER: number = process.env.PORT ? parseInt(process.env.PORT) : 5001;
+const PORTSOCKET: number = process.env.PORT_SOCKET ? parseInt(process.env.PORT_SOCKET) : 5000;
+const PORSERVER: number = process.env.PORT_SERVER ? parseInt(process.env.PORT_SERVER) : 5001;
 const host: string = "0.0.0.0";
 
 // Sử dụng portfinder để tìm cổng khả dụng
