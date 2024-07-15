@@ -7,19 +7,23 @@ import DataService from "./utils/DataService";
 
 DataService.checkConnection();
 const app = express();
-import "./test";
+// import "./test";
 
 app.use(
   cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization, Origin, X-Requested-With, Accept"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization, Origin, X-Requested-With, Accept",
+    ],
   })
 );
 app.use(json());
 app.use(helmet());
 app.use(morgan("tiny"));
 app.use(routers);
+app.get("/helloword", (req, res) => {
+  res.send("Hello World");
+});
 export default app;
-
-
