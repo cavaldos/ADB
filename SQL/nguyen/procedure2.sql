@@ -60,7 +60,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating topic.',16,2);
+        RAISERROR('Error occurred while updating topic.',16,1);
         PRINT 'Error occurred while updating topic.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -80,19 +80,19 @@ BEGIN
         BEGIN
             DELETE FROM [Topic]
             WHERE TopicID = @TopicID;
-            RAISERROR('Topic deleted successfully.',16,2);
+            RAISERROR('Topic deleted successfully.',16,1);
             PRINT 'Topic deleted successfully.';
         END
         ELSE
         BEGIN
-            RAISERROR('Topic does not exist.',16,2);
+            RAISERROR('Topic does not exist.',16,1);
             PRINT 'Topic does not exist.';
         END
     COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR ('Error occurred while deleting topic.',16,2);
+        RAISERROR ('Error occurred while deleting topic.',16,1);
         PRINT 'Error occurred while deleting topic.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -114,7 +114,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while selecting all topics.',16,2);
+        RAISERROR('Error occurred while selecting all topics.',16,1);
         PRINT 'Error occurred while selecting all topics.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -137,7 +137,7 @@ BEGIN
         -- Check if the parent category exists if ParentCategoryID is provided
         IF @ParentCategoryID IS NOT NULL AND NOT EXISTS (SELECT 1 FROM [Category] WHERE CategoryID = @ParentCategoryID)
         BEGIN
-            RAISERROR('Parent category does not exist.',16,2);
+            RAISERROR('Parent category does not exist.',16,1);
             PRINT 'Parent category does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -146,7 +146,7 @@ BEGIN
         -- Check if the category already exists
         IF EXISTS (SELECT 1 FROM [Category] WHERE CategoryName = @CategoryName AND ParentCategoryID = @ParentCategoryID)
         BEGIN
-            RAISERROR('Category already exists.',16,2);
+            RAISERROR('Category already exists.',16,1);
             PRINT 'Category already exists.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -154,7 +154,7 @@ BEGIN
         -- Check if the category already exists
         IF EXISTS (SELECT 1 FROM [Category] WHERE CategoryName = @CategoryName )
         BEGIN
-            RAISERROR('Category already exists.',16,2);
+            RAISERROR('Category already exists.',16,1);
             PRINT 'Category already exists.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -162,7 +162,7 @@ BEGIN
         -- Insert the new category if it does not exist
         INSERT INTO [Category] (CategoryName, CategoryDescription, ParentCategoryID)
         VALUES (@CategoryName, @CategoryDescription, @ParentCategoryID);
-         RAISERROR ('Category created successfully.',16,2);
+         RAISERROR ('Category created successfully.',16,1);
         PRINT 'Category created successfully.';
 
         COMMIT TRANSACTION;
@@ -172,7 +172,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR ('Error occurred while creating category.',16,2);
+        RAISERROR ('Error occurred while creating category.',16,1);
         PRINT 'Error occurred while creating category.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -200,19 +200,19 @@ BEGIN
                 CategoryDescription = @CategoryDescription,
                 ParentCategoryID = @ParentCategoryID
             WHERE CategoryID = @CategoryID
-            RAISERROR ('Category updated successfully.',16,2);
+            RAISERROR ('Category updated successfully.',16,1);
             PRINT 'Category updated successfully.';
         END
         ELSE
         BEGIN
-            RAISERROR('Category does not exist.',16,2);
+            RAISERROR('Category does not exist.',16,1);
             PRINT 'Category does not exist.';
         END
     COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating category.',16,2);
+        RAISERROR('Error occurred while updating category.',16,1);
         PRINT 'Error occurred while updating category.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -239,20 +239,20 @@ BEGIN
             -- Kiểm tra xem danh mục có được sử dụng trong bảng Course không
             IF EXISTS (SELECT 1 FROM [Course] WHERE CategoryID = @CategoryID)
             BEGIN
-                RAISERROR('Category is being used in Course table and cannot be deleted.',16,2);
+                RAISERROR('Category is being used in Course table and cannot be deleted.',16,1);
                 PRINT 'Category is being used in Course table and cannot be deleted.';
             END
             ELSE
             BEGIN
                 DELETE FROM [Category]
                 WHERE CategoryID = @CategoryID;
-                RAISERROR('Category deleted successfully.',16,2);
+                RAISERROR('Category deleted successfully.',16,1);
                 PRINT 'Category deleted successfully.';
             END
         END
         ELSE
         BEGIN
-            RAISERROR('Category does not exist.',16,2);
+            RAISERROR('Category does not exist.',16,1);
             PRINT 'Category does not exist.';
         END
 
@@ -260,7 +260,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while deleting category.',16,2);
+        RAISERROR('Error occurred while deleting category.',16,1);
         PRINT 'Error occurred while deleting category.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -281,19 +281,19 @@ BEGIN
         BEGIN
             INSERT INTO [DiscussionForum] (CreatedDate, CourseID)
             VALUES (GETDATE(), @CourseID);
-            RAISERROR ('Discussion forum created successfully.',16,2);
+            RAISERROR ('Discussion forum created successfully.',16,1);
             PRINT 'Discussion forum created successfully.';
         END
         ELSE
         BEGIN
-        RAISERROR('Discussion forum already exists for this course.',16,2);
+        RAISERROR('Discussion forum already exists for this course.',16,1);
             PRINT 'Discussion forum already exists for this course.';
         END
     COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR ('Error occurred while creating discussion forum.',16,2);
+        RAISERROR ('Error occurred while creating discussion forum.',16,1);
         PRINT 'Error occurred while creating discussion forum.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -423,12 +423,12 @@ BEGIN
                 Price = @NewPrice,
                 Status = @NewStatus
             WHERE CourseID = @CourseID;
-            RAISERROR ('Course updated successfully.',16,2);
+            RAISERROR ('Course updated successfully.',16,1);
             PRINT 'Course updated successfully.';
         END
         ELSE
         BEGIN
-        RAISERROR(PRINT 'Information has not been changed.',16,2);
+        RAISERROR ('Information has not been changed.',16,1);
             PRINT 'Information has not been changed.';
         END
         
@@ -436,7 +436,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR ('Error occurred while updating course.')
+        RAISERROR ('Error occurred while updating course.',16,1);
         PRINT 'Error occurred while updating course.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -459,12 +459,12 @@ BEGIN
         VALUES (@ChatContent, GETDATE(), @SendChatID, @ReceiveChatID);
 
     COMMIT TRANSACTION;
-    RAISERROR ('Chat created successfully.',16,2);
+    RAISERROR ('Chat created successfully.',16,1);
     PRINT 'Chat created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating chat.',16,2);
+        RAISERROR('Error occurred while creating chat.',16,1);
         PRINT 'Error occurred while creating chat.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -531,25 +531,25 @@ BEGIN
             -- Check if the delete was successful
             IF @@ROWCOUNT = 0
             BEGIN
-                RAISERROR ('No chat found with the provided ChatID.',16,2);
+                RAISERROR ('No chat found with the provided ChatID.',16,1);
                 PRINT 'No chat found with the provided ChatID.';
             END
             ELSE
             BEGIN
-                RAISERROR ('Chat deleted successfully.',16,2);
+                RAISERROR ('Chat deleted successfully.',16,1);
                 PRINT 'Chat deleted successfully.';
             END
         END
         ELSE
         BEGIN
-            RAISERROR ('You can only delete your own chat messages.',16,2);
+            RAISERROR ('You can only delete your own chat messages.',16,1);
             PRINT 'You can only delete your own chat messages.';
     COMMIT TRANSACTION;
         END
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while deleting chat.',16,2);
+        RAISERROR('Error occurred while deleting chat.',16,1);
         PRINT 'Error occurred while deleting chat.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -574,7 +574,7 @@ BEGIN
         -- Check if a lesson with the same title and topic already exists (case insensitive)
         IF EXISTS (SELECT 1 FROM [Lessons] WHERE LOWER(Title) = LOWER(@Title) AND TopicID = @TopicID)
         BEGIN
-            RAISERROR('A lesson with this title and topic already exists.',16,2);
+            RAISERROR('A lesson with this title and topic already exists.',16,1);
             PRINT 'A lesson with this title and topic already exists.';
             RETURN;
         END
@@ -593,12 +593,12 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR ('Lesson and lesson video created successfully.',16,2);
+    RAISERROR ('Lesson and lesson video created successfully.',16,1);
     PRINT 'Lesson and lesson video created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating lesson and lesson video.',16,2);
+        RAISERROR('Error occurred while creating lesson and lesson video.',16,1);
         PRINT 'Error occurred while creating lesson and lesson video.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -629,7 +629,7 @@ BEGIN
         -- Check if the lesson video exists
         IF NOT EXISTS (SELECT 1 FROM [LessonVideo] WHERE LessonVideoID = @LessonVideoID)
         BEGIN
-            RAISERROR ('Lesson video does not exist.',16,2);
+            RAISERROR ('Lesson video does not exist.',16,1);
             PRINT 'Lesson video does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -641,12 +641,12 @@ BEGIN
         WHERE LessonVideoID = @LessonVideoID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Lesson video updated successfully.',16,2);
+    RAISERROR('Lesson video updated successfully.',16,1);
     PRINT 'Lesson video updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating lesson video.',16,2);
+        RAISERROR('Error occurred while updating lesson video.',16,1);
         PRINT 'Error occurred while updating lesson video.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -672,7 +672,7 @@ BEGIN
         -- Check if a lesson with the same title already exists (case insensitive)
         IF EXISTS (SELECT 1 FROM [Lessons] WHERE LOWER(Title) = LOWER(@Title))
         BEGIN
-            RAISERROR('A lesson with this title already exists.',16,2);
+            RAISERROR('A lesson with this title already exists.',16,1);
             PRINT 'A lesson with this title already exists.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -691,12 +691,12 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Lesson document created successfully.',16,2);
+    RAISERROR('Lesson document created successfully.',16,1);
     PRINT 'Lesson document created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating lesson document.',16,2);
+        RAISERROR('Error occurred while creating lesson document.',16,1);
         PRINT 'Error occurred while creating lesson document.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -725,7 +725,7 @@ BEGIN
         -- Check if the lesson document exists
         IF NOT EXISTS (SELECT 1 FROM [LessonDocument] WHERE LessonDocumentID = @LessonDocumentID)
         BEGIN
-            RAISERROR('Lesson document does not exist.',16,2);
+            RAISERROR('Lesson document does not exist.',16,1);
             PRINT 'Lesson document does not exist.';
             RETURN;
         END
@@ -733,7 +733,7 @@ BEGIN
         -- Check if the page number already exists for the given lesson document
         IF EXISTS (SELECT 1 FROM [PageDocument] WHERE LessonDocumentID = @LessonDocumentID AND Page = @Page)
         BEGIN
-            RAISERROR('Page number already exists for this lesson document.',16,2);
+            RAISERROR('Page number already exists for this lesson document.',16,1);
             PRINT 'Page number already exists for this lesson document.';
             RETURN;
         END
@@ -743,12 +743,12 @@ BEGIN
         VALUES (@Content, @Page, @LessonDocumentID);
 
     COMMIT TRANSACTION;
-    RAISERROR('Page document added successfully.',16,2);
+    RAISERROR('Page document added successfully.',16,1);
     PRINT 'Page document added successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while adding page document.',16,2);
+        RAISERROR('Error occurred while adding page document.',16,1);
         PRINT 'Error occurred while adding page document.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -776,7 +776,7 @@ BEGIN
         -- Check if the page document exists
         IF NOT EXISTS (SELECT 1 FROM [PageDocument] WHERE PageDocumentID = @PageDocumentID)
         BEGIN
-            RAISERROR ('Page document does not exist.',16,2);
+            RAISERROR ('Page document does not exist.',16,1);
             PRINT 'Page document does not exist.';
             RETURN;
         END
@@ -785,7 +785,7 @@ BEGIN
         IF @Content IS NULL OR LTRIM(RTRIM(@Content)) = ''
         BEGIN
             DELETE FROM [PageDocument] WHERE PageDocumentID = @PageDocumentID;
-            RAISERROR ('Page document deleted successfully.',16,2);
+            RAISERROR ('Page document deleted successfully.',16,1);
             PRINT 'Page document deleted successfully.';
         END
         ELSE
@@ -793,7 +793,7 @@ BEGIN
             -- Check if the page number already exists for the given lesson document (excluding the current page document)
             IF EXISTS (SELECT 1 FROM [PageDocument] WHERE LessonDocumentID = @LessonDocumentID AND Page = @Page AND PageDocumentID <> @PageDocumentID)
             BEGIN
-                RAISERROR ('Page number already exists for this lesson document.',16,2);
+                RAISERROR ('Page number already exists for this lesson document.',16,1);
                 PRINT 'Page number already exists for this lesson document.';
                 RETURN;
             END
@@ -802,7 +802,7 @@ BEGIN
             UPDATE [PageDocument]
             SET Content = @Content, Page = @Page, LessonDocumentID = @LessonDocumentID
             WHERE PageDocumentID = @PageDocumentID;
-            RAISERROR ('Page document updated successfully.',16,2);
+            RAISERROR ('Page document updated successfully.',16,1);
             PRINT 'Page document updated successfully.';
         END
 
@@ -810,7 +810,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR ('Error occurred while updating page document.',16,2);
+        RAISERROR ('Error occurred while updating page document.',16,1);
         PRINT 'Error occurred while updating page document.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -836,7 +836,7 @@ BEGIN
         -- Check if a lesson with the same title already exists (case insensitive)
         IF EXISTS (SELECT 1 FROM [Lessons] WHERE LOWER(Title) = LOWER(@Title))
         BEGIN
-            RAISERROR('A lesson with this title already exists.',16,2);
+            RAISERROR('A lesson with this title already exists.',16,1);
             PRINT 'A lesson with this title already exists.';
             RETURN;
         END
@@ -853,12 +853,12 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Lesson test created successfully.',16,2);
+    RAISERROR('Lesson test created successfully.',16,1);
     PRINT 'Lesson test created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating lesson test.',16,2);
+        RAISERROR('Error occurred while creating lesson test.',16,1);
         PRINT 'Error occurred while creating lesson test.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -908,12 +908,12 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Question and answers created successfully.',16,2);
+    RAISERROR('Question and answers created successfully.',16,1);
     PRINT 'Question and answers created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating question and answers.',16,2);
+        RAISERROR('Error occurred while creating question and answers.',16,1);
         PRINT 'Error occurred while creating question and answers.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -976,7 +976,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating question and answers.',16,2);
+        RAISERROR('Error occurred while updating question and answers.',16,1);
         PRINT 'Error occurred while updating question and answers.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1002,7 +1002,7 @@ BEGIN
         -- Check if the lesson exists
         IF NOT EXISTS (SELECT 1 FROM [Lessons] WHERE LessonsID = @LessonsID)
         BEGIN
-            RAISERROR('Lesson does not exist.',16,2);
+            RAISERROR('Lesson does not exist.',16,1);
             PRINT 'Lesson does not exist.';
             RETURN;
         END
@@ -1018,12 +1018,12 @@ BEGIN
         WHERE LessonsID = @LessonsID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Lesson updated successfully.',16,2);
+    RAISERROR('Lesson updated successfully.',16,1);
     PRINT 'Lesson updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating lesson.',16,2);
+        RAISERROR('Error occurred while updating lesson.',16,1);
         PRINT 'Error occurred while updating lesson.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1044,7 +1044,7 @@ BEGIN
         -- Check if the lesson exists
         IF NOT EXISTS (SELECT 1 FROM [Lessons] WHERE LessonsID = @LessonsID)
         BEGIN
-            RAISERROR('Lesson does not exist.',16,2);
+            RAISERROR('Lesson does not exist.',16,1);
             PRINT 'Lesson does not exist.';
             RETURN;
         END
@@ -1059,12 +1059,12 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Lesson and related entries deleted successfully.',16,2);
+    RAISERROR('Lesson and related entries deleted successfully.',16,1);
     PRINT 'Lesson and related entries deleted successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while deleting lesson.',16,2);
+        RAISERROR('Error occurred while deleting lesson.',16,1);
         PRINT 'Error occurred while deleting lesson.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1092,7 +1092,7 @@ BEGIN
         -- Check if the question exists
         IF NOT EXISTS (SELECT 1 FROM [Question] WHERE QuestionID = @QuestionID)
         BEGIN
-            RAISERROR('Question does not exist.',16,2);
+            RAISERROR('Question does not exist.',16,1);
             PRINT 'Question does not exist.';
             RETURN;
         END
@@ -1133,12 +1133,12 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Question and answers updated successfully.',16,2);
+    RAISERROR('Question and answers updated successfully.',16,1);
     PRINT 'Question and answers updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating question and answers.',16,2);
+        RAISERROR('Error occurred while updating question and answers.',16,1);
         PRINT 'Error occurred while updating question and answers.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1159,7 +1159,7 @@ BEGIN
         -- Check if the question exists
         IF NOT EXISTS (SELECT 1 FROM [Question] WHERE QuestionID = @QuestionID)
         BEGIN
-            RAISERROR('Question does not exist.',16,2);
+            RAISERROR('Question does not exist.',16,1);
             PRINT 'Question does not exist.';
             RETURN;
         END
@@ -1174,12 +1174,12 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Question and associated answers deleted successfully.',16,2);
+    RAISERROR('Question and associated answers deleted successfully.',16,1);
     PRINT 'Question and associated answers deleted successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while deleting question and answers.',16,2);
+        RAISERROR('Error occurred while deleting question and answers.',16,1);
         PRINT 'Error occurred while deleting question and answers.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1200,7 +1200,7 @@ BEGIN
         -- Check if the lesson test exists
         IF NOT EXISTS (SELECT 1 FROM [LessonTest] WHERE LessonTestID = @LessonTestID)
         BEGIN
-            RAISERROR('Lesson test does not exist.',16,2);
+            RAISERROR('Lesson test does not exist.',16,1);
             PRINT 'Lesson test does not exist.';
             RETURN;
         END
@@ -1223,12 +1223,12 @@ BEGIN
             q.QuestionID, a.AnswerID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Questions and answers retrieved successfully.',16,2);
+    RAISERROR('Questions and answers retrieved successfully.',16,1);
     PRINT 'Questions and answers retrieved successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while retrieving questions and answers.',16,2);
+        RAISERROR('Error occurred while retrieving questions and answers.',16,1);
         PRINT 'Error occurred while retrieving questions and answers.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1253,7 +1253,7 @@ BEGIN
         -- Kiểm tra xem bài học có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [LessonsProcess] WHERE LessonsProcessID = @LessonProcessID)
         BEGIN
-            RAISERROR('Lesson process does not exist.',16,2);
+            RAISERROR('Lesson process does not exist.',16,1);
             PRINT 'Lesson process does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -1262,7 +1262,7 @@ BEGIN
         -- Kiểm tra xem quá trình học có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [LearnProcess] WHERE LearnProcessID = @LearnProcessID)
         BEGIN
-            RAISERROR('Learn process does not exist.',16,2);
+            RAISERROR('Learn process does not exist.',16,1);
             PRINT 'Learn process does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -1271,12 +1271,12 @@ BEGIN
         -- -- Kiểm tra xem bài học đã bắt đầu chưa
         IF EXISTS (SELECT 1 FROM [LessonsProcess] WHERE LessonsProcessID = @LessonProcessID AND LearnProcessID = @LearnProcessID AND Status IN ('InProcess', 'Done'))
         BEGIN
-            RAISERROR('Lesson process already started.',16,2);
+            RAISERROR('Lesson process already started.',16,1);
             PRINT 'Lesson process already started.';
             ROLLBACK TRANSACTION;
             RETURN;
         END
-        RAISERROR('Lesson process started successfully.',16,2);
+        RAISERROR('Lesson process started successfully.',16,1);
         Print 'Lesson process started successfully. KKKKKKKK';
         UPDATE [LessonsProcess]
         SET Status = 'InProcess',
@@ -1285,7 +1285,7 @@ BEGIN
 
         -- Xác nhận giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Lesson process started successfully.',16,2);
+        RAISERROR('Lesson process started successfully.',16,1);
         PRINT 'Lesson process started successfully.';
     END TRY
     BEGIN CATCH
@@ -1294,7 +1294,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR('Error occurred while starting lesson process.',16,2);
+        RAISERROR('Error occurred while starting lesson process.',16,1);
         PRINT 'Error occurred while starting lesson process.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1318,7 +1318,7 @@ BEGIN
         -- Kiểm tra xem quá trình bài học có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [LessonsProcess] WHERE LessonsProcessID = @LessonsProcessID)
         BEGIN
-            RAISERROR('Lesson process does not exist.',16,2);
+            RAISERROR('Lesson process does not exist.',16,1);
             PRINT 'Lesson process does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -1332,7 +1332,7 @@ BEGIN
 
         -- Xác nhận giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Lesson process marked as done successfully.',16,2);
+        RAISERROR('Lesson process marked as done successfully.',16,1);
         PRINT 'Lesson process marked as done successfully.';
     END TRY
     BEGIN CATCH
@@ -1341,7 +1341,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR('Error occurred while marking lesson process as done.',16,2);
+        RAISERROR('Error occurred while marking lesson process as done.',16,1);
         PRINT 'Error occurred while marking lesson process as done.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1368,7 +1368,7 @@ BEGIN
         -- Kiểm tra xem sinh viên có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [Student] WHERE StudentID = @StudentID)
         BEGIN
-            RAISERROR('Student does not exist.',16,2);
+            RAISERROR('Student does not exist.',16,1);
             PRINT 'Student does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -1377,7 +1377,7 @@ BEGIN
         -- Kiểm tra xem khóa học có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [Course] WHERE CourseID = @CourseID)
         BEGIN
-            RAISERROR('Course does not exist.',16,2);
+            RAISERROR('Course does not exist.',16,1);
             PRINT 'Course does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -1398,7 +1398,7 @@ BEGIN
 
         -- Xác nhận giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Learn process started successfully, and lesson processes created.',16,2);
+        RAISERROR('Learn process started successfully, and lesson processes created.',16,1);
         PRINT 'Learn process started successfully, and lesson processes created.';
     END TRY
     BEGIN CATCH
@@ -1407,7 +1407,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR('Error occurred while starting learn process.',16,2);
+        RAISERROR('Error occurred while starting learn process.',16,1);
         PRINT 'Error occurred while starting learn process.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1439,7 +1439,7 @@ BEGIN
         -- Check if the student exists
         IF NOT EXISTS (SELECT 1 FROM [Student] WHERE StudentID = @StudentID)
         BEGIN
-            RAISERROR('Student does not exist.',16,2);
+            RAISERROR('Student does not exist.',16,1);
             PRINT 'Student does not exist.';
             RETURN;
         END
@@ -1447,7 +1447,7 @@ BEGIN
         -- Check if the course exists
         IF NOT EXISTS (SELECT 1 FROM [Course] WHERE CourseID = @CourseID)
         BEGIN
-            RAISERROR('Course does not exist.',16,2);
+            RAISERROR('Course does not exist.',16,1);
             PRINT 'Course does not exist.';
             RETURN;
         END
@@ -1460,12 +1460,12 @@ BEGIN
         WHERE LearnProcessID = @LearnProcessID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Learn process updated successfully.',16,2);
+    RAISERROR('Learn process updated successfully.',16,1);
     PRINT 'Learn process updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating learn process.',16,2);
+        RAISERROR('Error occurred while updating learn process.',16,1);
         PRINT 'Error occurred while updating learn process.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1488,7 +1488,7 @@ BEGIN
         -- Check if the user exists
         IF NOT EXISTS (SELECT 1 FROM [User] WHERE UserID = @UserID)
         BEGIN
-            RAISERROR('User does not exist.',16,2);
+            RAISERROR('User does not exist.',16,1);
             PRINT 'User does not exist.';
             RETURN;
         END
@@ -1496,7 +1496,7 @@ BEGIN
         -- Check if the discussion forum exists
         IF NOT EXISTS (SELECT 1 FROM [DiscussionForum] WHERE ForumID = @DiscussionForumID)
         BEGIN
-            RAISERROR('Discussion forum does not exist.',16,2);
+            RAISERROR('Discussion forum does not exist.',16,1);
             PRINT 'Discussion forum does not exist.';
             RETURN;
         END
@@ -1506,12 +1506,12 @@ BEGIN
         VALUES (@MessageContent, GETDATE(), @UserID, @DiscussionForumID);
 
     COMMIT TRANSACTION;
-    RAISERROR('Forum message created successfully.',16,2);
+    RAISERROR('Forum message created successfully.',16,1);
     PRINT 'Forum message created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating forum message.',16,2);
+        RAISERROR('Error occurred while creating forum message.',16,1);
         PRINT 'Error occurred while creating forum message.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1541,7 +1541,7 @@ BEGIN
         -- Check if the discussion forum exists
         IF NOT EXISTS (SELECT 1 FROM [DiscussionForum] WHERE ForumID = @DiscussionForumID)
         BEGIN
-        RAISERROR('Discussion forum does not exist.',16,2);
+        RAISERROR('Discussion forum does not exist.',16,1);
             PRINT 'Discussion forum does not exist.';
             RETURN;
         END
@@ -1550,12 +1550,12 @@ BEGIN
         DELETE FROM [ForumMessage] WHERE ForumMessageID = @ForumMessageID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Forum message deleted successfully.',16,2);
+    RAISERROR('Forum message deleted successfully.',16,1);
     PRINT 'Forum message deleted successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while deleting forum message.',16,2);
+        RAISERROR('Error occurred while deleting forum message.',16,1);
         PRINT 'Error occurred while deleting forum message.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1581,7 +1581,7 @@ BEGIN
         -- Check if the username already exists
         IF EXISTS (SELECT 1 FROM [User] WHERE UserName = @UserName)
         BEGIN
-            RAISERROR('Username already exists.',16,2);
+            RAISERROR('Username already exists.',16,1);
             PRINT 'Username already exists.';
             RETURN;
         END
@@ -1589,7 +1589,7 @@ BEGIN
         -- Check if the email already exists
         IF EXISTS (SELECT 1 FROM [User] WHERE Email = @Email)
         BEGIN
-            RAISERROR('Email already exists.',16,2);
+            RAISERROR('Email already exists.',16,1);
             PRINT 'Email already exists.';
             RETURN;
         END
@@ -1611,12 +1611,12 @@ BEGIN
 
 
         COMMIT TRANSACTION;
-    RAISERROR('Admin created successfully.',16,2);
+    RAISERROR('Admin created successfully.',16,1);
     PRINT 'Admin created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating admin.',16,2);
+        RAISERROR('Error occurred while creating admin.',16,1);
         PRINT 'Error occurred while creating admin.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1646,7 +1646,7 @@ BEGIN
         -- Check if the username already exists
         IF EXISTS (SELECT 1 FROM [User] WHERE UserName = @UserName)
         BEGIN
-            RAISERROR('Username already exists.',16,2);
+            RAISERROR('Username already exists.',16,1);
             PRINT 'Username already exists.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -1655,7 +1655,7 @@ BEGIN
         -- Check if the email already exists
         IF EXISTS (SELECT 1 FROM [User] WHERE Email = @Email)
         BEGIN
-        RAISERROR('Email already exists.',16,2);
+        RAISERROR('Email already exists.',16,1);
             PRINT 'Email already exists.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -1676,7 +1676,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Instructor created successfully.',16,2);
+        RAISERROR('Instructor created successfully.',16,1);
         PRINT 'Instructor created successfully.';
     END TRY
     BEGIN CATCH
@@ -1685,7 +1685,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR('Error occurred while creating instructor.',16,2);
+        RAISERROR('Error occurred while creating instructor.',16,1);
         PRINT 'Error occurred while creating instructor.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1711,7 +1711,7 @@ BEGIN
         -- Check if the admin exists
         IF NOT EXISTS (SELECT 1 FROM [Admin] WHERE UserID = @UserID)
         BEGIN
-            RAISERROR('Admin does not exist.',16,2);
+            RAISERROR('Admin does not exist.',16,1);
             PRINT 'Admin does not exist.';
             RETURN;
         END
@@ -1719,7 +1719,7 @@ BEGIN
         -- Check if the username is unique for other users
         IF EXISTS (SELECT 1 FROM [User] WHERE UserName = @UserName AND UserID <> @UserID)
         BEGIN
-            RAISERROR('Username already exists for another user.',16,2);
+            RAISERROR('Username already exists for another user.',16,1);
             PRINT 'Username already exists for another user.';
             RETURN;
         END
@@ -1727,7 +1727,7 @@ BEGIN
         -- Check if the email is unique for other users
         IF EXISTS (SELECT 1 FROM [User] WHERE Email = @Email AND UserID <> @UserID)
         BEGIN
-            RAISERROR('Email already exists for another user.',16,2);
+            RAISERROR('Email already exists for another user.',16,1);
             PRINT 'Email already exists for another user.';
             RETURN;
         END
@@ -1752,7 +1752,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating admin.',16,2);
+        RAISERROR('Error occurred while updating admin.',16,1);
         PRINT 'Error occurred while updating admin.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1782,7 +1782,7 @@ BEGIN
         -- Check if the username already exists
         IF EXISTS (SELECT 1 FROM [User] WHERE UserName = @UserName)
         BEGIN
-            RAISERROR('Username already exists.',16,2);
+            RAISERROR('Username already exists.',16,1);
             PRINT 'Username already exists.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -1791,7 +1791,7 @@ BEGIN
         -- Check if the email already exists
         IF EXISTS (SELECT 1 FROM [User] WHERE Email = @Email)
         BEGIN
-            RAISERROR('Email already exists.',16,2);
+            RAISERROR('Email already exists.',16,1);
             PRINT 'Email already exists.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -1812,7 +1812,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Student created successfully.',16,2);
+        RAISERROR('Student created successfully.',16,1);
         PRINT 'Student created successfully.';
     END TRY
     BEGIN CATCH
@@ -1821,7 +1821,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR('Error occurred while creating student.',16,2);
+        RAISERROR('Error occurred while creating student.',16,1);
         PRINT 'Error occurred while creating student.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1848,7 +1848,7 @@ BEGIN
         -- Check if the student exists
         IF NOT EXISTS (SELECT 1 FROM [Student] WHERE UserID = @UserID)
         BEGIN
-            RAISERROR('Student does not exist.',16,2);
+            RAISERROR('Student does not exist.',16,1);
             PRINT 'Student does not exist.';
             RETURN;
         END
@@ -1856,7 +1856,7 @@ BEGIN
         -- Check if the username is unique for other users
         IF EXISTS (SELECT 1 FROM [User] WHERE UserName = @UserName AND UserID <> @UserID)
         BEGIN
-            RAISERROR('Username already exists for another user.',16,2);
+            RAISERROR('Username already exists for another user.',16,1);
             PRINT 'Username already exists for another user.';
             RETURN;
         END
@@ -1864,7 +1864,7 @@ BEGIN
         -- Check if the email is unique for other users
         IF EXISTS (SELECT 1 FROM [User] WHERE Email = @Email AND UserID <> @UserID)
         BEGIN
-            RAISERROR('Email already exists for another user.',16,2);
+            RAISERROR('Email already exists for another user.',16,1);
             PRINT 'Email already exists for another user.';
             RETURN;
         END
@@ -1889,12 +1889,12 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Student updated successfully.',16,2);
+    RAISERROR('Student updated successfully.',16,1);
     PRINT 'Student updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating student.',16,2);
+        RAISERROR('Error occurred while updating student.',16,1);
         PRINT 'Error occurred while updating student.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1922,7 +1922,7 @@ BEGIN
         -- Check if the instructor exists
         IF NOT EXISTS (SELECT 1 FROM [Instructor] WHERE UserID = @UserID)
         BEGIN
-            RAISERROR('Instructor does not exist.',16,2);
+            RAISERROR('Instructor does not exist.',16,1);
             PRINT 'Instructor does not exist.';
             RETURN;
         END
@@ -1930,7 +1930,7 @@ BEGIN
         -- Check if the username is unique for other users
         IF EXISTS (SELECT 1 FROM [User] WHERE UserName = @UserName AND UserID <> @UserID)
         BEGIN
-            RAISERROR('Username already exists for another user.',16,2);
+            RAISERROR('Username already exists for another user.',16,1);
             PRINT 'Username already exists for another user.';
             RETURN;
         END
@@ -1938,7 +1938,7 @@ BEGIN
         -- Check if the email is unique for other users
         IF EXISTS (SELECT 1 FROM [User] WHERE Email = @Email AND UserID <> @UserID)
         BEGIN
-            RAISERROR('Email already exists for another user.',16,2);
+            RAISERROR('Email already exists for another user.',16,1);
             PRINT 'Email already exists for another user.';
             RETURN;
         END
@@ -1964,12 +1964,12 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Instructor updated successfully.',16,2);
+    RAISERROR('Instructor updated successfully.',16,1);
     PRINT 'Instructor updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating instructor.',16,2);
+        RAISERROR('Error occurred while updating instructor.',16,1);
         PRINT 'Error occurred while updating instructor.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -1993,7 +1993,7 @@ BEGIN
         -- Check if the student exists
         IF NOT EXISTS (SELECT 1 FROM [Student] WHERE StudentID = @StudentID)
         BEGIN
-            RAISERROR('Student does not exist.',16,2);
+            RAISERROR('Student does not exist.',16,1);
             PRINT 'Student does not exist.';
             RETURN;
         END
@@ -2001,7 +2001,7 @@ BEGIN
         -- Check if the course exists
         IF NOT EXISTS (SELECT 1 FROM [Course] WHERE CourseID = @CourseID)
         BEGIN
-            RAISERROR('Course does not exist.',16,2);
+            RAISERROR('Course does not exist.',16,1);
             PRINT 'Course does not exist.';
             RETURN;
         END
@@ -2011,12 +2011,12 @@ BEGIN
         VALUES (@Comment, @Rating, GETDATE(), @StudentID, @CourseID);
 
     COMMIT TRANSACTION;
-    RAISERROR('Review created successfully.',16,2);
+    RAISERROR('Review created successfully.',16,1);
     PRINT 'Review created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR ('Error occurred while creating review.',16,2);
+        RAISERROR ('Error occurred while creating review.',16,1);
         PRINT 'Error occurred while creating review.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2038,7 +2038,7 @@ BEGIN
         -- Check if the review exists
         IF NOT EXISTS (SELECT 1 FROM [Review] WHERE ReviewID = @ReviewID)
         BEGIN
-            RAISERROR('Review does not exist.',16,2);
+            RAISERROR('Review does not exist.',16,1);
             PRINT 'Review does not exist.';
             RETURN;
         END
@@ -2051,12 +2051,12 @@ BEGIN
         WHERE ReviewID = @ReviewID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Review updated successfully.',16,2);
+    RAISERROR('Review updated successfully.',16,1);
     PRINT 'Review updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating review.',16,2);
+        RAISERROR('Error occurred while updating review.',16,1);
         PRINT 'Error occurred while updating review.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2080,14 +2080,14 @@ BEGIN
         -- Check if the student exists
         IF NOT EXISTS (SELECT 1 FROM [Student] WHERE StudentID = @StudentID)
         BEGIN
-            RAISERROR('Student does not exist.',16,2);
+            RAISERROR('Student does not exist.',16,1);
             PRINT 'Student does not exist.';
             RETURN;
         END
         -- Check if the course exists
         IF NOT EXISTS (SELECT 1 FROM [Course] WHERE CourseID = @CourseID)
         BEGIN
-            RAISERROR('Course does not exist.',16,2);
+            RAISERROR('Course does not exist.',16,1);
             PRINT 'Course does not exist.';
             RETURN;
         END
@@ -2108,7 +2108,7 @@ BEGIN
         -- Check if the course is already in the cart
         IF EXISTS (SELECT 1 FROM [CartDetail] WHERE CartID = @CartID AND CourseID = @CourseID)
         BEGIN
-            RAISERROR('Course is already in the cart.',16,2);
+            RAISERROR('Course is already in the cart.',16,1);
             PRINT 'Course is already in the cart.';
             RETURN;
         END
@@ -2118,12 +2118,12 @@ BEGIN
         VALUES (@CartID, @CourseID);
 
     COMMIT TRANSACTION;
-    RAISERROR('Course added to cart successfully.',16,2);
+    RAISERROR('Course added to cart successfully.',16,1);
     PRINT 'Course added to cart successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while adding course to cart.',16,2);
+        RAISERROR('Error occurred while adding course to cart.',16,1);
         PRINT 'Error occurred while adding course to cart.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2144,7 +2144,7 @@ BEGIN
         -- Check if the cart exists
         IF NOT EXISTS (SELECT 1 FROM [Cart] WHERE CartID = @CartID)
         BEGIN
-            RAISERROR('Cart does not exist.',16,2);
+            RAISERROR('Cart does not exist.',16,1);
             PRINT 'Cart does not exist.';
             RETURN;
         END
@@ -2155,12 +2155,12 @@ BEGIN
         WHERE CartID = @CartID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Cart status updated successfully.',16,2);
+    RAISERROR('Cart status updated successfully.',16,1);
     PRINT 'Cart status updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating cart status.',16,2);
+        RAISERROR('Error occurred while updating cart status.',16,1);
         PRINT 'Error occurred while updating cart status.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2181,7 +2181,7 @@ BEGIN
         -- Check if the cart detail exists
         IF NOT EXISTS (SELECT 1 FROM [CartDetail] WHERE CartID = @CartID AND CourseID = @CourseID)
         BEGIN
-            RAISERROR('Cart detail does not exist.',16,2);
+            RAISERROR('Cart detail does not exist.',16,1);
             PRINT 'Cart detail does not exist.';
             RETURN;
         END
@@ -2191,12 +2191,12 @@ BEGIN
         WHERE CartID = @CartID AND CourseID = @CourseID;
 
     COMMIT TRANSACTION;
-        RAISERROR('Cart detail removed successfully.',16,2);
+        RAISERROR('Cart detail removed successfully.',16,1);
         PRINT 'Cart detail removed successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while removing cart detail.',16,2);
+        RAISERROR('Error occurred while removing cart detail.',16,1);
         PRINT 'Error occurred while removing cart detail.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2219,7 +2219,7 @@ BEGIN
         -- Check if the TaxSettingID exists
         IF NOT EXISTS (SELECT 1 FROM [TaxSetting] WHERE TaxSettingID = @TaxSettingID)
         BEGIN
-            RAISERROR('Tax setting does not exist.',16,2);
+            RAISERROR('Tax setting does not exist.',16,1);
             PRINT 'Tax setting does not exist.';
             RETURN;
         END
@@ -2227,7 +2227,7 @@ BEGIN
         -- Check if the InstructorID exists
         IF NOT EXISTS (SELECT 1 FROM [Instructor] WHERE InstructorID = @InstructorID)
         BEGIN
-            RAISERROR('Instructor does not exist.',16,2);
+            RAISERROR('Instructor does not exist.',16,1);
             PRINT 'Instructor does not exist.';
             RETURN;
         END
@@ -2237,12 +2237,12 @@ BEGIN
         VALUES (GETDATE(), @TaxCode, @TaxSettingID, @InstructorID);
 
     COMMIT TRANSACTION;
-    RAISERROR('Tax report created successfully.',16,2);
+    RAISERROR('Tax report created successfully.',16,1);
     PRINT 'Tax report created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating tax report.',16,2);
+        RAISERROR('Error occurred while creating tax report.',16,1);
         PRINT 'Error occurred while creating tax report.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2266,7 +2266,7 @@ BEGIN
         -- Kiểm tra xem sinh viên có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [Student] WHERE StudentID = @StudentID)
         BEGIN
-            RAISERROR('Student does not exist.',16,2);
+            RAISERROR('Student does not exist.',16,1);
             PRINT 'Student does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2291,7 +2291,7 @@ BEGIN
             -- Kiểm tra xem khoá học đã có trong chi tiết hoá đơn chưa
             IF EXISTS (SELECT 1 FROM [InvoiceDetail] WHERE InvoiceID = @InvoiceID AND CourseID = @CourseID)
             BEGIN
-                RAISERROR('Course already exists in the unpaid invoice.',16,2);
+                RAISERROR('Course already exists in the unpaid invoice.',16,1);
                 PRINT 'Course already exists in the unpaid invoice.';
                 ROLLBACK TRANSACTION;
                 RETURN;
@@ -2303,7 +2303,7 @@ BEGIN
                    JOIN [Cart] c ON cd.CartID = c.CartID
                    WHERE c.StudentID = @StudentID AND cd.CourseID = @CourseID AND c.CartStatus = 'Done')
         BEGIN
-            RAISERROR('Course already exists in a completed cart.',16,2);
+            RAISERROR('Course already exists in a completed cart.',16,1);
             PRINT 'Course already exists in a completed cart.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2322,7 +2322,7 @@ BEGIN
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Invoice updated successfully.',16,2);
+        RAISERROR('Invoice updated successfully.',16,1);
         PRINT 'Invoice updated successfully.';
     END TRY
     BEGIN CATCH
@@ -2331,7 +2331,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR('Error occurred while creating/updating invoice.',16,2);
+        RAISERROR('Error occurred while creating/updating invoice.',16,1);
         PRINT 'Error occurred while creating/updating invoice.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2362,7 +2362,7 @@ BEGIN
 
         IF @DiscountID IS NULL
         BEGIN
-            RAISERROR('Invalid discount code.',16,2);
+            RAISERROR('Invalid discount code.',16,1);
             PRINT 'Invalid discount code.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2370,7 +2370,7 @@ BEGIN
 
         IF @ExpiryDate < GETDATE()
         BEGIN
-            RAISERROR('Discount code has expired.',16,2);
+            RAISERROR('Discount code has expired.',16,1);
             PRINT 'Discount code has expired.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2378,7 +2378,7 @@ BEGIN
 
         IF @Quantity <= 0
         BEGIN
-            RAISERROR('Discount code is out of quantity.',16,2);
+            RAISERROR('Discount code is out of quantity.',16,1);
             PRINT 'Discount code is out of quantity.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2392,7 +2392,7 @@ BEGIN
 
         IF @CourseID IS NULL
         BEGIN
-            RAISERROR('Invalid invoice detail ID.',16,2);
+            RAISERROR('Invalid invoice detail ID.',16,1);
             PRINT 'Invalid invoice detail ID.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2427,7 +2427,7 @@ BEGIN
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Discount applied successfully.',16,2);
+        RAISERROR('Discount applied successfully.',16,1);
         PRINT 'Discount applied successfully.';
     END TRY
     BEGIN CATCH
@@ -2436,7 +2436,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR('Error occurred while applying discount.',16,2);
+        RAISERROR('Error occurred while applying discount.',16,1);
         PRINT 'Error occurred while applying discount.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2461,7 +2461,7 @@ BEGIN
         -- Kiểm tra xem InvoiceDetailID có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [InvoiceDetail] WHERE InvoiceDetailID = @InvoiceDetailID)
         BEGIN
-            RAISERROR('Invoice detail does not exist.',16,2);
+            RAISERROR('Invoice detail does not exist.',16,1);
             PRINT 'Invoice detail does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2488,7 +2488,7 @@ BEGIN
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Invoice detail deleted and total amount updated successfully.',16,2);
+        RAISERROR('Invoice detail deleted and total amount updated successfully.',16,1);
         PRINT 'Invoice detail deleted and total amount updated successfully.';
     END TRY
     BEGIN CATCH
@@ -2497,7 +2497,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR('Error occurred while deleting invoice detail.',16,2);
+        RAISERROR('Error occurred while deleting invoice detail.',16,1);
         PRINT 'Error occurred while deleting invoice detail.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2526,7 +2526,7 @@ BEGIN
         -- Check if the user exists
         IF NOT EXISTS (SELECT 1 FROM [User] WHERE UserID = @UserID)
         BEGIN
-            RAISERROR('User does not exist.',16,2);
+            RAISERROR('User does not exist.',16,1);
             PRINT 'User does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2535,7 +2535,7 @@ BEGIN
         -- Check if the account number already exists
         IF EXISTS (SELECT 1 FROM [BankAccount] WHERE AccountNumber = @AccountNumber)
         BEGIN
-            RAISERROR('Account number already exists.',16,2);
+            RAISERROR('Account number already exists.',16,1);
             PRINT 'Account number already exists.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2547,13 +2547,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Bank account created successfully.',16,2);
+        RAISERROR('Bank account created successfully.',16,1);
         PRINT 'Bank account created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating bank account.',16,2);
+        RAISERROR('Error occurred while creating bank account.',16,1);
         PRINT 'Error occurred while creating bank account.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2582,7 +2582,7 @@ BEGIN
         -- Check if the user exists
         IF NOT EXISTS (SELECT 1 FROM [User] WHERE UserID = @UserID)
         BEGIN
-        RAISERROR('User does not exist.',16,2);
+        RAISERROR('User does not exist.',16,1);
             PRINT 'User does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2591,7 +2591,7 @@ BEGIN
         -- Check if the bank account exists for the user
         IF NOT EXISTS (SELECT 1 FROM [BankAccount] WHERE UserID = @UserID AND BankAccountID = @BankAccountID)
         BEGIN
-            RAISERROR('Bank account does not exist for this user.',16,2);
+            RAISERROR('Bank account does not exist for this user.',16,1);
             PRINT 'Bank account does not exist for this user.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2608,13 +2608,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Bank account updated successfully.',16,2);
+        RAISERROR('Bank account updated successfully.',16,1);
         PRINT 'Bank account updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating bank account.',16,2);
+        RAISERROR('Error occurred while updating bank account.',16,1);
         PRINT 'Error occurred while updating bank account.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2642,7 +2642,7 @@ BEGIN
         -- Check if the bank account exists
         IF NOT EXISTS (SELECT 1 FROM [BankAccount] WHERE BankAccountID = @BankAccountID)
         BEGIN
-            RAISERROR('Bank account does not exist.',16,2);
+            RAISERROR('Bank account does not exist.',16,1);
             PRINT 'Bank account does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2654,13 +2654,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('History banking record created successfully.',16,2);
+        RAISERROR('History banking record created successfully.',16,1);
         PRINT 'History banking record created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating history banking record.',16,2);
+        RAISERROR('Error occurred while creating history banking record.',16,1);
         PRINT 'Error occurred while creating history banking record.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2685,7 +2685,7 @@ BEGIN
         -- Check if the bank account exists for the user
         IF NOT EXISTS (SELECT 1 FROM [BankAccount] WHERE BankAccountID = @BankAccountID)
         BEGIN
-            RAISERROR('Bank account does not exist.',16,2);
+            RAISERROR('Bank account does not exist.',16,1);
             PRINT 'Bank account does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2716,7 +2716,7 @@ BEGIN
         END
         ELSE
         BEGIN
-            RAISERROR('Invalid transaction type. Please specify "Deposit" or "Withdrawal".',16,2);
+            RAISERROR('Invalid transaction type. Please specify "Deposit" or "Withdrawal".',16,1);
             PRINT 'Invalid transaction type. Please specify "Deposit" or "Withdrawal".';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2740,7 +2740,7 @@ BEGIN
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while processing transaction.',16,2);
+        RAISERROR('Error occurred while processing transaction.',16,1);
                 PRINT 'Error occurred while processing transaction.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2769,7 +2769,7 @@ BEGIN
         -- Check if the beneficiary bank account exists (if provided)
         IF @BankBeneficiaryID IS NOT NULL AND NOT EXISTS (SELECT 1 FROM [BankAccount] WHERE BankAccountID = @BankBeneficiaryID)
         BEGIN
-            RAISERROR('Beneficiary bank account does not exist.',16,2);
+            RAISERROR('Beneficiary bank account does not exist.',16,1);
             PRINT 'Beneficiary bank account does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2778,7 +2778,7 @@ BEGIN
         -- Check if the ordering bank account exists (if provided)
         IF @BankOrderingID IS NOT NULL AND NOT EXISTS (SELECT 1 FROM [BankAccount] WHERE BankAccountID = @BankOrderingID)
         BEGIN
-            RAISERROR('Ordering bank account does not exist.',16,2);
+            RAISERROR('Ordering bank account does not exist.',16,1);
             PRINT 'Ordering bank account does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2806,13 +2806,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Transfer created and balances updated successfully.',16,2);
+        RAISERROR('Transfer created and balances updated successfully.',16,1);
         PRINT 'Transfer created and balances updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating transfer and updating balances.',16,2);
+        RAISERROR('Error occurred while creating transfer and updating balances.',16,1);
         PRINT 'Error occurred while creating transfer and updating balances.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2837,7 +2837,7 @@ BEGIN
         -- Check if the invoice exists and is unpaid
         IF NOT EXISTS (SELECT 1 FROM [Invoice] WHERE InvoiceID = @InvoiceID AND Status = 'UnPaied')
         BEGIN
-            RAISERROR('Invoice does not exist or is already paid.',16,2);
+            RAISERROR('Invoice does not exist or is already paid.',16,1);
             PRINT 'Invoice does not exist or is already paid.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2846,7 +2846,7 @@ BEGIN
         -- if hoa don da thanh thoan roi thi khong the thanh toan nua
         IF EXISTS (SELECT 1 FROM [Invoice] WHERE InvoiceID = @InvoiceID AND Status = 'Paied')
         BEGIN
-            RAISERROR('Invoice is already paid.',16,2);
+            RAISERROR('Invoice is already paid.',16,1);
             PRINT 'Invoice is already paid.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2868,7 +2868,7 @@ BEGIN
         -- Check if the student has a bank account
         IF @StudentBankAccountID IS NULL
         BEGIN
-            RAISERROR('Student does not have a bank account.',16,2);
+            RAISERROR('Student does not have a bank account.',16,1);
             PRINT 'Student does not have a bank account.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2903,7 +2903,7 @@ BEGIN
             -- Check if the instructor has a bank account
             IF @InstructorBankAccountID IS NULL
             BEGIN
-                RAISERROR('Instructor does not have a bank account.',16,2);
+                RAISERROR('Instructor does not have a bank account.',16,1);
                 PRINT 'Instructor does not have a bank account.';
                 ROLLBACK TRANSACTION;
                 CLOSE course_cursor;
@@ -2973,7 +2973,7 @@ BEGIN
         -- Check if the instructor exists
         IF NOT EXISTS (SELECT 1 FROM [Instructor] WHERE InstructorID = @InstructorID)
         BEGIN
-            RAISERROR('Instructor does not exist.',16,2);
+            RAISERROR('Instructor does not exist.',16,1);
             PRINT 'Instructor does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -2985,13 +2985,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Certificate created successfully.',16,2);
+        RAISERROR('Certificate created successfully.',16,1);
         PRINT 'Certificate created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating certificate.',16,2);
+        RAISERROR('Error occurred while creating certificate.',16,1);
         PRINT 'Error occurred while creating certificate.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -3017,7 +3017,7 @@ BEGIN
         -- Check if the certificate exists
         IF NOT EXISTS (SELECT 1 FROM [Certificate] WHERE CertificateID = @CertificateID)
         BEGIN
-            RAISERROR('Certificate does not exist.',16,2);
+            RAISERROR('Certificate does not exist.',16,1);
             PRINT 'Certificate does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3032,13 +3032,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Certificate updated successfully.',16,2);
+        RAISERROR('Certificate updated successfully.',16,1);
         PRINT 'Certificate updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating certificate.',16,2);
+        RAISERROR('Error occurred while updating certificate.',16,1);
         PRINT 'Error occurred while updating certificate.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -3063,7 +3063,7 @@ BEGIN
         -- Check if the user exists
         IF NOT EXISTS (SELECT 1 FROM [User] WHERE UserID = @UserID)
         BEGIN
-            RAISERROR('User does not exist.',16,2);
+            RAISERROR('User does not exist.',16,1);
             PRINT 'User does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3075,13 +3075,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Education record created successfully.',16,2);
+        RAISERROR('Education record created successfully.',16,1);
         PRINT 'Education record created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating education record.',16,2);
+        RAISERROR('Error occurred while creating education record.',16,1);
         PRINT 'Error occurred while creating education record.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -3106,7 +3106,7 @@ BEGIN
         -- Check if the education record exists
         IF NOT EXISTS (SELECT 1 FROM [Education] WHERE EducationID = @EducationID)
         BEGIN
-            RAISERROR('Education record does not exist.',16,2);
+            RAISERROR('Education record does not exist.',16,1);
             PRINT 'Education record does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3121,13 +3121,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Education record updated successfully.',16,2);
+        RAISERROR('Education record updated successfully.',16,1);
         PRINT 'Education record updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating education record.',16,2);
+        RAISERROR('Error occurred while updating education record.',16,1);
         PRINT 'Error occurred while updating education record.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -3149,7 +3149,7 @@ BEGIN
         -- Check if the course exists
         IF NOT EXISTS (SELECT 1 FROM [Course] WHERE CourseID = @CourseID)
         BEGIN
-            RAISERROR( 'Course does not exist.',16,2);
+            RAISERROR( 'Course does not exist.',16,1);
             PRINT 'Course does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3161,13 +3161,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Course deleted successfully.',16,2);
+        RAISERROR('Course deleted successfully.',16,1);
         PRINT 'Course deleted successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while deleting course.',16,2);
+        RAISERROR('Error occurred while deleting course.',16,1);
         PRINT 'Error occurred while deleting course.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -3191,7 +3191,7 @@ BEGIN
         -- Kiểm tra xem người dùng gửi có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [User] WHERE UserID = @SendUserID)
         BEGIN
-            RAISERROR('Send user does not exist.',16,2);
+            RAISERROR('Send user does not exist.',16,1);
             PRINT 'Send user does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3200,7 +3200,7 @@ BEGIN
         -- Kiểm tra xem người dùng nhận có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM [User] WHERE UserID = @ReceiveUserID)
         BEGIN
-            RAISERROR('Receive user does not exist.',16,2);
+            RAISERROR('Receive user does not exist.',16,1);
             PRINT 'Receive user does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3212,7 +3212,7 @@ BEGIN
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Notification created successfully.',16,2);
+        RAISERROR('Notification created successfully.',16,1);
         PRINT 'Notification created successfully.';
     END TRY
     BEGIN CATCH
@@ -3221,7 +3221,7 @@ BEGIN
         BEGIN
             ROLLBACK TRANSACTION;
         END
-        RAISERROR('Error occurred while creating notification.',16,2);
+        RAISERROR('Error occurred while creating notification.',16,1);
         PRINT 'Error occurred while creating notification.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -3302,12 +3302,12 @@ BEGIN
         BEGIN
             DELETE FROM Discount
             WHERE DiscountID = @DiscountID;
-            RAISERROR('Discount deleted successfully.',16,2);
+            RAISERROR('Discount deleted successfully.',16,1);
             PRINT 'Discount deleted successfully.';
         END
         ELSE
         BEGIN
-            RAISERROR('Discount does not exist.',16,2);
+            RAISERROR('Discount does not exist.',16,1);
             PRINT 'Discount does not exist.';
         END
 
@@ -3362,12 +3362,12 @@ BEGIN
                 ExpiryDate = @ExpiryDate,
                 Quantity = @Quantity
             WHERE DiscountID = @DiscountID;
-            RAISERROR('Discount updated successfully.',16,2);
+            RAISERROR('Discount updated successfully.',16,1);
             PRINT 'Discount updated successfully.';
         END
         ELSE
         BEGIN
-            RAISERROR('Discount does not exist.',16,2);
+            RAISERROR('Discount does not exist.',16,1);
             PRINT 'Discount does not exist.';
         END
 
@@ -3440,7 +3440,7 @@ BEGIN
         -- Kiểm tra xem TaxSettingID có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM TaxSetting WHERE TaxSettingID = @TaxSettingID)
         BEGIN
-            RAISERROR('Tax setting does not exist.',16,2);
+            RAISERROR('Tax setting does not exist.',16,1);
             PRINT 'Tax setting does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3449,7 +3449,7 @@ BEGIN
         -- Kiểm tra xem TaxSettingID đã được sử dụng trong bảng khác chưa
         IF EXISTS (SELECT 1 FROM TaxReport WHERE TaxSettingID = @TaxSettingID)
         BEGIN
-            RAISERROR('Tax setting has been referenced in another table and cannot be updated.',16,2);
+            RAISERROR('Tax setting has been referenced in another table and cannot be updated.',16,1);
             PRINT 'Tax setting has been referenced in another table and cannot be updated.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3464,13 +3464,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Tax setting updated successfully.',16,2);
+        RAISERROR('Tax setting updated successfully.',16,1);
         PRINT 'Tax setting updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while updating tax setting.',16,2);
+        RAISERROR('Error occurred while updating tax setting.',16,1);
         PRINT 'Error occurred while updating tax setting.';
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -3494,7 +3494,7 @@ BEGIN
         -- Kiểm tra xem InstructorID có tồn tại không
         IF NOT EXISTS (SELECT 1 FROM Instructor WHERE InstructorID = @InstructorID)
         BEGIN
-            RAISERROR('Instructor does not exist.',16,2);
+            RAISERROR('Instructor does not exist.',16,1);
             PRINT 'Instructor does not exist.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3509,7 +3509,7 @@ BEGIN
         -- Kiểm tra xem có TaxSettingID nào không
         IF @TaxSettingID IS NULL
         BEGIN
-            RAISERROR('No tax setting available.',16,2);
+            RAISERROR('No tax setting available.',16,1);
             PRINT 'No tax setting available.';
             ROLLBACK TRANSACTION;
             RETURN;
@@ -3524,13 +3524,13 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Tax report created successfully.',16,2);
+        RAISERROR('Tax report created successfully.',16,1);
         PRINT 'Tax report created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating tax report.',16,2);
+        RAISERROR('Error occurred while creating tax report.',16,1);
         PRINT 'Error occurred while creating tax report.';
         PRINT ERROR_MESSAGE();
     END CATCH
