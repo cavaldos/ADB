@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react(), reactRefresh()],
   entry: "./src/index.js",
   server: {
+    // port: 433,
     host: "0.0.0.0", // default: 'localhost'
   
   },

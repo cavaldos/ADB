@@ -29,7 +29,7 @@ const ButtonItem = ({ isHovered, name, icon, path }) => {
         {icon ? icon : <h1 className="text-2xl font-bold">U</h1>}
       </div>
       <h3
-        className={`truncate overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-300 ${
+        className={`truncate overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-300 ml-4 ${
           isHovered ? "inline-block" : "hidden"
         }`}
       >

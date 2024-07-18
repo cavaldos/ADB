@@ -88,10 +88,10 @@ const InstructorAccount = () => {
   return (
     <div className="relative">
       <div
-        className="flex items-center space-x-4 cursor-pointer"
+        className="flex items-center space-x-4 cursor-pointer "
         onClick={toggleDropdown}
       >
-        <a href="#" className="text-gray-600">
+        <a href="#" className="text-gray-600 ">
           English
         </a>
         <a href="#" className="text-gray-600">

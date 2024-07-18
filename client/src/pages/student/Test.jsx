@@ -96,7 +96,6 @@ const VideoCom = () => {
   );
 };
 
-
 const VideoC = ({ videoUrl }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -197,12 +196,10 @@ const CollapsibleSection = () => {
               <div className="text-green-500">✔</div>
             </div>
             <Lecture />
-
             <VideoCom />
             kk
             <VideoC videoUrl={"https://www.youtube.com/watch?v=bU98q1wNCzA"} />
             <VideoC videoUrl="https://drive.google.com/file/d/1B9KwdIpO96IaxaQbsoFTfxdZ97TFuwfT/view?usp=sharing" />
-
             <div className="mt-4">
               <p className="text-lg font-semibold text-gray-900">
                 Prepare for Predicting and Review the Lesson
@@ -234,4 +231,6 @@ const Test = () => {
     </div>
   );
 };
+
+export { CollapsibleSection };
 export default Test;

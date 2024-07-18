@@ -1,6 +1,6 @@
 import React from "react";
 
-import CourseDetail from "./test";
+import CourseDetail from "./Test";
 const Sidebar = () => {
   return (
     <div className="w-64 bg-white shadow-md p-4">
