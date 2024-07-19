@@ -27,6 +27,7 @@ function generateSQL(numLessons, procedureName) {
     let sqlStatements = '';
 
     for (let i = 1; i <= numLessons; i++) {
+        sadf
         const title = `Lesson Title ${getRandomString(10)}`;
         const duration = getRandomInt(5, 60); // Giả định thời lượng từ 5 đến 60 phút
         const complexityLevel = getRandomElement(complexityLevels); // Chọn ngẫu nhiên một trong ba mức độ phức tạp
