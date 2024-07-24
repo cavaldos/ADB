@@ -194,8 +194,8 @@ BEGIN
     ELSE
     BEGIN
         -- Nếu không tồn tại, thực hiện chèn
-        INSERT INTO LessonTest (EnrollmentTime, LessonsID)
-        SELECT EnrollmentTime, LessonsID FROM inserted;
+        INSERT INTO LessonTest (LessonsID, LessonTestID)
+        SELECT LessonsID, LessonTestID FROM inserted;
     END
 END;
 GO

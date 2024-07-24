@@ -4,7 +4,7 @@
 
 CREATE TABLE [LessonsProcess] (
   [LessonsProcessID] integer PRIMARY KEY IDENTITY(1, 1),
-  [Status] nvarchar(255) NOT NULL CHECK ([Status] IN ('NotStarted', 'InProcess', 'Done')),
+  [Status] nvarchar(10) NOT NULL CHECK ([Status] IN ('NotStarted', 'InProcess', 'Done')),
   [StartTime] datetime,
   [EndTime] datetime,
   [LessonsID] integer,
@@ -16,7 +16,7 @@ CREATE TABLE [Lessons] (
   [LessonsID] integer PRIMARY KEY IDENTITY(1, 1),
   [Title] varchar(255),
   [Duration] integer,
-  [ComplexityLevel] nvarchar(255) NOT NULL CHECK ([ComplexityLevel] IN ('Easy', 'Medium', 'Hard')),
+  [ComplexityLevel] nvarchar(6) NOT NULL CHECK ([ComplexityLevel] IN ('Easy', 'Medium', 'Hard')),
   [CreatedTime] datetime,
   [UpdatedTime] datetime,
   [LessonType] nvarchar(255),
@@ -27,7 +27,7 @@ GO
 
 CREATE TABLE [QuizResults] (
   [QuizResultsID] integer PRIMARY KEY IDENTITY(1, 1),
-  [Status] nvarchar(255) NOT NULL CHECK ([Status] IN ('NotStarted', 'InProcess', 'Done')),
+  [Status] nvarchar(10) NOT NULL CHECK ([Status] IN ('NotStarted', 'InProcess', 'Done')),
   [TimeTaken] integer,
   [UserAnswer] nvarchar(1000),
   [LessonsProcessID] integer
@@ -62,7 +62,7 @@ GO
 
 CREATE TABLE [LessonVideo] (
   [LessonVideoID] integer PRIMARY KEY IDENTITY(1, 1) ,
-  [URL] varchar(255),
+  [URL] varchar(500),
   [LessonsID] integer UNIQUE 
   FOREIGN KEY (LessonsID) REFERENCES [Lessons](LessonsID) ON DELETE CASCADE
 
@@ -99,7 +99,7 @@ CREATE TABLE [User] (
   [FullName] varchar(20),
   [Phone] varchar(20),
   [Address] varchar(50),
-  [Role] nvarchar(255) NOT NULL CHECK ([Role] IN ('Student', 'Instructor', 'Admin')),
+  [Role] nvarchar(10) NOT NULL CHECK ([Role] IN ('Student', 'Instructor', 'Admin')),
   [CreatedTime] datetime,
   [UpdateTime] datetime
 )
@@ -122,8 +122,8 @@ GO
 
 CREATE TABLE [Instructor] (
   [InstructorID] integer PRIMARY KEY IDENTITY(1, 1),
-  [Level] nvarchar(255) NOT NULL CHECK ([Level] IN ('Beginner', 'Intermediate', 'Advanced')),
-  [Status] nvarchar(255) NOT NULL CHECK ([Status] IN ('Pending', 'Done')),
+  [Level] nvarchar(15) NOT NULL CHECK ([Level] IN ('Beginner', 'Intermediate', 'Advanced')),
+  [Status] nvarchar(7) NOT NULL CHECK ([Status] IN ('Pending', 'Done')),
   [UserID] integer UNIQUE,
   FOREIGN KEY (UserID) REFERENCES [User](UserID) ON DELETE CASCADE
 )
@@ -163,7 +163,7 @@ CREATE TABLE [Course] (
   [Language] varchar(20),
   [Image] varchar(50),
   [Price] float,
-  [Status] nvarchar(255) NOT NULL CHECK ([Status] IN ('Hide', 'Free', 'Plus')),
+  [Status] nvarchar(4) NOT NULL CHECK ([Status] IN ('Hide', 'Free', 'Plus')),
   [CreateTime] datetime,
   [CategoryID] integer
 )
@@ -177,7 +177,7 @@ CREATE TABLE [CourseHistory] (
   [Language] varchar(20),
   [Image] varchar(50),
   [Price] float,
-  [Status] nvarchar(255) NOT NULL CHECK ([Status] IN ('Hide', 'Free', 'Plus')),
+  [Status] nvarchar(4) NOT NULL CHECK ([Status] IN ('Hide', 'Free', 'Plus')),
   [UpdateTime] datetime,
   [CourseID] integer,
   [UserUpdate] integer,
@@ -222,7 +222,7 @@ GO
 
 CREATE TABLE [Cart] (
   [CartID] integer PRIMARY KEY IDENTITY(1, 1),
-  [CartStatus] nvarchar(255) NOT NULL CHECK ([CartStatus] IN ('Pending', 'Done')),
+  [CartStatus] nvarchar(7) NOT NULL CHECK ([CartStatus] IN ('Pending', 'Done')),
   [UserID] integer
 )
 GO
@@ -283,7 +283,7 @@ CREATE TABLE [Transfer] (
   [TransferID] integer PRIMARY KEY IDENTITY(1, 1),
   [TransactionTime] datetime,
   [Amount] float,
-  [TransferType] nvarchar(255) NOT NULL CHECK ([TransferType] IN ('Deposit', 'Withdrawal')),
+  [TransferType] nvarchar(10) NOT NULL CHECK ([TransferType] IN ('Deposit', 'Withdrawal')),
   [TransferDescription] nvarchar(500),
   [BankBeneficiaryID] integer,
   [BankOrderingID] integer,
@@ -305,7 +305,7 @@ CREATE TABLE [Invoice] (
   [InvoiceID] integer PRIMARY KEY IDENTITY(1, 1),
   [InvoiceDate] datetime,
   [TotalAmount] float,
-  [Status] nvarchar(255) NOT NULL CHECK ([Status] IN ('Paied', 'UnPaied')),
+  [Status] nvarchar(7) NOT NULL CHECK ([Status] IN ('Paied', 'UnPaied')),
   [TransferID] integer DEFAULT (null),
   [StudentID] integer
 )
@@ -505,8 +505,3 @@ GO
 
 ALTER TABLE [Revenue] ADD FOREIGN KEY ([TaxReportID]) REFERENCES [TaxReport] ([TaxReportID])
 GO
-
-
---insert course
-INSERT INTO [Course] ([Title], [Subtitle], [Description], [Language], [Image], [Price], [Status], [CreateTime], [CategoryID])
-VALUES ('Java', 'Java for beginner', 'Java for beginner', 'English', 'java.jpg', 0, 'Free', '2021-01-01', 1);
