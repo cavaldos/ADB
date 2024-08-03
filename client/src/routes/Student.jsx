@@ -4,27 +4,21 @@ import { lazy } from "react";
 
 const StudentLayout = lazy(() => import("~/components/Layout/StudentLayout"));
 const HomeStudent = lazy(() => import("~/pages/student/index"));
-const DevPage = lazy(() => import("~/pages/student/chat"));
-const Cart = lazy(() => import("~/pages/student/Cart"));
-const Learning = lazy(() => import("~/pages/student/Learning"));
-const CourseDetail = lazy(() => import("~/pages/student/CourseDetail"));
-const Chats = lazy(() => import("~/pages/student/Chats"));
-const LearnProcess = lazy(() => import("~/pages/student/LearnProcess"));
+const SearchCourse = lazy(() => import("~/pages/student/SearchCourse.page"));
+const CourseDetail = lazy(() => import("~/pages/student/CourseDetail.page"));
+const Cart = lazy(() => import("~/pages/student/Cart.page"));
+const Learning = lazy(() => import("~/pages/student/Learning.page"));
+const LearnProcess = lazy(() => import("~/pages/student/LearnProcess.page"));
+const Invoice = lazy(() => import("~/pages/student/Invoice.page"));
+const Profile = lazy(() => import("~/components/Profile/Profile"));
+
 const BankAccount = lazy(() => import("~/pages/guest/BankAccount"));
-const Profile = lazy(() => import("~/pages/guest/Profile"));
-const Image = lazy(() => import("~/pages/student/image"));
-import Test from "../pages/student/Test";
+import Test from "../components/Test";
 const StudentRouter = [
   {
     name: "Home",
     path: "/",
     component: HomeStudent,
-    Layout: StudentLayout,
-  },
-  {
-    name: "Dev",
-    path: "/dev",
-    component: DevPage,
     Layout: StudentLayout,
   },
 
@@ -41,22 +35,17 @@ const StudentRouter = [
     component: Learning,
     Layout: StudentLayout,
   },
-  {
-    name: "CourseDetail",
-    path: "/course-detail",
-    component: CourseDetail,
-    Layout: StudentLayout,
-  },
-  {
-    name: "Chats",
-    path: "/chat",
-    component: Chats,
-    Layout: StudentLayout,
-  },
+
   {
     name: "LearnProcess",
     path: "/learn-process",
     component: LearnProcess,
+    Layout: StudentLayout,
+  },
+  {
+    name: "Invoice",
+    path: "/invoice",
+    component: Invoice,
     Layout: StudentLayout,
   },
   {
@@ -66,15 +55,21 @@ const StudentRouter = [
     Layout: null,
   },
   {
-    name: "Profile",
-    path: "/profile",
-    component: Profile,
+    name: null,
+    path: "/search/:search",
+    component: SearchCourse,
     Layout: StudentLayout,
   },
   {
-    name: "Image",
-    path: "/image",
-    component: Image,
+    name: null,
+    path: "/course-detail/:id",
+    component: CourseDetail,
+    Layout: StudentLayout,
+  },
+  {
+    name: null,
+    path: "/profile",
+    component: Profile,
     Layout: StudentLayout,
   },
 

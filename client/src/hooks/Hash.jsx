@@ -3,6 +3,7 @@ class Hash {
     this.id = 1;
   }
 
+
   encode(str) {
     let encoded = "";
     for (let i = 0; i < str.length; i++) {

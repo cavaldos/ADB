@@ -5,7 +5,7 @@ import {
   InstructorRouter,
 } from "~/routes";
 
-import React, { Fragment, Suspense, lazy } from "react";
+import { Fragment, Suspense, lazy } from "react";
 import { useSelector } from "react-redux";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Loading from "./components/err/loading";

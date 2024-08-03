@@ -3,7 +3,6 @@ import ForumIcon from "@mui/icons-material/Forum";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import BuildIcon from "@mui/icons-material/Build";
 import HelpIcon from "@mui/icons-material/Help";
-import { name } from "@cloudinary/url-gen/actions/namedTransformation";
 const InstructorLayout = lazy(() =>
   import("~/components/Layout/InstructorLayout")
 );
@@ -36,26 +35,33 @@ const InstructorRouter = [
     Layout: InstructorLayout,
   },
   {
-    name: "Lesson Video",
-    path: "/lesson-video",
-    icon: <HelpIcon />,
+    name: null,
+    path: "/create-course/lesson-video",
+    icon: null,
     component: LessonVideo,
     Layout: InstructorLayout,
   },
   {
-    name: "Lesson Document",
-    path : "/lesson-document",
-    icon: <HelpIcon />,
+    name: null,
+    path: "/create-course/lesson-document",
+    icon: null,
     component: LessonDocument,
     Layout: InstructorLayout,
   },
   {
-    name: "Lesson Test",
-    path : "/lesson-test",
-    icon: <HelpIcon />,
+    name: null,
+    path: "/create-course/lesson-test",
+    icon: null,
     component: LessonTest,
     Layout: InstructorLayout,
-  }
+  },
+  {
+    name: "Create Bank Account",
+    path: "/create-bank-account",
+    icon: <HelpIcon />,
+    component: MyCourse,
+    Layout: InstructorLayout,
+  },
 ];
 
 export default InstructorRouter;

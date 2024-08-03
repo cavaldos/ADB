@@ -79,7 +79,7 @@ const CollapsibleTopic = () => {
             <div className="flex items-center justify-between bg-red-400">
               <div>
                 <p className="text-lg font-semibold text-gray-900">
-                  Making Predictions Before You Listen
+                  Making Predictions Before You Listensdfsadf
                 </p>
                 <p className="text-gray-600">Video • 2 min</p>
               </div>

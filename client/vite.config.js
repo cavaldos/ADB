@@ -1,17 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import reactRefresh from "@vitejs/plugin-react-refresh";
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), reactRefresh()],
-  entry: "./src/index.js",
   server: {
-    // port: 433,
     host: "0.0.0.0", // default: 'localhost'
-  
+    hmr: {
+      overlay: false,
+    },
   },
   preview: {
-    port: 8080,
+    port: 80,
   },
   resolve: {
     alias: [

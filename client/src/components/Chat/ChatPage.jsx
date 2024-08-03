@@ -5,8 +5,8 @@ const ChatPage = () => {
   const [message, setMessage] = useState("");
   const [senderId, setSenderId] = useState("");
   const [receiverId, setReceiverId] = useState("");
-
-  const { messages, sendMessage } = useChatSocket(senderId);
+  const { messages, typingUsers, sendMessage, handleTyping } =
+    useChatSocket(senderId);
 
   const handleSendMessage = () => {
     sendMessage(message, receiverId);
@@ -42,12 +42,25 @@ const ChatPage = () => {
             </li>
           ))}
         </ul>
+        {Array.from(typingUsers).map((userId) => (
+          <div key={userId} className="text-sm text-gray-500">
+            {userId} is typing...
+          </div>
+        ))}
       </div>
       <div className="flex w-full max-w-md">
         <input
           type="text"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            handleTyping(e, receiverId);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSendMessage();
+            }
+          }}
           className="flex-grow border p-2"
           placeholder="Type your message here..."
         />

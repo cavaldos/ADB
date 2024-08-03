@@ -10,7 +10,7 @@ const ButtonItem = ({ isHovered, name, icon, path }) => {
     navigate(path);
   };
   const isActive = location.pathname === path;
-  if (name === null) {
+  if (name === null || icon === null) {
     return <div></div>;
   }
   return (

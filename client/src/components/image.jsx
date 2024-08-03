@@ -1,5 +1,5 @@
 import React from "react";
-import ImageUpload from "../../components/ImageUpload";
+import ImageUpload from "./ImageUpload";
 
 function App() {
   return (

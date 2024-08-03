@@ -6,7 +6,7 @@ import CourseService from "../../services/Course.service";
 import FilterCourse from "../../components/Course/FilterCourse";
 import Pagination from "../../components/Course/Pagination";
 import GetCourseService from "../../components/Course/GetCourseService";
-function Home() {
+function SearchCourse() {
   let location = useLocation();
   let stringTemp = decodeURIComponent(location.pathname.split("/").pop());
   const {
@@ -34,7 +34,7 @@ function Home() {
           {" "}
           result for "{searchString}"
         </h1>
-        <div className="grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-1 sm:grid-cols-2 sm:gap-2 gap-4 px-4 p-2 ">
+        <div className="grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-1 sm:grid-cols-2  gap-3 px-4 p-2 ">
           {courseData.length === 0 ? (
             <div className="text-center">No course found</div>
           ) : (
@@ -61,4 +61,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default SearchCourse;

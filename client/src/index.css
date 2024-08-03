@@ -11,6 +11,15 @@
 @tailwind utilities;
 
 /* index.css */
+ utilities {
+    .animation-delay-200 {
+        animation-delay: 0.2s;
+    }
+
+    .animation-delay-400 {
+        animation-delay: 0.4s;
+    }
+}
 
 :root {
   font-family: "Source Sans 3",'Nunito',sans-serif;
@@ -40,3 +49,30 @@ body {
 .transition-max-height {
   transition: max-height 0.35s ease-in-out;
 }
+
+/* Đặt trong tệp CSS global hoặc trong một <style> tag nếu là inline style */
+input[type='range'] {
+  /* Thay đổi màu của track */
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px; /* Có thể điều chỉnh độ cao của track */
+  border-radius: 5px;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px; /* Kích thước của thumb */
+  height: 20px; /* Kích thước của thumb */
+  background: #000; /* Màu của thumb */
+  cursor: pointer; /* Con trỏ chuột khi di chuyển lên thumb */
+  border-radius: 50%; /* Làm tròn thumb */
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 20px; /* Kích thước của thumb cho Firefox */
+  height: 20px; /* Kích thước của thumb cho Firefox */
+  cursor: pointer; /* Con trỏ chuột khi di chuyển lên thumb */
+  border-radius: 50%; /* Làm tròn thumb */
+}
+

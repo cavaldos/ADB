@@ -121,11 +121,11 @@ const InstructorAccount = () => {
 const studentItems = [
   {
     name: "Profile",
-    path: "/2",
+    path: "/profile",
   },
   {
-    name: "Logddout",
-    path: "/1",
+    name: "Cart",
+    path: "/cart",
   },
 ];
 const StudentAccount = () => {

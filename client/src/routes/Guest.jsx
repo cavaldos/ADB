@@ -4,7 +4,8 @@ const GuestLayout = lazy(() => import("~/components/Layout/GuestLayout"));
 const HomeGuest = lazy(() => import("~/pages/guest/index"));
 const SignIn = lazy(() => import("~/pages/auth/signIn"));
 const SignUp = lazy(() => import("~/pages/auth/signUp"));
-const CourseDetail = lazy(() => import("~/pages/guest/CourseDetail"));
+const VisaPage = lazy(() => import("~/pages/guest/visapage"));
+const Bank = lazy(() => import("~/pages/guest/BankAccount"));
 const GuestRouter = [
   {
     name: "Home",
@@ -25,9 +26,15 @@ const GuestRouter = [
     Layout: GuestLayout,
   },
   {
-    name: "CourseDetail",
-    path: "/coursedetail",
-    component: CourseDetail,
+    name: "bank",
+    path: "/bank",
+    component: Bank,
+    Layout: GuestLayout,
+  },
+  {
+    name: "Visa",
+    path: "/visa",
+    component: VisaPage,
     Layout: GuestLayout,
   },
 ];
