@@ -79,11 +79,12 @@ const GlobalController = {
       const pageSize = parseInt(req.body.pageSize as string) || 10;
       const offset = (page - 1) * pageSize;
 
-      const result: VW_Course = await CourseRepo.searchCourses(
+      const result = await CourseRepo.searchCourses(
         searchString,
         offset,
         pageSize
       );
+
       return res.status(200).json({
         message: `Search results for: ${searchString}`,
         status: 200,
@@ -99,6 +100,35 @@ const GlobalController = {
       });
     }
   },
+  // auto compelete course
+  async autoCompleteCourse(req: Request, res: Response) {
+    try {
+      const { searchString } = req.body;
+
+      if (!searchString) {
+        return res.status(400).json({
+          message: "Invalid search string",
+          status: 400,
+          data: {
+            Title: "Invalid search string",
+          },
+        });
+      }
+      const result = await CourseRepo.autoCompleteSearch(searchString);
+      return res.status(200).json({
+        message: `Auto complete results for: ${searchString}`,
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+
   //4. get course by ID
   async getCourseById(req: Request, res: Response) {
     try {
@@ -324,10 +354,11 @@ const GlobalController = {
         sendChatID
       );
       const result = _.unionBy(sendResult, receiveResult, "ChatID");
+      const sortedResult = _.orderBy(result, ["ChatID"], ["asc"]);
       return res.status(200).json({
         message: `Get all chat`,
         status: 200,
-        data: result,
+        data: sortedResult,
       });
     } catch (error: any) {
       return res.status(500).json({

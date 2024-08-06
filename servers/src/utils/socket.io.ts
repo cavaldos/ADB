@@ -2,12 +2,12 @@ import { Server } from "socket.io";
 import portfinder from "portfinder";
 import dotenv from "dotenv";
 dotenv.config();
+import { fetchPublicIP } from "../config/IP";
 interface Message {
   content: string;
   senderId: string;
   receiverId: string;
 }
-
 const startSocketServer = async (port: number) => {
   try {
     const freePort = await portfinder.getPortPromise({ port });
@@ -16,9 +16,8 @@ const startSocketServer = async (port: number) => {
         origin: "*",
       },
     });
-    let hasConnection = false;
 
-    const users = new Map<string, string>(); // Lưu trữ mapping từ userId đến socketId
+    const users = new Map<string, string>(); // Map from userId to socketId
 
     io.on("connection", (socket) => {
       console.log("New client connected:", socket.id);
@@ -41,9 +40,28 @@ const startSocketServer = async (port: number) => {
         }
       });
 
+      socket.on("typing", (data: { senderId: string; receiverId: string }) => {
+        const { senderId, receiverId } = data;
+        const receiverSocketId = users.get(receiverId);
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit("typing", { senderId });
+        }
+      });
+
+      socket.on(
+        "stopTyping",
+        (data: { senderId: string; receiverId: string }) => {
+          const { senderId, receiverId } = data;
+          const receiverSocketId = users.get(receiverId);
+          if (receiverSocketId) {
+            io.to(receiverSocketId).emit("stopTyping", { senderId });
+          }
+        }
+      );
+
       socket.on("disconnect", () => {
         console.log("Client disconnected:", socket.id);
-        // Xóa user khỏi map khi socket ngắt kết nối
+        // Remove user from map when socket disconnects
         for (const [userId, socketId] of users.entries()) {
           if (socketId === socket.id) {
             users.delete(userId);
@@ -52,21 +70,17 @@ const startSocketServer = async (port: number) => {
         }
       });
     });
+    const publicIP = await fetchPublicIP();
 
-    console.log(
-      `  💬  ➜ Socket.io  http://${process.env.HOSTING}:${freePort} \n`
-    );
-    // Hàm kiểm tra kết nối và log
+    console.log(`  💬  ➜ Socket.io  http://${publicIP}:${freePort} \n`);
+
+    // Function to check connections and log
     const checkConnections = () => {
-      if (hasConnection) {
-        setTimeout(() => {
-          console.log("waiting for connections to close...");
-        }, 60000);
-      }
+      // Here you can check active connections or any other condition
     };
 
-    // Thiết lập interval để kiểm tra kết nối
-    setInterval(checkConnections, 100000); // Kiểm tra mỗi 10 giây
+    // Set interval to check connections
+    setInterval(checkConnections, 10000); // Check every 10 seconds
   } catch (err) {
     console.error("Error finding free port:", err);
   }

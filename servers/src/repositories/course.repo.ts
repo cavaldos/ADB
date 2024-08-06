@@ -195,30 +195,52 @@ const CourseRepo = {
   // 9. Search for courses
   async searchCourses(searchString: string, offset: number, pageSize: number) {
     try {
+      const baseQuery = `
+      FROM [Course] co
+      JOIN [Instructor] i ON co.InstructorID = i.InstructorID
+      JOIN [User] u ON u.UserID = i.UserID
+      JOIN Category c ON co.CategoryID = c.CategoryID
+      WHERE co.Title LIKE '%'+@searchString+'%'
+      OR co.Description LIKE '%'+@searchString+'%'
+      OR c.CategoryName LIKE '%'+@searchString+'%'
+      OR u.FullName LIKE '%'+@searchString+'%'
+    `;
+
+      // Query to get paginated results
       const query = `
-        SELECT [CourseID],[Title],[Description],[Language],co.[Status],[Image],[Price],CreateTime,c.CategoryName,u.FullName 
-        FROM [Course] co 
-        JOIN [Instructor] i ON co.InstructorID = i.InstructorID 
-        JOIN [User] u ON u.UserID = i.UserID
-        JOIN Category c ON co.CategoryID = c.CategoryID 
-        WHERE co.Title LIKE '%'+@searchString+'%' 
-        OR co.Description LIKE '%'+@searchString+'%' 
-        OR c.CategoryName LIKE '%'+@searchString+'%'
-        OR u.FullName LIKE '%'+@searchString+'%'
-        ORDER BY co.CreateTime DESC
-        OFFSET @offset ROWS
-        FETCH NEXT @pageSize ROWS ONLY;
-      `;
+      SELECT [CourseID],[Title],[Description],[Language],co.[Status],[Image],[Price],CreateTime,c.CategoryName,u.FullName
+      ${baseQuery}
+      ORDER BY co.CreateTime DESC
+      OFFSET @offset ROWS
+      FETCH NEXT @pageSize ROWS ONLY;
+    `;
+
+      // Query to get total count
+      const countQuery = `
+      SELECT COUNT(*) as TotalCount
+      ${baseQuery}
+    `;
+
       const params = {
         searchString,
         offset,
         pageSize,
       };
-      const courses: VW_Course = await DataConnect.executeWithParams(
+
+      // Execute both queries
+      const courses: VW_Course[] = await DataConnect.executeWithParams(
         query,
         params
       );
-      return courses;
+
+      const totalCountResult = await DataConnect.executeWithParams(countQuery, {
+        searchString,
+      });
+      const totalCount = totalCountResult[0]?.TotalCount || 0;
+
+      const totalPage = Math.ceil(totalCount / pageSize);
+
+      return { courses, totalPage };
     } catch (error: any) {
       throw new Error(`Error searching courses: ${error.message}`);
     }
@@ -235,7 +257,6 @@ const CourseRepo = {
     offset: number,
     pageSize: number
   ) {
-
     try {
       let query = `
         SELECT [CourseID],[Title],[Description],[Language],co.[Status],[Image],[Price],CreateTime,c.CategoryName,u.FullName 
@@ -291,9 +312,46 @@ const CourseRepo = {
     } catch (error: any) {
       throw new Error(`Error filtering courses: ${error.message}`);
     }
-
   },
-  //
+  // 11. Get auto complete search
+  async autoCompleteSearch(searchString: string) {
+    try {
+      // Tách searchString thành các ký tự riêng lẻ
+      const searchTerms = searchString.split("").map((char) => `%${char}%`);
+
+      // Tạo biểu thức LIKE cho từng ký tự
+      const likeConditions = searchTerms
+        .map(
+          (term, index) =>
+            `Title LIKE @term${index} OR Description LIKE @term${index} OR c.CategoryName LIKE @term${index} OR u.FullName LIKE @term${index}`
+        )
+        .join(" AND ");
+
+      const query = `
+      SELECT [CourseID],[Title],[Description],[Language],co.[Status],[Image],[Price],CreateTime,c.CategoryName,u.FullName 
+      FROM [Course] co 
+      JOIN [Instructor] i ON co.InstructorID = i.InstructorID 
+      JOIN [User] u ON u.UserID = i.UserID
+      JOIN Category c ON co.CategoryID = c.CategoryID 
+      WHERE (${likeConditions})
+      ORDER BY co.CreateTime DESC;
+    `;
+
+      // Gán giá trị cho từng điều kiện LIKE
+      const params: { [key: string]: any } = {};
+      searchTerms.forEach((term, index) => {
+        params[`term${index}`] = term;
+      });
+
+      const courses: VW_Course = await DataConnect.executeWithParams(
+        query,
+        params
+      );
+      return courses;
+    } catch (error: any) {
+      throw new Error(`Error auto completing search: ${error.message}`);
+    }
+  },
 };
 
 export default CourseRepo;

@@ -26,7 +26,8 @@ PublicRouter.post("/create_transfer_course", GlobalController.createTransferCour
 PublicRouter.post("/get_bank_account", GlobalController.getBankAccountByUserID);
 // 11. get all transfer course
 PublicRouter.post("/get_all_transfer", GlobalController.getAllTransfer);
-
+// 12. auto complete search
+PublicRouter.post("/auto_complete_search", GlobalController.autoCompleteCourse);
 
 // 12. chat
 PublicRouter.post("/create_chat", GlobalController.createChat);

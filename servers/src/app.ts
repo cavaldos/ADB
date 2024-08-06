@@ -16,6 +16,9 @@ app.use(
     allowedHeaders: [
       "Content-Type",
       "Authorization, Origin, X-Requested-With, Accept",
+      "X-HTTP-Method-Override",
+      "x-access-token",
+      "x-custom-header",
     ],
   })
 );
@@ -26,5 +29,9 @@ app.use(routers);
 app.get("/hello", (req, res) => {
   console.log(req.body);
   res.send("Hello World");
+});
+app.get("/", (req, res) => {
+  console.log(req.body);
+  res.send("Hello , Welcome to my server");
 });
 export default app;
