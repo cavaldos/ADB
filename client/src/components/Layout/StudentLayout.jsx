@@ -1,9 +1,10 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { StudentRouter } from "../../routes";
-import { StudentAccount } from "../AccountCpn";
+import { StudentAccount } from "../other/AccountCpn";
 import ChatApp from "../Chat/ChatBox";
 import SearchCourse from "../course/SearchCourse";
+import Notify from "../other/Notify";
 import Footer from "../other/Footer";
 
 const Buttons = ({ name, path }) => {

@@ -3,6 +3,8 @@ import { FaArrowRight, FaSearch, FaSpinner } from "react-icons/fa";
 import debounce from "lodash/debounce";
 import CourseService from "../../services/Course.service";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { resetState } from "../../redux/features/resetStateSlice";
 
 function SearchCourse() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,6 +15,8 @@ function SearchCourse() {
   const [inputFocused, setInputFocused] = useState(false);
   const navigate = useNavigate();
   const suggestionsRef = useRef(null);
+
+  const dispatch = useDispatch();
 
   const fetchSuggestions = async (value) => {
     if (value.trim() === "") {
@@ -43,7 +47,6 @@ function SearchCourse() {
     if (inputFocused) {
       CourseService.autoComplete("").then((response) => {
         if (response.error) {
-          console.error(response.error);
           setNoResults(true);
         } else if (response.data) {
           setSuggestions(response.data || []);
@@ -70,6 +73,8 @@ function SearchCourse() {
     if (searchTerm.trim() === "") {
       return;
     }
+    setSuggestions([]); // Clear suggestions
+    setInputFocused(false); // Hide suggestions
     navigate(`/search/${encodeURIComponent(searchTerm)}`);
   };
 
@@ -94,6 +99,8 @@ function SearchCourse() {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSearch();
+      setInputFocused(false);
+      dispatch(resetState());
     }
   };
 
@@ -122,7 +129,8 @@ function SearchCourse() {
             onChange={handleInputChange}
             onFocus={() => setInputFocused(true)}
             onKeyDown={handleKeyDown}
-          />
+            style={{ paddingRight: "30px" }}
+          />{" "}
           <button
             className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 rounded-full p-2 text-black"
             onClick={handleSearch}
@@ -146,7 +154,6 @@ function SearchCourse() {
               </ul>
             </div>
           )}
-
           {suggestions.length > 0 && (
             <div className="absolute left-0 mt-2 w-full bg-white border rounded-md shadow-lg overflow-y-auto h-[300px]">
               <ul>

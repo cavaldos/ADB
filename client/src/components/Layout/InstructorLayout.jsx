@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { InstructorRouter } from "../../routes";
-import { InstructorAccount } from "../AccountCpn";
+import { InstructorAccount } from "../other/AccountCpn";
 
 const ButtonItem = ({ isHovered, name, icon, path }) => {
   const navigate = useNavigate();

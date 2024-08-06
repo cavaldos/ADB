@@ -6,8 +6,8 @@ const CourseService = {
     try {
       const response = await instance.post(`/public/search_course`, {
         searchString,
-        pageSize,
-        page,
+        pageSize: pageSize || 10,
+        page: page || 1,
       });
       return response;
     } catch (error) {
@@ -19,7 +19,7 @@ const CourseService = {
     const pageSize = 15;
     const page = 1;
     try {
-      const response = await instance.post(`/public/search_course`, {
+      const response = await instance.post(`/public/auto_complete_search`, {
         searchString,
         pageSize,
         page,

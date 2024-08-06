@@ -66,7 +66,7 @@ const Learning = () => {
   ];
 
   return (
-    <div className="p-8">
+    <div className="p-8 mx-6">
       <h1 className="text-3xl font-bold mb-6">My Learning</h1>
       <div className="flex space-x-4 mb-6">
         <button

@@ -76,3 +76,15 @@ input[type='range']::-moz-range-thumb {
   border-radius: 50%; /* Làm tròn thumb */
 }
 
+.fake-caret {
+  position: absolute;
+  height: 1em;
+  width: 2px;
+  background-color: blue;
+  animation: blink-caret .7s step-end infinite;
+}
+
+@keyframes blink-caret {
+  from, to { opacity: 1 }
+  50% { opacity: 0 }
+}

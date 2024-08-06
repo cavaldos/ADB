@@ -4,7 +4,7 @@ function GetCourseService() {
   const [courseData, setCourseData] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totalPage, setTotalPage] = useState(5);
+  const [totalPage, setTotalPage] = useState(2);
   const [searchString, setSearchString] = useState("");
 
   const [language, setLanguage] = useState("");

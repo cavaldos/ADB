@@ -4,7 +4,8 @@ import { useLocation } from "react-router-dom";
 import CourseItem from "../../components/Course/CourseItem";
 import CourseService from "../../services/Course.service";
 import FilterCourse from "../../components/Course/FilterCourse";
-import Pagination from "../../components/Course/Pagination";
+import { Pagination } from "@mui/material";
+
 import GetCourseService from "../../components/Course/GetCourseService";
 function Home() {
   let location = useLocation();
@@ -13,7 +14,9 @@ function Home() {
     courseData,
     setCourseData,
     page,
+    setPage,
     pageSize,
+    totalPage,
     setTotalPage,
     searchString,
     setSearchString,
@@ -26,6 +29,9 @@ function Home() {
       // setTotalPage(response.totalPage);
     });
   }, [searchString, page, pageSize, stringTemp]);
+  const handleChange = (event, value) => {
+    setPage(value);
+  };
   return (
     <div className=" min-h-[80%] mx-[100px] p-2 flex flex-row gap-1">
       <FilterCourse />
@@ -55,7 +61,14 @@ function Home() {
             ))
           )}
         </div>
-        <Pagination />
+        <Pagination
+          count={totalPage}
+          page={page}
+          onChange={handleChange}
+          variant="outlined"
+          color="primary"
+          shape="rounded"
+        />
       </div>
     </div>
   );

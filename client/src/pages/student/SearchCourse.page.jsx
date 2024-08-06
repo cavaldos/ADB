@@ -1,31 +1,41 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useLocation } from "react-router-dom";
+import { Pagination } from "@mui/material";
+import { useSelector } from "react-redux";
 
 import CourseItem from "../../components/Course/CourseItem";
 import CourseService from "../../services/Course.service";
 import FilterCourse from "../../components/Course/FilterCourse";
-import Pagination from "../../components/Course/Pagination";
 import GetCourseService from "../../components/Course/GetCourseService";
 function SearchCourse() {
   let location = useLocation();
   let stringTemp = decodeURIComponent(location.pathname.split("/").pop());
+  const state = useSelector((state) => state.resetState.state);
   const {
     courseData,
     setCourseData,
     page,
+    setPage,
     pageSize,
+    totalPage,
     setTotalPage,
     searchString,
     setSearchString,
+    loading,
   } = GetCourseService();
-  //
+  
   useEffect(() => {
     setSearchString(stringTemp || "");
-    CourseService.getAllCourse(pageSize, page).then((response) => {
-      setCourseData(response.data || []);
-      // setTotalPage(response.totalPage);
+    CourseService.searchCourse(searchString, pageSize, page).then((res) => {
+      setCourseData(res.data.courses || []);
+      setTotalPage(res.data.totalPage);
     });
-  }, [searchString, page, pageSize, stringTemp]);
+  }, [searchString, page, pageSize, stringTemp, state]);
+
+  const handleChange = (event, value) => {
+    setPage(value);
+  };
+
   return (
     <div className=" min-h-[80%] mx-[100px] p-2 flex flex-row gap-1">
       <FilterCourse />
@@ -55,7 +65,16 @@ function SearchCourse() {
             ))
           )}
         </div>
-        <Pagination />
+        <div className="flex items-center justify-center gap-4 p-4 mt-[100px] ">
+          <Pagination
+            count={totalPage}
+            page={page}
+            onChange={handleChange}
+            variant="outlined"
+            color="primary"
+            shape="rounded"
+          />
+        </div>
       </div>
     </div>
   );

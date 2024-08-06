@@ -41,7 +41,9 @@ function CourseItem(props) {
           />
           {FullName}
         </div>
-        <div className="font-bold text-xl mt-2">{title}</div>
+        <div className="font-bold text-xl mt-2">
+          {Title},{CourseID}
+        </div>
         <div className="text-sm text-blue-600 mt-2">
           <a href="#degree-link" className="flex items-center">
             <svg

@@ -7,6 +7,8 @@ const InstructorLayout = lazy(() =>
   import("~/components/Layout/InstructorLayout")
 );
 const HomeInstructor = lazy(() => import("~/pages/instructor/index"));
+const Profile = lazy(() => import("~/components/Profile/Profile"));
+const RevenuePage = lazy(() => import("~/pages/instructor/RevenuePage"));
 const MyCourse = lazy(() => import("~/pages/instructor/MyCourse"));
 const CreateCourse = lazy(() => import("~/pages/instructor/CreateCourse"));
 const LessonVideo = lazy(() => import("~/pages/instructor/LessonVideo"));
@@ -34,6 +36,21 @@ const InstructorRouter = [
     component: CreateCourse,
     Layout: InstructorLayout,
   },
+  {
+    name: null,
+    path: "/profile",
+    icon: null,
+    component: Profile,
+    Layout: InstructorLayout,
+  },
+  {
+    name: null,
+    path: "/revenue",
+    icon: null,
+    component: RevenuePage,
+    Layout: InstructorLayout,
+  },
+
   {
     name: null,
     path: "/create-course/lesson-video",

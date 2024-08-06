@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import ProductCard from "../../components/ProductCard";
 
 const GuestPage = () => {
   return (
@@ -37,7 +36,7 @@ const GuestPage = () => {
           />
         </div>
       </section>
-      <ProductCard />
+
     </>
   );
 };

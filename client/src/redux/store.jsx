@@ -1,5 +1,6 @@
 import countSlice from "./features/countSlice";
 import authSlice from "./features/authSlice";
+import resetStateSlice from "./features/resetStateSlice";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
   persistStore,
@@ -21,6 +22,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   count: countSlice,
   auth: authSlice,
+  resetState: resetStateSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
