@@ -24,7 +24,9 @@ app.use(
 );
 app.use(json());
 app.use(helmet());
-app.use(morgan("tiny"));
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms")
+);
 app.use(routers);
 app.get("/hello", (req, res) => {
   console.log(req.body);

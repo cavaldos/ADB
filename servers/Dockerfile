@@ -28,5 +28,4 @@ CMD ["node", "dist/server.js"]
 
 
 #  docker build -t coursera-app-image .
-
 # docker run -p 5001:5001 -p 5002:5002  --name cousera coursera-app-image

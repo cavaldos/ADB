@@ -322,7 +322,7 @@ const CourseRepo = {
       // Tạo biểu thức LIKE cho từng ký tự
       const likeConditions = searchTerms
         .map(
-          (term, index) =>
+          (index) =>
             `Title LIKE @term${index} OR Description LIKE @term${index} OR c.CategoryName LIKE @term${index} OR u.FullName LIKE @term${index}`
         )
         .join(" AND ");
