@@ -1,41 +1,23 @@
 import { lazy } from "react";
 import ForumIcon from "@mui/icons-material/Forum";
-import AssessmentIcon from "@mui/icons-material/Assessment";
+import { GoDiscussionClosed } from "react-icons/go";
 import BuildIcon from "@mui/icons-material/Build";
 import HelpIcon from "@mui/icons-material/Help";
+import { SiCoursera } from "react-icons/si";
+
 const InstructorLayout = lazy(() =>
   import("~/components/Layout/InstructorLayout")
 );
+const NewCourse = lazy(() => import("~/pages/instructor/NewCourse"));
+
 const HomeInstructor = lazy(() => import("~/pages/instructor/index"));
 const Profile = lazy(() => import("~/components/Profile/Profile"));
 const RevenuePage = lazy(() => import("~/pages/instructor/RevenuePage"));
 const MyCourse = lazy(() => import("~/pages/instructor/MyCourse"));
-const CreateCourse = lazy(() => import("~/pages/instructor/CreateCourse"));
-const LessonVideo = lazy(() => import("~/pages/instructor/LessonVideo"));
-const LessonDocument = lazy(() => import("~/pages/instructor/LessonDocument"));
-const LessonTest = lazy(() => import("~/pages/instructor/LessonTest"));
+const CreateLesson = lazy(() => import("~/pages/instructor/CreateLesson"));
+const Discussion = lazy(() => import("~/pages/instructor/Discussion"));
+const CourseDetail = lazy(() => import("~/pages/instructor/CourseDetail"));
 const InstructorRouter = [
-  {
-    name: "Home",
-    icon: <ForumIcon />,
-    path: "/",
-    component: HomeInstructor,
-    Layout: InstructorLayout,
-  },
-  {
-    name: "Mananger My Course",
-    path: "/manager-my-course",
-    icon: <BuildIcon />,
-    component: MyCourse,
-    Layout: InstructorLayout,
-  },
-  {
-    name: "Create Course",
-    path: "/create-course",
-    icon: <AssessmentIcon />,
-    component: CreateCourse,
-    Layout: InstructorLayout,
-  },
   {
     name: null,
     path: "/profile",
@@ -53,23 +35,58 @@ const InstructorRouter = [
 
   {
     name: null,
-    path: "/create-course/lesson-video",
+    path: "/new-course",
     icon: null,
-    component: LessonVideo,
+    component: NewCourse,
     Layout: InstructorLayout,
   },
   {
     name: null,
-    path: "/create-course/lesson-document",
+    path: "/new-course/:courseID/create-lesson/:lessonID",
     icon: null,
-    component: LessonDocument,
+    component: CreateLesson,
     Layout: InstructorLayout,
   },
   {
     name: null,
-    path: "/create-course/lesson-test",
+    path: "/new-course/:courseID/create-lesson/",
     icon: null,
-    component: LessonTest,
+    component: CreateLesson,
+    Layout: InstructorLayout,
+  },
+  {
+    name: "Course Detail",
+    path: "/course-detail/:courseID",
+    icon: <SiCoursera />,
+    component: CourseDetail,
+    Layout: InstructorLayout,
+  },
+  {
+    name: "Home",
+    icon: <ForumIcon />,
+    path: "/",
+    component: HomeInstructor,
+    Layout: InstructorLayout,
+  },
+  {
+    name: "Mananger My Course",
+    path: "/manager-my-course",
+    icon: <BuildIcon />,
+    component: MyCourse,
+    Layout: InstructorLayout,
+  },
+  {
+    name: "Discussion",
+    path: "/discussion",
+    icon: <GoDiscussionClosed className=" text-2xl" />,
+    component: Discussion,
+    Layout: InstructorLayout,
+  },
+  {
+    name: null,
+    path: "/discussion/:discussionID",
+    icon: null,
+    component: Discussion,
     Layout: InstructorLayout,
   },
   {

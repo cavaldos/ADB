@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -6,6 +6,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/features/authSlice";
 import Notify from "./Notify";
+import { Menu, MenuItem } from "@mui/material";
 
 const ButtonItem = ({ name, path }) => {
   const navigate = useNavigate();
@@ -13,12 +14,12 @@ const ButtonItem = ({ name, path }) => {
     navigate(path);
   };
   return (
-    <button
+    <MenuItem
       onClick={handleClick}
-      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
+      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left min-w-[120px]"
     >
       {name}
-    </button>
+    </MenuItem>
   );
 };
 
@@ -30,35 +31,28 @@ const ButtonLogout = () => {
     navigate("/");
   };
   return (
-    <button
+    <MenuItem
       onClick={handleClick}
       className="block px-4 py-2 text-red-700 hover:bg-gray-100 w-full text-left"
     >
-      Logout
-    </button>
+      <h1 className="text-ret">Logout</h1>
+    </MenuItem>
   );
 };
 
-const useOutsideClick = (ref, callback) => {
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (ref.current && !ref.current.contains(event.target)) {
-        callback();
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [ref, callback]);
-};
+const AccountDropdown = ({ children }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
 
-const AccountDropdown = ({ children, isOpen, toggleDropdown }) => {
-  const dropdownRef = useRef(null);
-  useOutsideClick(dropdownRef, () => isOpen && toggleDropdown());
+  const toggleDropdown = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
-    <div ref={dropdownRef} className="relative">
+    <div className="relative">
       <div
         className="flex items-center space-x-4 cursor-pointer"
         onClick={toggleDropdown}
@@ -66,31 +60,37 @@ const AccountDropdown = ({ children, isOpen, toggleDropdown }) => {
         <a className="text-gray-600 select-none">English</a>
         <a className="text-gray-600">
           <AccountCircleIcon />
-          {isOpen ? (
+          {anchorEl ? (
             <ArrowDropUpIcon className="ml-1" />
           ) : (
             <ArrowDropDownIcon className="ml-1" />
           )}
         </a>
       </div>
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg">
-          <ul className="py-1">{children}</ul>
-        </div>
-      )}
+      <Menu
+        id="options-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "options-menu",
+        }}
+        className="py-1 text-gray-700 dark:text-gray-400 text-sm"
+      >
+        {children}
+      </Menu>
     </div>
   );
 };
 
 const AdminAccount = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+  const studentItems = [
+    { name: "Profile", path: "/profile" },
+    { name: "Cart", path: "/cart" },
+  ];
 
   return (
-    <AccountDropdown isOpen={isOpen} toggleDropdown={toggleDropdown}>
-      <ButtonItem />
+    <AccountDropdown>
       {studentItems.map((item, index) => (
         <ButtonItem key={index} name={item.name} path={item.path} />
       ))}
@@ -100,55 +100,35 @@ const AdminAccount = () => {
 };
 
 const InstructorAccount = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const instructorItem = [
-    {
-      name: "Profile",
-      path: "/profile",
-    },
-    {
-      name: "Revenue",
-      path: "/revenue",
-    },
+  const instructorItems = [
+    { name: "Profile", path: "/profile" },
+    { name: "Revenue", path: "/revenue" },
   ];
+
   return (
-    <AccountDropdown isOpen={isOpen} toggleDropdown={toggleDropdown}>
-      <ButtonItem />
-      {instructorItem.map((item, index) => (
-        <ButtonItem key={index} name={item.name} path={item.path} />
-      ))}
-      <ButtonLogout />
-    </AccountDropdown>
+    <div className="flex items-center space-x-4 cursor-pointer z-50">
+      <Notify />
+      <AccountDropdown>
+        {instructorItems.map((item, index) => (
+          <ButtonItem key={index} name={item.name} path={item.path} />
+        ))}
+        <ButtonLogout />
+      </AccountDropdown>
+    </div>
   );
 };
 
-const studentItems = [
-  {
-    name: "Profile",
-    path: "/profile",
-  },
-  {
-    name: "Cart",
-    path: "/cart",
-  },
-];
-
 const StudentAccount = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+  const studentItems = [
+    { name: "Profile", path: "/profile" },
+    { name: "Cart", path: "/cart" },
+  ];
 
   return (
     <div className="relative">
       <div className="flex items-center space-x-4 cursor-pointer">
         <Notify />
-        <AccountDropdown isOpen={isOpen} toggleDropdown={toggleDropdown}>
-          <ButtonItem />
+        <AccountDropdown>
           {studentItems.map((item, index) => (
             <ButtonItem key={index} name={item.name} path={item.path} />
           ))}

@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { InstructorRouter } from "../../routes";
 import { InstructorAccount } from "../other/AccountCpn";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+
+import ChatApp from "../Chat/ChatBox";
 
 const ButtonItem = ({ isHovered, name, icon, path }) => {
   const navigate = useNavigate();
@@ -69,10 +72,22 @@ const Sidebar = () => {
 };
 
 const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <>
       <div className="fixed flex  left-14 top-0 right-0 h-16  justify-end  ">
-        <div className="container mx-auto px-6 py-3 flex  items-center justify-end ">
+        <div className="flex gap-3 text-center  w-[100px] justify-center">
+          <FaArrowLeft
+            onClick={() => navigate(-1)}
+            className="my-auto text-xl hover:text-blue-gray-700 hover:cursor-pointer"
+          />
+          <FaArrowRight
+            onClick={() => navigate(1)}
+            className="my-auto text-xl hover:text-blue-gray-700 hover:cursor-pointer"
+          />
+        </div>
+        <div className="container mx-auto px-6 py-3 flex  items-center justify-end">
           <InstructorAccount />
         </div>
       </div>
@@ -90,6 +105,7 @@ const InstructorLayout = ({ children }) => {
           className={`flex-1 p-6 mt-16 ml-14  transition-all duration-1000 `}
         >
           {children}
+          <ChatApp />
         </main>
       </div>
     </div>

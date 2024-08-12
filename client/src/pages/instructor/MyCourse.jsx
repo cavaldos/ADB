@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import InstructorService from "../../services/Instructor.service";
 import axios from "axios";
 import { Space, Table, Tag } from "antd";
+import ColumnSearch from "~/hooks/useSortTable";
+import { useNavigate, useNavigation } from "react-router-dom";
+import { FaSearch } from "react-icons/fa";
 
 const SearchComponent = () => {
   return (
@@ -11,92 +15,136 @@ const SearchComponent = () => {
         className="p-2 w-full outline-none"
       />
       <button className="bg-gray-700 h-full w-[50px] p-2 flex items-center justify-center text-white">
-        dfg
+        <FaSearch className="text-2xl hover:text-gray-400" />
       </button>
     </div>
   );
 };
+
 const CreateCourse = () => {
-  const [course, setCourse] = useState({
-    title: "",
-    subtitle: "",
-    description: "",
-    language: "English",
-    image: "",
-    price: "",
-    status: "Hide",
-    categoryID: "",
-    instructorID: "",
-  });
+  const [data, setData] = useState([]);
+  const navigate = useNavigate();
+  // useEffect(() => {
+  //   InstructorService.getAllCOurseByInstructor(1)
+  //     .then((res) => {
+  //       setData(res.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
+
+  useEffect(() => {
+    // Replace API call with demo data
+    const demoData = [
+      {
+        CourseID: 1,
+        CategoryName: "React",
+        CreateTime: "2021-09-01",
+        Description: "Learn the basics of React",
+        Language: "English",
+        Price: "$50",
+        FullName: "John Doe",
+        Status: "Published",
+        Title: "Introduction to React",
+      },
+      {
+        CourseID: 2,
+        CategoryName: "Node.js",
+        CreateTime: "2021-10-15",
+        Description: "Master backend development with Node.js",
+        Language: "English",
+        Price: "$70",
+        FullName: "Jane Smith",
+        Status: "Published",
+        Title: "Node.js Mastery",
+      },
+      {
+        CourseID: 3,
+        CategoryName: "Python",
+        CreateTime: "2021-11-10",
+        Description: "Python for beginners",
+        Language: "English",
+        Price: "$60",
+        FullName: "Alice Johnson",
+        Status: "Draft",
+        Title: "Python 101",
+      },
+    ];
+
+    setData(demoData);
+  }, []);
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      render: (text) => <a>{text}</a>,
+      title: "CourseID",
+      dataIndex: "CourseID",
+      key: "CourseID",
     },
     {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
+      title: "CategoryName",
+      dataIndex: "CategoryName",
+      key: "CategoryName",
     },
     {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
+      title: "CreateTime",
+      dataIndex: "CreateTime",
+      key: "CreateTime",
     },
     {
-      title: "Tags",
-      key: "tags",
-      dataIndex: "tags",
-      render: (_, { tags }) => (
-        <>
-          {tags.map((tag) => {
-            let color = tag.length > 5 ? "geekblue" : "green";
-            if (tag === "loser") {
-              color = "volcano";
-            }
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
+      title: "Description",
+      dataIndex: "Description",
+      key: "Description",
+    },
+    // {
+    //   title: "Image",
+    //   dataIndex: "Image",
+    //   key: "Image",
+    // },
+    {
+      title: "Language",
+      dataIndex: "Language",
+      key: "Language",
     },
     {
-      title: "Action",
+      title: "Price",
+      dataIndex: "Price",
+      key: "Price",
+    },
+    {
+      title: "FullName",
+      dataIndex: "FullName",
+      key: "FullName",
+    },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+    },
+    {
+      title: "Title",
+      dataIndex: "Title",
+      key: "Title",
+    },
+    {
+      title: "Manage",
       key: "action",
-      render: (_, record) => (
+      fixed: "center",
+      render: (text, record) => (
         <Space size="middle">
-          <a>Invite {record.name}</a>
-          <a>Delete</a>
+          <button
+            onClick={() => navigate(`/edit-course/${record.CourseID}`)}
+            className="btn btn-xs bg-gray-300 "
+          >
+            Edit Course
+          </button>
+          <button
+            onClick={() => navigate(`/new-course/${1}/create-lesson`)}
+            className="btn btn-xs bg-gray-300 "
+          >
+            Edit Lesson
+          </button>
         </Space>
       ),
-    },
-  ];
-  const data = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
     },
   ];
 
@@ -104,15 +152,20 @@ const CreateCourse = () => {
     <div className="flex flex-col gap-7 min-h-full">
       <div className="h-12 flex items-center gap-4">
         <SearchComponent />
-        <button className="bg-[#A535F0] h-full w-[120px] ml-auto text-white font-bold">
+        <button
+          onClick={() => navigate("/new-course")}
+          className="bg-[#A535F0] h-full w-[120px] ml-auto text-white font-bold"
+        >
           New Course
         </button>
       </div>
-      <div className="flex h-[175px] w-full border-2 bg-[#f0f2f4] p-3">
-        New course
-      </div>
-      <div className="bg-gray-300 pt-2">
-        <Table columns={columns} dataSource={data} />
+
+      <div className="bg-gray-300 p-2 overflow-x-auto rounded-md">
+        <Table
+          columns={columns}
+          tableLayout="auto"
+          dataSource={data?.map((item, index) => ({ ...item, key: index }))}
+        />
       </div>
     </div>
   );

@@ -15,21 +15,28 @@ import {
 } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
- function SortableItem(props) {
-   const { attributes, listeners, setNodeRef, transform, transition } =
-     useSortable({ id: props.id });
+import LessonDetails from "./LessonItemList";
+function SortableItem(props) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: props.id });
 
-   const style = {
-     transform: CSS.Transform.toString(transform),
-     transition,
-   };
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
-   return (
-     <div className="bg-red-300 p-2" ref={setNodeRef} style={style} {...attributes} {...listeners}>
-       {props.children}3
-     </div>
-   );
- }
+  return (
+    <div
+      className="text-black p-4 mb-2 bg-gray-400 rounded shadow"
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
+      {props.children}
+    </div>
+  );
+}
 const initialLessons = [
   { id: "1", content: "Lesson 1 Content" },
   { id: "2", content: "Lesson 2 Content" },
@@ -38,7 +45,7 @@ const initialLessons = [
   { id: "5", content: "Lesson 5 Content" },
 ];
 
-const InstructorPage = () => {
+const LessonDrag = () => {
   const [lessons, setLessons] = useState(initialLessons);
 
   const sensors = useSensors(
@@ -67,16 +74,13 @@ const InstructorPage = () => {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <h1 className="text-red-800 mr-auto text-lg">Instructor Page 󰯉</h1>
-      <div className="bg-blue-500 text-white p-6 w-64 text-center rounded">
-        Test drag and drop
-      </div>
       <SortableContext items={lessons} strategy={verticalListSortingStrategy}>
         {lessons.map((lesson, index) => (
           <SortableItem key={lesson.id} id={lesson.id}>
             <div className="p-4 mb-2 bg-gray-200 rounded shadow">
               <div className="font-bold">Lesson {index + 1}</div>
               <div>{lesson.content}</div>
+              <LessonDetails />
             </div>
           </SortableItem>
         ))}
@@ -85,4 +89,4 @@ const InstructorPage = () => {
   );
 };
 
-export default InstructorPage;
+export default LessonDrag;

@@ -11,18 +11,18 @@
 @tailwind utilities;
 
 /* index.css */
- utilities {
-    .animation-delay-200 {
-        animation-delay: 0.2s;
-    }
+utilities {
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+  }
 
-    .animation-delay-400 {
-        animation-delay: 0.4s;
-    }
+  .animation-delay-400 {
+    animation-delay: 0.4s;
+  }
 }
 
 :root {
-  font-family: "Source Sans 3",'Nunito',sans-serif;
+  font-family: "Source Sans 3", "Nunito", sans-serif;
   font-optical-sizing: auto;
   font-weight: weight;
   font-style: normal;
@@ -51,7 +51,7 @@ body {
 }
 
 /* Đặt trong tệp CSS global hoặc trong một <style> tag nếu là inline style */
-input[type='range'] {
+input[type="range"] {
   /* Thay đổi màu của track */
   -webkit-appearance: none;
   width: 100%;
@@ -59,7 +59,7 @@ input[type='range'] {
   border-radius: 5px;
 }
 
-input[type='range']::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 20px; /* Kích thước của thumb */
@@ -69,7 +69,7 @@ input[type='range']::-webkit-slider-thumb {
   border-radius: 50%; /* Làm tròn thumb */
 }
 
-input[type='range']::-moz-range-thumb {
+input[type="range"]::-moz-range-thumb {
   width: 20px; /* Kích thước của thumb cho Firefox */
   height: 20px; /* Kích thước của thumb cho Firefox */
   cursor: pointer; /* Con trỏ chuột khi di chuyển lên thumb */
@@ -81,10 +81,16 @@ input[type='range']::-moz-range-thumb {
   height: 1em;
   width: 2px;
   background-color: blue;
-  animation: blink-caret .7s step-end infinite;
+  animation: blink-caret 0.7s step-end infinite;
 }
 
 @keyframes blink-caret {
-  from, to { opacity: 1 }
-  50% { opacity: 0 }
+  from,
+  to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
+

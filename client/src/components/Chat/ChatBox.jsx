@@ -9,7 +9,7 @@ import axios from "axios";
 const UserList = ({ users, onSelectUser }) => {
   return (
     <div className="w-[60px] bg-gray-700 p-2 overflow-y-auto rounded-md">
-      {users.map((user,index) => (
+      {users.map((user, index) => (
         <div
           key={user.id}
           className="cursor-pointer mb-2"
@@ -33,7 +33,7 @@ const ChatBox = () => {
   const [senderId, setSenderId] = useState(0);
   const [receiverId, setReceiverId] = useState(0);
   const [messagesBase, setMessagesBase] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { messages, typingUsers, sendMessage, handleTyping } =
     useChatSocket(senderId);
@@ -82,6 +82,7 @@ const ChatBox = () => {
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-2 rounded-t-lg max-h-[455px]">
         <div className="flex w-full max-w-md mb-4">
+          {/*  */}
           <input
             type="text"
             value={senderId}
@@ -96,14 +97,10 @@ const ChatBox = () => {
             className="flex-grow border p-2"
             placeholder="Receiver ID"
           />
+          {/*  */}
         </div>
         {loading && (
-          <div className="flex justify-center items-center">
-            <span className="loading loading-dots loading-md"></span>
-          </div>
-        )}
-        {loading && (
-          <div className="flex justify-center items-center">
+          <div className="flex justify-left items-left ">
             <span className="loading loading-dots loading-md"></span>
           </div>
         )}
@@ -167,7 +164,7 @@ const ChatBox = () => {
           <IoSend className="hover:text-gray-950 text-gray-800" size={24} />
         </button>
       </div>
-{/*       
+      {/*       
       <div className="flex items-center p-2 bg-white rounded-full shadow-md">
       <input
         type="text"

@@ -3,8 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { StudentRouter } from "../../routes";
 import { StudentAccount } from "../other/AccountCpn";
 import ChatApp from "../Chat/ChatBox";
-import SearchCourse from "../course/SearchCourse";
-import Notify from "../other/Notify";
+import SearchCourse from "../Course/SearchCourse";
 import Footer from "../other/Footer";
 
 const Buttons = ({ name, path }) => {
