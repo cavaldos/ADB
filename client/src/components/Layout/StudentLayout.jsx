@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { StudentRouter } from "../../routes";
 import { StudentAccount } from "../other/AccountCpn";
@@ -50,17 +50,27 @@ const Navbar = () => {
     </nav>
   );
 };
+
 const StudentLayout = ({ children }) => {
+  const location = useLocation();
+  const [locationPath, setLocationPath] = useState(location.pathname);
+  useEffect(() => {
+    setLocationPath(location.pathname);
+  }, [location.pathname]);
+
+  const shouldHideFooter =
+    locationPath === "/learn-process" || locationPath === "/chat";
+
   return (
-    <div className="h-screen flex flex-col ">
+    <div className="min-h-screen flex flex-col">
       <header className="bg-gray-200 fixed w-full h-[100px] z-50">
         <Navbar />
       </header>
-      <main className="flex-1 mt-32 pb-[150px] ">
+      <main className="flex-1 mt-32 pb-[10px]">
         {children}
-        <ChatApp />
+        {/* <ChatApp /> */}
       </main>
-      <Footer />
+      {!shouldHideFooter && <Footer />}
     </div>
   );
 };

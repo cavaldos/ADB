@@ -1,23 +1,14 @@
-// khach hang
-
 import { lazy } from "react";
-
 const StudentLayout = lazy(() => import("~/components/Layout/StudentLayout"));
 const HomeStudent = lazy(() => import("~/pages/student/index"));
 const SearchCourse = lazy(() => import("~/pages/student/SearchCourse.page"));
 const CourseDetail = lazy(() => import("~/pages/student/CourseDetail.page"));
 const Cart = lazy(() => import("~/pages/student/Cart.page"));
-const Learning = lazy(() => import("~/pages/student/Learning.page"));
+const Learning = lazy(() => import("~/pages/student/LearningPage"));
 const LearnProcess = lazy(() => import("~/pages/student/LearnProcess.page"));
 const Invoice = lazy(() => import("~/pages/student/Invoice.page"));
 const Profile = lazy(() => import("~/components/Profile/Profile"));
-const InvoiceHistory = lazy(() =>
-  import("~/pages/student/InvoiceHistory.page")
-);
-const BankingPage = lazy(() => import("~/pages/student/Banking.page"));
-
-const BankAccount = lazy(() => import("~/pages/guest/BankAccount"));
-import Test from "../components/Test";
+const ChatPage = lazy(() => import("~/pages/student/ChatPage"));
 const StudentRouter = [
   {
     name: "Home",
@@ -32,7 +23,6 @@ const StudentRouter = [
     component: Learning,
     Layout: StudentLayout,
   },
-
   {
     name: "LearnProcess",
     path: "/learn-process",
@@ -52,24 +42,6 @@ const StudentRouter = [
     Layout: StudentLayout,
   },
   {
-    name: "Banking",
-    path: "/banking",
-    component: BankingPage,
-    Layout: StudentLayout,
-  },
-  {
-    name: null,
-    path: "/invoice-history/:id",
-    component: InvoiceHistory,
-    Layout: StudentLayout,
-  },
-  {
-    name: null,
-    path: "/bank",
-    component: BankAccount,
-    Layout: null,
-  },
-  {
     name: null,
     path: "/search/:search",
     component: SearchCourse,
@@ -87,11 +59,16 @@ const StudentRouter = [
     component: Profile,
     Layout: StudentLayout,
   },
-
   {
-    name: "Test",
-    path: "/test",
-    component: Test,
+    name: null,
+    path: "/chat",
+    component: ChatPage,
+    Layout: StudentLayout,
+  },
+  {
+    name: null,
+    path: "/chat/:chatID",
+    component: ChatPage,
     Layout: StudentLayout,
   },
 ];

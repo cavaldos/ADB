@@ -4,8 +4,10 @@ import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useDispatch } from "react-redux";
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { logout } from "../../redux/features/authSlice";
 import Notify from "./Notify";
+import ChatIcon from "../Chat/ChatIcon";
 import { Menu, MenuItem } from "@mui/material";
 
 const ButtonItem = ({ name, path }) => {
@@ -107,6 +109,7 @@ const InstructorAccount = () => {
 
   return (
     <div className="flex items-center space-x-4 cursor-pointer z-50">
+      <ChatIcon />
       <Notify />
       <AccountDropdown>
         {instructorItems.map((item, index) => (
@@ -127,6 +130,7 @@ const StudentAccount = () => {
   return (
     <div className="relative">
       <div className="flex items-center space-x-4 cursor-pointer">
+        <ChatIcon />
         <Notify />
         <AccountDropdown>
           {studentItems.map((item, index) => (

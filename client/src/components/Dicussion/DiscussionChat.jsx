@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DiscusiionService from "./DiscusiionService";
 import { IoSend } from "react-icons/io5";
 import { Avatar, Space } from "antd";
@@ -78,7 +78,9 @@ const MessageForum = ({ message }) => {
 function DiscussionChat() {
   const { discussionID, discussions, setDiscussions } = DiscusiionService();
   const [loading, setLoading] = useState(false);
-  const myId = 1;
+
+  const containerRef = useRef(null);
+
   const message = [
     {
       userid: 1,
@@ -93,42 +95,79 @@ function DiscussionChat() {
       createdAt: "2021-09-20",
     },
   ];
+
+  const handleScroll = () => {
+    const container = containerRef.current;
+    if (container) {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+
+      // Kiểm tra nếu đã cuộn đến cuối
+      if (scrollTop + clientHeight >= scrollHeight) {
+        // Ngăn cuộn thêm
+        container.style.overflowY = "hidden";
+      } else {
+        // Cho phép cuộn nếu chưa đến cuối
+        container.style.overflowY = "auto";
+      }
+    }
+  };
+
   return (
-    <div className="w-full flex flex-col rounded-md">
-      <div className="bg-red-100 p-1 rounded-md">dsf</div>
-      <div className="flex-1 overflow-y-auto p-2 rounded-t-lg  ">
-        {loading && (
-          <div className="flex justify-left items-left">
-            <span className="loading loading-dots loading-md"></span>
-          </div>
-        )}
-        {!loading &&
-          message.map((discussion, index) => (
-            <MessageForum key={index} message={discussion} />
-          ))}
-        <MessageForum message={message} />
-        <AnymousMessage />
-      </div>
-      <div className="flex p-1 bg-gray-500 rounded-lg sticky">
-        <input
-          type="text"
-          className="flex-1 p-2 border rounded-lg bg-white"
-          placeholder="Type a message"
-          value={"newMessage"}
-          // onChange={(e) => {
-          //   setNewMessage(e.target.value);
-          //   handleTyping(e, receiverId);
-          // }}
-          // onKeyDown={handleKeyDown}
-        />
-        <button
-          className="ml-2 p-2 bg-blue-500 rounded-lg"
-          // onClick={handleSendMessage}
+    <>
+      <div
+        className="w-full flex flex-col rounded-md  relative h-[100%] overflow-hidden"
+        onScroll={handleScroll}
+        ref={containerRef}
+      >
+        <div
+          className="bg-white p-1 rounded-md h-[80px]  opacity-65 bg-opacity-95
+        flex items-center shadow-xl  shadow-blur backdrop-blur-2xl overflow-hidden"
         >
-          <IoSend className="hover:text-gray-950 text-gray-800" size={24} />
-        </button>
+          dsf
+        </div>
+        <div className="flex-1 overflow-y-auto rounded-t-lg p-2 relative h-full pb-24 ">
+          {loading && (
+            <div className="flex justify-left items-left">
+              <span className="loading loading-dots loading-md"></span>
+            </div>
+          )}
+          {!loading &&
+            message.map((discussion, index) => (
+              <MessageForum key={index} message={discussion} />
+            ))}
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+          <MessageForum message={message} />
+
+          <AnymousMessage />
+        </div>
+        <div className="bg-white flex border rounded-3xl absolute bottom-4 right-4 left-4  min-w-auto shadow-2xl ">
+          <input
+            type="text"
+            className="rounded-3xl w-full py-2 px-3 text-gray-700 focus:outline-none  
+            overflow-hidden break-words bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200  "
+            placeholder="Type a message"
+          />
+
+          <button className="ml-2 p-2 bg-blue-500 rounded-lg">
+            <IoSend className="hover:text-gray-950 text-gray-800" size={24} />
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

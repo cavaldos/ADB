@@ -94,3 +94,10 @@ input[type="range"]::-moz-range-thumb {
   }
 }
 
+.discussion-container {
+  overflow: hidden; /* Ẩn bất kỳ nội dung nào tràn ra ngoài */
+}
+
+.discussion-container:hover {
+  overflow-y: auto; /* Chỉ cho phép cuộn theo chiều dọc khi hover */
+}

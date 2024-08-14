@@ -1,13 +1,15 @@
 import { lazy } from "react";
 import ForumIcon from "@mui/icons-material/Forum";
-import { GoDiscussionClosed } from "react-icons/go";
 import BuildIcon from "@mui/icons-material/Build";
 import HelpIcon from "@mui/icons-material/Help";
 import { SiCoursera } from "react-icons/si";
+import { IoHomeSharp } from "react-icons/io5";
+import { BsBank2 } from "react-icons/bs";
 
 const InstructorLayout = lazy(() =>
   import("~/components/Layout/InstructorLayout")
 );
+const ProfileLayout = lazy(() => import("~/components/Layout/ProfileLayout"));
 const NewCourse = lazy(() => import("~/pages/instructor/NewCourse"));
 
 const HomeInstructor = lazy(() => import("~/pages/instructor/index"));
@@ -17,13 +19,14 @@ const MyCourse = lazy(() => import("~/pages/instructor/MyCourse"));
 const CreateLesson = lazy(() => import("~/pages/instructor/CreateLesson"));
 const Discussion = lazy(() => import("~/pages/instructor/Discussion"));
 const CourseDetail = lazy(() => import("~/pages/instructor/CourseDetail"));
+const Banking = lazy(() => import("~/pages/instructor/BankingPage"));
 const InstructorRouter = [
   {
     name: null,
     path: "/profile",
     icon: null,
     component: Profile,
-    Layout: InstructorLayout,
+    Layout: ProfileLayout,
   },
   {
     name: null,
@@ -55,7 +58,7 @@ const InstructorRouter = [
     Layout: InstructorLayout,
   },
   {
-    name: "Course Detail",
+    name: null,
     path: "/course-detail/:courseID",
     icon: <SiCoursera />,
     component: CourseDetail,
@@ -63,7 +66,7 @@ const InstructorRouter = [
   },
   {
     name: "Home",
-    icon: <ForumIcon />,
+    icon: <IoHomeSharp className="text-xl" />,
     path: "/",
     component: HomeInstructor,
     Layout: InstructorLayout,
@@ -78,7 +81,7 @@ const InstructorRouter = [
   {
     name: "Discussion",
     path: "/discussion",
-    icon: <GoDiscussionClosed className=" text-2xl" />,
+    icon: <ForumIcon />,
     component: Discussion,
     Layout: InstructorLayout,
   },
@@ -90,10 +93,10 @@ const InstructorRouter = [
     Layout: InstructorLayout,
   },
   {
-    name: "Create Bank Account",
-    path: "/create-bank-account",
-    icon: <HelpIcon />,
-    component: MyCourse,
+    name: "Banking",
+    path: "/banking",
+    icon: <BsBank2 className="text-xl" />,
+    component: Banking,
     Layout: InstructorLayout,
   },
 ];

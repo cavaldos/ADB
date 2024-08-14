@@ -1,172 +1,117 @@
 import React, { useState } from "react";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
+import ItemInput from "../other/ItemInput";
 
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  p: 4,
-};
-
-function Company() {
-  const [companies, setCompanies] = useState([
-    {
-      companyName: "ABC Corp",
-      position: "Software Engineer",
-    },
-  ]);
-
-  const [isEditing, setIsEditing] = useState(null);
-  const [newCompany, setNewCompany] = useState({
-    companyName: "",
-    position: "",
+const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
+  const [formData, setFormData] = useState({
+    companyID: companyID,
+    companyName: companyName,
+    bankName: bankName,
   });
-  const [openModal, setOpenModal] = useState(false);
 
-  const handleEdit = (index) => {
-    setIsEditing(index);
+  const [isEditable, setIsEditable] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setLoading(false);
+    setIsEditable(false);
   };
-
-  const handleSave = (index) => {
-    setIsEditing(null);
-  };
-
-  const handleAddCompany = () => {
-    setCompanies([...companies, newCompany]);
-    setNewCompany({ companyName: "", position: "" });
-    setOpenModal(false);
-  };
-
+  const handleRemove = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setLoading(false);
+    setIsEditable(false);
+  }
   return (
-    <div>
-      {companies.map((company, index) => (
-        <Card key={index} className="m-4 p-4 bg-white shadow-md ">
-          <CardContent>
-            {isEditing === index ? (
-              <div className="flex flex-col gap-2">
-                <TextField
-                  label="Company Name"
-                  variant="outlined"
-                  value={company.companyName}
-                  onChange={(e) => {
-                    const newCompanies = [...companies];
-                    newCompanies[index].companyName = e.target.value;
-                    setCompanies(newCompanies);
-                  }}
-                  className="mb-2"
-                  fullWidth
-                />
-                <TextField
-                  label="Position"
-                  variant="outlined"
-                  value={company.position}
-                  onChange={(e) => {
-                    const newCompanies = [...companies];
-                    newCompanies[index].position = e.target.value;
-                    setCompanies(newCompanies);
-                  }}
-                  className="mb-2"
-                  fullWidth
-                />
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleSave(index)}
-                  className="mt-2"
-                >
-                  Save
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Typography variant="h5" component="div">
-                  Company
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Company Name: {company.companyName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Position: {company.position}
-                </Typography>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => handleEdit(index)}
-                  className="mt-2"
-                >
-                  Edit
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+    <div className="bg-[#F8F9FA] rounded-md w-full min-h-[150px] p-2">
+      <div className="form-control w-52 mb-4 flex flex-row justify-end gap-4 items-center ml-auto h-[34px]">
+        {loading && (
+          <span className="loading loading-spinner loading-xs"></span>
+        )}
+        <button
+          type="submit"
+          onClick={handleRemove}
+          className={`bg-red-600  text-white btn btn-sm text-bl py-1 px-4 rounded hover:bg-red-700
+                   transform transition-all duration-500 ease-in-out
+                    ${
+                      !isEditable ? "opacity-50 cursor-not-allowed hidden" : ""
+                    }`}
+          disabled={!isEditable}
+        >
+          Remove
+        </button>
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className={`bg-gray-300  btn btn-sm text-bl py-1 px-4 rounded
+                   transform transition-all duration-500 ease-in-out
+                    ${
+                      !isEditable ? "opacity-50 cursor-not-allowed hidden" : ""
+                    }`}
+          disabled={!isEditable}
+        >
+          Update
+        </button>
+        <input
+          type="checkbox"
+          className="toggle toggle-accent "
+          checked={isEditable}
+          onChange={() => setIsEditable(!isEditable)}
+        />
+      </div>
 
-      <Button
-        size="small"
-        variant="contained"
-        color="primary"
-        onClick={() => setOpenModal(true)}
-      >
-        Add Company
-      </Button>
-
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box className="flex flex-col gap-2" sx={modalStyle}>
-          <Typography variant="h6" component="h2">
-            Add Company
-          </Typography>
-          <TextField
-            label="Company Name"
-            variant="outlined"
-            value={newCompany.companyName}
-            onChange={(e) =>
-              setNewCompany({
-                ...newCompany,
-                companyName: e.target.value,
-              })
-            }
-            className="mb-2"
-            fullWidth
-          />
-          <TextField
-            label="Position"
-            variant="outlined"
-            value={newCompany.position}
-            onChange={(e) =>
-              setNewCompany({
-                ...newCompany,
-                position: e.target.value,
-              })
-            }
-            className="mb-2"
-            fullWidth
-          />
-          <Button
-            size="small"
-            variant="contained"
-            color="primary"
-            onClick={handleAddCompany}
-            className="mt-2"
-          >
-            Add
-          </Button>
-        </Box>
-      </Modal>
+      <form onSubmit={handleSubmit}>
+        <ItemInput
+          label="Company Name"
+          type="text"
+          name="companyName"
+          placeholder="Enter Company Name"
+          value={formData.companyName}
+          setValue={setFormData}
+          isEditable={isEditable}
+        />
+        <ItemInput
+          label="Bank Name"
+          type="text"
+          name="bankName"
+          placeholder="Enter Bank Name"
+          value={formData.bankName}
+          setValue={setFormData}
+          isEditable={isEditable}
+        />
+      </form>
     </div>
   );
-}
+};
+
+const Company = () => {
+  const companies = [
+    { id: 1, companyName: "Company 1", bankName: "Bank 1" },
+    { id: 2, companyName: "Company 2", bankName: "Bank 2" }, // Sử dụng ID khác nhau
+  ];
+  return (
+    <>
+      <div className="flex gap-10 min-h-[300px]">
+        <div className="card bg-base-100 shadow-xl shadow-gray-200 rounded-xl w-1/2 p-6">
+          {/* Component add company item */}
+        </div>
+        <div className="card bg-base-100 shadow-xl shadow-gray-200 rounded-md p-2 w-1/2 gap-4">
+          <h1>List of Companies</h1>
+          {companies.map((company,index) => (
+            <CompanyItem
+              key={index}
+              companyID={company.id}
+              companyName={company.companyName}
+              bankName={company.bankName}
+            />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default Company;

@@ -28,7 +28,7 @@ function App() {
           <Routes>
             {VerifyRoure().map((route, index) => {
               const Layout = route.Layout === null ? Fragment : route.Layout;
-              const Page = route.component;
+              const Page = route.component === null ? Fragment : route.component;
               return (
                 <Route
                   key={index}

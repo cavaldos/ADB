@@ -1,215 +1,117 @@
 import React, { useState } from "react";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
+import ItemInput from "../other/ItemInput";
 
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  p: 4,
-};
-
-function Certificate() {
-  const [certificates, setCertificates] = useState([
-    {
-      certificateName: "Certified React Developer",
-      startDate: "2021-01-01",
-      endDate: "2023-01-01",
-    },
-    {
-      certificateName: "Certified JavaScript Developer",
-      startDate: "2020-01-01",
-      endDate: "2022-01-01",
-    },
-  ]);
-
-  const [isEditing, setIsEditing] = useState(null);
-  const [newCertificate, setNewCertificate] = useState({
-    certificateName: "",
-    startDate: "",
-    endDate: "",
+const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
+  const [formData, setFormData] = useState({
+    companyID: companyID,
+    companyName: companyName,
+    bankName: bankName,
   });
-  const [openModal, setOpenModal] = useState(false);
 
-  const handleEdit = (index) => {
-    setIsEditing(index);
+  const [isEditable, setIsEditable] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setLoading(false);
+    setIsEditable(false);
   };
-
-  const handleSave = (index) => {
-    setIsEditing(null);
+  const handleRemove = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setLoading(false);
+    setIsEditable(false);
   };
-
-  const handleAddCertificate = () => {
-    setCertificates([...certificates, newCertificate]);
-    setNewCertificate({ certificateName: "", startDate: "", endDate: "" });
-    setOpenModal(false);
-  };
-
   return (
-    <div>
-      {certificates.map((certificate, index) => (
-        <Card key={index} className="m-4 p-4 bg-white shadow-2xl ">
-          <CardContent>
-            {isEditing === index ? (
-              <div className="flex flex-col gap-2">
-                <TextField
-                  label="Certificate Name"
-                  variant="outlined"
-                  value={certificate.certificateName}
-                  onChange={(e) => {
-                    const newCertificates = [...certificates];
-                    newCertificates[index].certificateName = e.target.value;
-                    setCertificates(newCertificates);
-                  }}
-                  className="mb-2"
-                  fullWidth
-                />
-                <TextField
-                  label="Start Date"
-                  type="date"
-                  variant="outlined"
-                  value={certificate.startDate}
-                  onChange={(e) => {
-                    const newCertificates = [...certificates];
-                    newCertificates[index].startDate = e.target.value;
-                    setCertificates(newCertificates);
-                  }}
-                  className="mb-2"
-                  InputLabelProps={{ shrink: true }}
-                  fullWidth
-                />
-                <TextField
-                  label="End Date"
-                  type="date"
-                  variant="outlined"
-                  value={certificate.endDate}
-                  onChange={(e) => {
-                    const newCertificates = [...certificates];
-                    newCertificates[index].endDate = e.target.value;
-                    setCertificates(newCertificates);
-                  }}
-                  className="mb-2"
-                  InputLabelProps={{ shrink: true }}
-                  fullWidth
-                />
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleSave(index)}
-                  className="mt-2"
-                >
-                  Save
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Typography variant="h5" component="div">
-                  Certificate
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Certificate Name: {certificate.certificateName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Start Date: {certificate.startDate}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  End Date: {certificate.endDate}
-                </Typography>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => handleEdit(index)}
-                  className="mt-4 "
-                >
-                  Edit
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+    <div className="bg-[#F8F9FA] rounded-md w-full min-h-[150px] p-2">
+      <div className="form-control w-52 mb-4 flex flex-row justify-end gap-4 items-center ml-auto h-[34px]">
+        {loading && (
+          <span className="loading loading-spinner loading-xs"></span>
+        )}
+        <button
+          type="submit"
+          onClick={handleRemove}
+          className={`bg-red-600  text-white btn btn-sm text-bl py-1 px-4 rounded hover:bg-red-700
+                   transform transition-all duration-500 ease-in-out
+                    ${
+                      !isEditable ? "opacity-50 cursor-not-allowed hidden" : ""
+                    }`}
+          disabled={!isEditable}
+        >
+          Remove
+        </button>
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className={`bg-gray-300  btn btn-sm text-bl py-1 px-4 rounded
+                   transform transition-all duration-500 ease-in-out
+                    ${
+                      !isEditable ? "opacity-50 cursor-not-allowed hidden" : ""
+                    }`}
+          disabled={!isEditable}
+        >
+          Update
+        </button>
+        <input
+          type="checkbox"
+          className="toggle toggle-accent "
+          checked={isEditable}
+          onChange={() => setIsEditable(!isEditable)}
+        />
+      </div>
 
-      <Button
-        size="small"
-        variant="contained"
-        color="primary"
-        onClick={() => setOpenModal(true)}
-      >
-        Add Certificate
-      </Button>
-
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box className="flex flex-col gap-2" sx={modalStyle}>
-          <Typography variant="h6" component="h2">
-            Add Certificate
-          </Typography>
-          <TextField
-            label="Certificate Name"
-            variant="outlined"
-            value={newCertificate.certificateName}
-            onChange={(e) =>
-              setNewCertificate({
-                ...newCertificate,
-                certificateName: e.target.value,
-              })
-            }
-            className="mb-2"
-            fullWidth
-          />
-          <TextField
-            label="Start Date"
-            type="date"
-            variant="outlined"
-            value={newCertificate.startDate}
-            onChange={(e) =>
-              setNewCertificate({
-                ...newCertificate,
-                startDate: e.target.value,
-              })
-            }
-            className="mb-2"
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-          <TextField
-            label="End Date"
-            type="date"
-            variant="outlined"
-            value={newCertificate.endDate}
-            onChange={(e) =>
-              setNewCertificate({
-                ...newCertificate,
-                endDate: e.target.value,
-              })
-            }
-            className="mb-2"
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-          <Button
-            size="small"
-            variant="contained"
-            color="primary"
-            onClick={handleAddCertificate}
-            className="mt-2"
-          >
-            Add
-          </Button>
-        </Box>
-      </Modal>
+      <form onSubmit={handleSubmit}>
+        <ItemInput
+          label="Company Name"
+          type="text"
+          name="companyName"
+          placeholder="Enter Company Name"
+          value={formData.companyName}
+          setValue={setFormData}
+          isEditable={isEditable}
+        />
+        <ItemInput
+          label="Bank Name"
+          type="text"
+          name="bankName"
+          placeholder="Enter Bank Name"
+          value={formData.bankName}
+          setValue={setFormData}
+          isEditable={isEditable}
+        />
+      </form>
     </div>
   );
-}
+};
+
+const Certificate = () => {
+  const companies = [
+    { id: 1, companyName: "Company 1", bankName: "Bank 1" },
+    { id: 2, companyName: "Company 2", bankName: "Bank 2" }, // Sử dụng ID khác nhau
+  ];
+  return (
+    <>
+      <div className="flex gap-10 min-h-[300px]">
+        <div className="card bg-base-100 shadow-xl shadow-gray-200 rounded-xl w-1/2 p-6">
+          {/* Component add company item */}
+        </div>
+        <div className="card bg-base-100 shadow-xl shadow-gray-200 rounded-md p-2 w-1/2 gap-4">
+          <h1>List of Companies</h1>
+          {companies.map((company, index) => (
+            <CompanyItem
+              key={index}
+              companyID={company.id}
+              companyName={company.companyName}
+              bankName={company.bankName}
+            />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default Certificate;

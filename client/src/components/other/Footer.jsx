@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 
-const Footer = () => {
+const Footer = ({className}) => {
   return (
     <>
-      <footer className="bg-gray-100 p-4 ">
+      <footer className={`bg-gray-100 p-4 ${className}`}>
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="">
-            <h3 className="font-bold text-lg mb-4 flex ">Get Started with AI</h3>
-            <ul >
+            <h3 className="font-bold text-lg mb-4 flex ">
+              Get Started with AI
+            </h3>
+            <ul>
               <li>
                 <Link to="#" className="text-gray-700 hover:text-blue-600">
                   DLAI AI For Everyone Course

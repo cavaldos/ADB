@@ -4,8 +4,6 @@ import { InstructorRouter } from "../../routes";
 import { InstructorAccount } from "../other/AccountCpn";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
-import ChatApp from "../Chat/ChatBox";
-
 const ButtonItem = ({ isHovered, name, icon, path }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -105,7 +103,6 @@ const InstructorLayout = ({ children }) => {
           className={`flex-1 p-6 mt-16 ml-14  transition-all duration-1000 `}
         >
           {children}
-          <ChatApp />
         </main>
       </div>
     </div>

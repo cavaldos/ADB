@@ -1,56 +1,134 @@
-import React, { useState, useRef, useEffect } from "react";
-import { MdClose, MdOpenInFull } from "react-icons/md";
+import React, { useState, useEffect, useRef, memo, useCallback } from "react";
 import { IoSend } from "react-icons/io5";
-import useChatSocket from "../../hooks/userChatSocket";
+import { Avatar } from "antd";
 import Tooltip from "@mui/material/Tooltip";
-
+import useChatSocket from "../../hooks/userChatSocket";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const UserList = ({ users, onSelectUser }) => {
+const text =
+  "mess age Ch at Cont esad fsd afd saf sf sdf sdaf sd f sdf sd f sdf sdf sd sdf  sdf s df sdf sd fds f sdf sd fs df sdf sd f sdf sd f sdf sd fds af sdaf sd f sdf sad f sdf sad f sadf sd f dsf sd f dssdf s df sd fs df sd f sdf sdf sd f sdaf sadf sadf asd fsad fnt";
+
+const AnymousMessage = memo(() => {
+  const firstLetter = useCallback((name) => name.charAt(0).toUpperCase(), []);
   return (
-    <div className="w-[60px] bg-gray-700 p-2 overflow-y-auto rounded-md">
-      {users.map((user, index) => (
-        <div
-          key={user.id}
-          className="cursor-pointer mb-2"
-          onClick={() => onSelectUser(user)}
-          title={user.name}
-        >
-          <img
-            src={user.avatar}
-            alt={user.name}
-            className="w-10 h-10 rounded-full mx-auto"
-          />
-        </div>
-      ))}
+    <div className="flex flex-col rounded-md mb-1">
+      <div className={`p-2 gap-1my-auto`}>
+        <Tooltip title={`Anynomus`} arrow placement="top-start">
+          <Avatar className="mr-2 mt-auto">{firstLetter("khandh")}</Avatar>
+        </Tooltip>
+        <Tooltip title={`inputing`} arrow placement="right-start">
+          <div
+            className={`inline-block py-1 px-2 min-h-5 my-auto min-w-[40px] rounded-md  max-w-[70%] break-words text-left bg-gray-400 text-black `}
+          >
+            <span className="loading loading-dots loading-md "></span>
+          </div>
+        </Tooltip>
+      </div>
     </div>
   );
-};
+});
+const Message = memo(({ message }) => {
+  const myId = 1;
+  const firstLetter = useCallback((name) => name.charAt(0).toUpperCase(), []);
+  const myMessage = message.userid === myId;
+  const GuestMessage = useCallback(() => {
+    return (
+      <div className="flex flex-col rounded-md mb-1">
+        <div className={`p-2 gap-1my-auto`}>
+          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="top-start">
+            <Avatar className="mr-2 mt-auto">{firstLetter("khandh")}</Avatar>
+          </Tooltip>
+          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="right-start">
+            <div
+              className={`inline-block py-1 px-2 min-h-5 my-auto min-w-[40px] rounded-md  max-w-[70%] break-words text-left bg-gray-300 text-black `}
+            >
+              {text}
+            </div>
+          </Tooltip>
+        </div>
+      </div>
+    );
+  }, [firstLetter, message.content]);
 
-const ChatBox = () => {
+  const MyMessage = useCallback(() => {
+    return (
+      <div className="flex flex-col rounded-md mb-1 ">
+        <div className={`p-2 gap-1 flex justify-end my-auto`}>
+          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="left-start">
+            <div
+              className={`inline-block py-1 px-2 min-h-5 my-auto min-w-[40px] rounded-md  max-w-[70%] break-words text-left bg-gray-400 text-black `}
+            >
+              {text}
+            </div>
+          </Tooltip>
+          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="top-start">
+            <Avatar className="mr-2 mt-auto">{firstLetter("khandh")}</Avatar>
+          </Tooltip>
+        </div>
+      </div>
+    );
+  }, [firstLetter, message.content]);
+
+  return (
+    <div className="flex flex-col">
+      {myMessage ? <MyMessage /> : <GuestMessage />}
+    </div>
+  );
+});
+function ChatBox() {
+  const [loading, setLoading] = useState(false);
+  const containerRef = useRef(null);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
+
   const [senderId, setSenderId] = useState(0);
   const [receiverId, setReceiverId] = useState(0);
   const [messagesBase, setMessagesBase] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const { messages, typingUsers, sendMessage, handleTyping } =
     useChatSocket(senderId);
-
-  const handleSendMessage = () => {
+  const message = [
+    {
+      userid: 1,
+      username: "user1",
+      content: "Hello",
+      createdAt: "2021-09-20",
+    },
+    {
+      userid: 2,
+      username: "user2",
+      content: "Hi",
+      createdAt: "2021-09-20",
+    },
+  ];
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSendMessage();
+      }
+    },
+    [newMessage, receiverId]
+  );
+  const handleSendMessage = useCallback(() => {
     sendMessage(newMessage, receiverId);
     setNewMessage("");
-    console.log("Send message", messages);
-  };
+  }, [newMessage, receiverId, sendMessage]);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSendMessage();
+  const handleScroll = useCallback(() => {
+    const container = containerRef.current;
+    if (container) {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      if (scrollTop + clientHeight >= scrollHeight) {
+        container.style.overflowY = "hidden";
+      } else {
+        container.style.overflowY = "auto";
+      }
     }
-  };
-  const fetchMessages = () => {
+  }, []);
+
+  const fetchMessages = useCallback(() => {
     setLoading(true);
     axios
       .post("http://113.173.71.43:5001/public/get_all_chat", {
@@ -60,209 +138,111 @@ const ChatBox = () => {
       .then((res) => {
         setMessagesBase(res.data.data);
         setLoading(false);
-        console.log(res.data.data);
       })
       .catch((error) => {
         console.error("Error fetching messages:", error);
         setLoading(false);
-        setTimeout(fetchMessages, 10000); // Retry after 1 second
+        setTimeout(fetchMessages, 10000); // Retry after 10 seconds
       });
-  };
+  }, [senderId, receiverId]);
   useEffect(() => {
     if (senderId && receiverId) {
       fetchMessages();
     }
   }, [senderId, receiverId]);
 
-  useEffect(() => {
+  const messageEnd = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-2 rounded-t-lg max-h-[455px]">
-        <div className="flex w-full max-w-md mb-4">
-          {/*  */}
-          <input
-            type="text"
-            value={senderId}
-            onChange={(e) => setSenderId(e.target.value)}
-            className="flex-grow border p-2 mr-2"
-            placeholder="Your ID"
-          />
-          <input
-            type="text"
-            value={receiverId}
-            onChange={(e) => setReceiverId(e.target.value)}
-            className="flex-grow border p-2"
-            placeholder="Receiver ID"
-          />
-          {/*  */}
-        </div>
-        {loading && (
-          <div className="flex justify-left items-left ">
-            <span className="loading loading-dots loading-md"></span>
-          </div>
-        )}
-        {!loading &&
-          messagesBase.map((message, index) => (
-            <div
-              key={index}
-              className={`p-2 gap-1 ${
-                message.SenderID == senderId ? "text-right" : "text-left"
-              }`}
-            >
-              <Tooltip
-                key={message.ChatID}
-                title={`${message.SenderName} - ${new Date(
-                  message.time
-                ).toLocaleString()}`}
-                arrow
-                placement="right-start"
-              >
-                <div
-                  className={`inline-block py-1 px-2 min-h-8 min-w-[40px] rounded-lg max-w-[80%] break-words ${
-                    message.SenderID == senderId
-                      ? "bg-gray-300 text-black text-left"
-                      : "bg-gray-400 text-black text-left"
-                  }`}
-                >
-                  {message.ChatContent}
-                </div>
-              </Tooltip>
-            </div>
-          ))}
-        {Array.from(typingUsers).map((userId, index) => (
-          <div key={index} className={`p-2 text-left`}>
-            <div
-              className={`inline-block  px-2 rounded-lg w-[50px]  break-words bg-gray-400 text-center `}
-            >
-              <span className="loading loading-dots loading-md mt-1"></span>
-            </div>
-          </div>
-        ))}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      <div className="flex p-1 bg-gray-500 rounded-lg">
-        <input
-          type="text"
-          className="flex-1 p-2 border rounded-lg bg-white"
-          placeholder="Type a message"
-          value={newMessage}
-          onChange={(e) => {
-            setNewMessage(e.target.value);
-            handleTyping(e, receiverId);
-          }}
-          onKeyDown={handleKeyDown}
-        />
-        <button
-          className="ml-2 p-2 bg-blue-500 rounded-lg"
-          onClick={handleSendMessage}
-        >
-          <IoSend className="hover:text-gray-950 text-gray-800" size={24} />
-        </button>
-      </div>
-      {/*       
-      <div className="flex items-center p-2 bg-white rounded-full shadow-md">
-      <input
-        type="text"
-        className="flex-1 p-3 border-none rounded-full focus:outline-none"
-        placeholder="Ask me anything..."
-        value={newMessage}
-        onChange={(e) => {
-          setNewMessage(e.target.value);
-          handleTyping(e, receiverId);
-        }}
-        onKeyDown={handleKeyDown}
-      />
-      <button
-        className="ml-2 p-3 bg-gray-800 rounded-full flex items-center justify-center"
-        onClick={handleSendMessage}
-      >
-        <IoSend className="text-white" size={24} />
-      </button>
-    </div>
-      */}
-    </div>
-  );
-};
-
-const FloatingComponent = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [messages, setMessages] = useState([
-    // Sample messages
-    { text: "Hello!", isOwn: false },
-    { text: "Hi, how are you?", isOwn: true },
-    { text: "I'm good, thank you!", isOwn: false },
-    { text: "How can I help you today?", isOwn: false },
-    { text: "I have a question about your product", isOwn: true },
-    { text: "Sure, what do you want to know?", isOwn: false },
-    { text: "Can I get a demo?", isOwn: true },
-    { text: "Yes, we can schedule a demo for you", isOwn: false },
-    { text: "Great, when can we do it?", isOwn: true },
-    { text: "How about tomorrow at 10 AM?", isOwn: false },
-    { text: "Sounds good, see you then!", isOwn: true },
-  ]);
-
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
   };
-
-  const users = [
-    { id: 1, name: "User 1", avatar: "https://via.placeholder.com/40" },
-    { id: 2, name: "User 2", avatar: "https://via.placeholder.com/40" },
-    { id: 3, name: "User 3", avatar: "https://via.placeholder.com/40" },
-  ];
-
-  const handleSendMessage = (message) => {
-    setMessages([...messages, { text: message, isOwn: true }]);
-  };
+  useEffect(() => {
+    messageEnd();
+  }, [messages, newMessage]);
 
   return (
     <>
       <div
-        className={`fixed bottom-0 right-0 w-[700px] h-[600px] bg-gray-300 text-white p-2 m-2 rounded-md shadow-lg z-50 transition-all duration-300 ${
-          isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        style={{
-          transform: isVisible ? "translateY(0)" : "translateY(100%)",
-        }}
+        className="w-full flex flex-col rounded-md  relative h-[100%] overflow-hidden"
+        onScroll={handleScroll}
+        ref={containerRef}
       >
-        <div className="flex justify-between items-center mb-2">
-          <span>Always on Top Component</span>
-          <button onClick={toggleVisibility} className="text-white">
-            <MdClose size={24} className="text-black" />
+        <div
+          className="bg-white p-1 rounded-md h-[60px]  opacity-65 bg-opacity-95
+        flex items-center shadow-xl  shadow-blur backdrop-blur-2xl overflow-hidden"
+        >
+          dsf
+        </div>
+        {/*  */}
+        <div className="flex-1 overflow-y-auto rounded-t-lg p-2 relative h-full pb-24 ">
+          {/*  */}
+          <div className="flex w-full max-w-md mb-4">
+            {/*  */}
+            <input
+              type="text"
+              value={senderId}
+              onChange={(e) => setSenderId(e.target.value)}
+              className="flex-grow border p-2 mr-2"
+              placeholder="Your ID"
+            />
+            <input
+              type="text"
+              value={receiverId}
+              onChange={(e) => setReceiverId(e.target.value)}
+              className="flex-grow border p-2"
+              placeholder="Receiver ID"
+            />
+            {/*  */}
+          </div>
+          {/*  */}
+          {!loading &&
+            message.map((discussion, index) => (
+              <Message key={index} message={discussion} />
+            ))}
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+          <Message message={message} />
+
+          <AnymousMessage />
+          {Array.from(typingUsers).map((userId, index) => (
+            <AnymousMessage key={index} />
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+        <div className="bg-white flex border rounded-3xl absolute bottom-4 right-4 left-4  min-w-auto shadow-2xl ">
+          <input
+            type="text"
+            className="rounded-3xl w-full py-2 px-3 text-gray-700 focus:outline-none  
+            overflow-hidden break-words bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200  "
+            placeholder="Type a message"
+            value={newMessage}
+            onChange={(e) => {
+              setNewMessage(e.target.value);
+              handleTyping(e, receiverId);
+              messageEnd();
+            }}
+            onKeyDown={handleKeyDown}
+          />
+
+          <button
+            onClick={handleSendMessage}
+            className="ml-2 p-2 bg-blue-500 rounded-lg"
+          >
+            <IoSend className="hover:text-gray-950 text-gray-800" size={24} />
           </button>
         </div>
-
-        <div className="flex h-[calc(100%-2rem)] ">
-          <UserList users={users} onSelectUser={setSelectedUser} />
-          <div className="flex-1 bg-white text-black p-2 rounded-lg ml-2 flex flex-col">
-            {selectedUser ? (
-              <div className="flex-1 flex flex-col">
-                <h2>{selectedUser.name}</h2>
-                <ChatBox />
-              </div>
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                Select a user to start a conversation
-              </div>
-            )}
-          </div>
-        </div>
       </div>
-      {!isVisible && (
-        <button
-          onClick={toggleVisibility}
-          className="fixed bottom-4 right-4 bg-black text-white p-2 rounded-full shadow-lg z-50"
-        >
-          <MdOpenInFull size={24} />
-        </button>
-      )}
     </>
   );
-};
-export default FloatingComponent;
+}
+
+export default ChatBox;

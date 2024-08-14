@@ -1,5 +1,6 @@
 import countSlice from "./features/countSlice";
 import authSlice from "./features/authSlice";
+import globalState from "./features/globalState";
 import resetStateSlice from "./features/resetStateSlice";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   count: countSlice,
   auth: authSlice,
   resetState: resetStateSlice,
+  globalState: globalState,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

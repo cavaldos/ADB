@@ -35,7 +35,7 @@ function Notify() {
   };
 
   return (
-    <div className=" mr-2">
+    <div className=" mr-2 p-2 ">
       <Badge
         badgeContent={1}
         invisible={false}
