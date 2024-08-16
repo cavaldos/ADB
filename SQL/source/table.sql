@@ -1,13 +1,3 @@
-CREATE TABLE [LessonsProcess] (
-  [LessonsProcessID] integer PRIMARY KEY IDENTITY(1, 1),
-  [Status] nvarchar(255) NOT NULL CHECK ([Status] IN ('NotStarted', 'InProcess', 'Done')),
-  [StartTime] datetime,
-  [EndTime] datetime,
-  [LessonsID] integer,
-  [LearnProcessID] integer
-)
-GO
-
 CREATE TABLE [Lessons] (
   [LessonsID] integer PRIMARY KEY IDENTITY(1, 1),
   [Title] varchar(255),
@@ -16,8 +6,9 @@ CREATE TABLE [Lessons] (
   [CreatedTime] datetime,
   [UpdatedTime] datetime,
   [LessonType] nvarchar(255),
-  [CourseID] integer,
-  [TopicID] integer
+  [Topic] varchar(255),
+  [OrderLesson] integer UNIQUE,
+  [CourseID] integer
 )
 GO
 
@@ -66,7 +57,8 @@ GO
 
 CREATE TABLE [LearnProcess] (
   [LearnProcessID] integer PRIMARY KEY IDENTITY(1, 1),
-  [Status] bit,
+  [StatusProcess] nvarchar(255) NOT NULL CHECK ([StatusProcess] IN ('NotStarted', 'InProcess', 'Done')),
+  [LessonsID] integer,
   [StudentID] integer,
   [CourseID] integer
 )
@@ -94,7 +86,6 @@ GO
 
 CREATE TABLE [Student] (
   [StudentID] integer PRIMARY KEY IDENTITY(1, 1),
-  [SchoolYear] varchar(20),
   [UserID] integer UNIQUE
 )
 GO
@@ -177,7 +168,9 @@ CREATE TABLE [Advertisement] (
   [CreatedTime] datetime,
   [Title] nvarchar(100),
   [Description] nvarchar(max),
-  [UserID] integer
+  [CourseID] integer,
+  [InstructorID] integer,
+  [Discount] integer
 )
 GO
 
@@ -191,16 +184,8 @@ CREATE TABLE [Discount] (
 )
 GO
 
-CREATE TABLE [Topic] (
-  [TopicID] integer PRIMARY KEY IDENTITY(1, 1),
-  [TopicName] varchar(255),
-  [CourseID] integer
-)
-GO
-
 CREATE TABLE [Cart] (
   [CartID] integer PRIMARY KEY IDENTITY(1, 1),
-  [CartStatus] nvarchar(255) NOT NULL CHECK ([CartStatus] IN ('Pending', 'Done')),
   [StudentID] integer
 )
 GO
@@ -225,9 +210,8 @@ GO
 CREATE TABLE [Notify] (
   [NotifyID] integer PRIMARY KEY IDENTITY(1, 1),
   [CreatedDate] datetime NOT NULL,
-  [Message] nvarchar(500),
-  [LearnProcessID] integer DEFAULT (null),
-  [SendUserID] integer,
+  [MessageNotify] nvarchar(500),
+  [StatusNotify] nvarchar(255) NOT NULL CHECK ([StatusNotify] IN ('Seen', 'UnSee')),
   [ReceiveUserID] integer NOT NULL
 )
 GO
@@ -243,7 +227,7 @@ CREATE TABLE [ForumMessage] (
   [ForumMessageID] integer PRIMARY KEY IDENTITY(1, 1),
   [MessageContent] nvarchar(500),
   [SendTime] datetime,
-  [UserID] integer,
+  [SenderID] integer,
   [DiscussionForumID] integer
 )
 GO
@@ -300,7 +284,7 @@ CREATE TABLE [Invoice] (
   [InvoiceID] integer PRIMARY KEY IDENTITY(1, 1),
   [InvoiceDate] datetime,
   [TotalAmount] float,
-  [Status] nvarchar(255) NOT NULL CHECK ([Status] IN ('Paied', 'UnPaied')),
+  [InvoiceStatus] nvarchar(255) NOT NULL CHECK ([InvoiceStatus] IN ('Paied', 'UnPaied')),
   [TransferID] integer DEFAULT (null),
   [StudentID] integer
 )
@@ -316,33 +300,15 @@ CREATE TABLE [InvoiceDetail] (
 )
 GO
 
-CREATE TABLE [TaxSetting] (
-  [TaxSettingID] integer PRIMARY KEY IDENTITY(1, 1),
+CREATE TABLE [Tax] (
+  [TaxID] integer PRIMARY KEY IDENTITY(1, 1),
   [TaxPercentage] float DEFAULT (10),
   [EffectiveDate] datetime,
-  [UpdateDate] datetime
+  [InstructorID] integer
 )
-GO
-
-CREATE TABLE [TaxReport] (
-  [TaxReportID] integer PRIMARY KEY IDENTITY(1, 1),
-  [CreateDate] datetime,
-  [TaxCode] varchar(20) UNIQUE,
-  [TaxSettingID] integer,
-  [InstructorID] integer UNIQUE
-)
-GO
-
-ALTER TABLE [LessonsProcess] ADD FOREIGN KEY ([LessonsID]) REFERENCES [Lessons] ([LessonsID])
-GO
-
-ALTER TABLE [LessonsProcess] ADD FOREIGN KEY ([LearnProcessID]) REFERENCES [LearnProcess] ([LearnProcessID])
 GO
 
 ALTER TABLE [Lessons] ADD FOREIGN KEY ([CourseID]) REFERENCES [Course] ([CourseID])
-GO
-
-ALTER TABLE [Lessons] ADD FOREIGN KEY ([TopicID]) REFERENCES [Topic] ([TopicID])
 GO
 
 ALTER TABLE [Question] ADD FOREIGN KEY ([LessonTestID]) REFERENCES [LessonTest] ([LessonTestID])
@@ -361,6 +327,9 @@ ALTER TABLE [LessonDocument] ADD FOREIGN KEY ([LessonsID]) REFERENCES [Lessons] 
 GO
 
 ALTER TABLE [PageDocument] ADD FOREIGN KEY ([LessonDocumentID]) REFERENCES [LessonDocument] ([LessonDocumentID])
+GO
+
+ALTER TABLE [LearnProcess] ADD FOREIGN KEY ([LessonsID]) REFERENCES [Lessons] ([LessonsID])
 GO
 
 ALTER TABLE [LearnProcess] ADD FOREIGN KEY ([StudentID]) REFERENCES [Student] ([StudentID])
@@ -399,13 +368,16 @@ GO
 ALTER TABLE [Category] ADD FOREIGN KEY ([ParentCategoryID]) REFERENCES [Category] ([CategoryID])
 GO
 
-ALTER TABLE [Advertisement] ADD FOREIGN KEY ([UserID]) REFERENCES [User] ([UserID])
+ALTER TABLE [Advertisement] ADD FOREIGN KEY ([CourseID]) REFERENCES [Course] ([CourseID])
+GO
+
+ALTER TABLE [Advertisement] ADD FOREIGN KEY ([InstructorID]) REFERENCES [Instructor] ([InstructorID])
+GO
+
+ALTER TABLE [Advertisement] ADD FOREIGN KEY ([Discount]) REFERENCES [Discount] ([DiscountID])
 GO
 
 ALTER TABLE [Discount] ADD FOREIGN KEY ([CourseID]) REFERENCES [Course] ([CourseID])
-GO
-
-ALTER TABLE [Topic] ADD FOREIGN KEY ([CourseID]) REFERENCES [Course] ([CourseID])
 GO
 
 ALTER TABLE [Cart] ADD FOREIGN KEY ([StudentID]) REFERENCES [Student] ([StudentID])
@@ -423,19 +395,13 @@ GO
 ALTER TABLE [Review] ADD FOREIGN KEY ([CourseID]) REFERENCES [Course] ([CourseID])
 GO
 
-ALTER TABLE [Notify] ADD FOREIGN KEY ([LearnProcessID]) REFERENCES [LearnProcess] ([LearnProcessID])
-GO
-
-ALTER TABLE [Notify] ADD FOREIGN KEY ([SendUserID]) REFERENCES [User] ([UserID])
-GO
-
 ALTER TABLE [Notify] ADD FOREIGN KEY ([ReceiveUserID]) REFERENCES [User] ([UserID])
 GO
 
 ALTER TABLE [DiscussionForum] ADD FOREIGN KEY ([CourseID]) REFERENCES [Course] ([CourseID])
 GO
 
-ALTER TABLE [ForumMessage] ADD FOREIGN KEY ([UserID]) REFERENCES [User] ([UserID])
+ALTER TABLE [ForumMessage] ADD FOREIGN KEY ([SenderID]) REFERENCES [User] ([UserID])
 GO
 
 ALTER TABLE [ForumMessage] ADD FOREIGN KEY ([DiscussionForumID]) REFERENCES [DiscussionForum] ([ForumID])
@@ -480,8 +446,5 @@ GO
 ALTER TABLE [InvoiceDetail] ADD FOREIGN KEY ([CourseID]) REFERENCES [Course] ([CourseID])
 GO
 
-ALTER TABLE [TaxReport] ADD FOREIGN KEY ([TaxSettingID]) REFERENCES [TaxSetting] ([TaxSettingID])
-GO
-
-ALTER TABLE [TaxReport] ADD FOREIGN KEY ([InstructorID]) REFERENCES [Instructor] ([InstructorID])
+ALTER TABLE [Tax] ADD FOREIGN KEY ([InstructorID]) REFERENCES [Instructor] ([InstructorID])
 GO
