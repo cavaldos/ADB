@@ -7,7 +7,7 @@ CREATE TABLE [Lessons] (
   [UpdatedTime] datetime,
   [LessonType] nvarchar(255),
   [Topic] varchar(255),
-  [OrderLesson] integer UNIQUE,
+  [OrderLesson] integer,
   [CourseID] integer
 )
 GO
