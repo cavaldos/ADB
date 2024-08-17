@@ -54,7 +54,7 @@ Table Lessons {
   UpdatedTime datetime
   LessonType varchar
   Topic varchar(255)
-  OrderLesson integer [unique]
+  OrderLesson integer
   CourseID integer [ref:> Course.CourseID]
 }
 
