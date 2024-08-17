@@ -319,7 +319,7 @@ BEGIN
         VALUES (@ChatContent, GETDATE(), @SendChatID, @ReceiveChatID);
 
     COMMIT TRANSACTION;
-    RAISERROR ('Chat created successfully.',16,1);
+    PRINT'Chat created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -409,6 +409,7 @@ BEGIN
 END;
 GO
 
+
 -- 14. Create the procedure to create lesson video
 IF OBJECT_ID('create_lesson_video', 'P') IS NOT NULL
     DROP PROCEDURE create_lesson_video;
@@ -424,18 +425,21 @@ CREATE PROCEDURE create_lesson_video
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
+        BEGIN TRANSACTION;
+        
         -- Check if a lesson with the same title and topic already exists (case insensitive)
         IF EXISTS (SELECT 1 FROM [Lessons] WHERE LOWER(Title) = LOWER(@Title) AND OrderLesson = @OrderLesson)
         BEGIN
-            RAISERROR('A lesson with this title and topic already exists.',16,1);
+            RAISERROR('A lesson with this title and topic already exists.', 16, 1);
+            ROLLBACK TRANSACTION;
             RETURN;
         END
+        
         DECLARE @LessonsID integer;
 
         -- Insert new lesson
-        INSERT INTO [Lessons] (Title, Duration, ComplexityLevel, CreatedTime, UpdatedTime, LessonType, CourseID, Topic , OrderLesson)
-        VALUES (@Title, @Duration, @ComplexityLevel, GETDATE(), GETDATE(), 'Video', @CourseID, @Topic , @OrderLesson);
+        INSERT INTO [Lessons] (Title, Duration, ComplexityLevel, CreatedTime, UpdatedTime, LessonType, CourseID, Topic, OrderLesson)
+        VALUES (@Title, @Duration, @ComplexityLevel, GETDATE(), GETDATE(), 'Video', @CourseID, @Topic, @OrderLesson);
 
         -- Get the ID of the newly created lesson
         SET @LessonsID = SCOPE_IDENTITY();
@@ -444,14 +448,19 @@ BEGIN
         INSERT INTO [LessonVideo] (LessonsID, URL)
         VALUES (@LessonsID, @URL);
 
-
-    COMMIT TRANSACTION;
-    RAISERROR ('Lesson and lesson video created successfully.',16,1);
+        COMMIT TRANSACTION;
+        
+        -- Success message (use PRINT or lower severity level)
+        PRINT 'Lesson and lesson video created successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating lesson and lesson video.',16,1);
-        PRINT ERROR_MESSAGE();
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        
+        -- Capture and display the error
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        SET @ErrorMessage = ERROR_MESSAGE();
+        RAISERROR(@ErrorMessage, 16, 1);
     END CATCH
 END;
 GO
@@ -481,7 +490,7 @@ BEGIN
         WHERE LessonVideoID = @LessonVideoID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Lesson video updated successfully.',16,1);
+    PRINT'Lesson video updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -490,7 +499,6 @@ BEGIN
     END CATCH
 END;
 GO
--- EXEC updateLessonVideo @LessonVideoID = 1, @URL = 'https://example.com/new_video.mp4';
 
 --- 16. Create the procedure create lesson document
 IF OBJECT_ID('create_lesson_document', 'P') IS NOT NULL
@@ -502,22 +510,26 @@ CREATE PROCEDURE create_lesson_document
     @Duration integer,
     @ComplexityLevel nvarchar(255),
     @CourseID integer,
-    @Topic nvarchar(255)
+    @Topic nvarchar(255),
+    @OrderLesson integer
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
-        -- Check if a lesson with the same title already exists (case insensitive)
-        IF EXISTS (SELECT 1 FROM [Lessons] WHERE LOWER(Title) = LOWER(@Title))
+        BEGIN TRANSACTION;
+        
+       -- Check if a lesson with the same title already exists within the same course (case insensitive)
+        IF EXISTS (SELECT 1 FROM [Lessons] 
+                   WHERE LOWER(Title) = LOWER(@Title) AND CourseID = @CourseID)
         BEGIN
-            RAISERROR('A lesson with this title already exists.',16,1);
+            RAISERROR('A lesson with this title already exists in the same course.', 16, 1);
             ROLLBACK TRANSACTION;
             RETURN;
         END
         DECLARE @LessonsID integer;
+
         -- Insert new lesson
-        INSERT INTO [Lessons] (Title, Duration, ComplexityLevel, CreatedTime, UpdatedTime, LessonType, CourseID, Topic)
-        VALUES (@Title, @Duration, @ComplexityLevel, GETDATE(), GETDATE(), 'Document', @CourseID, @Topic);
+        INSERT INTO [Lessons] (Title, Duration, ComplexityLevel, CreatedTime, UpdatedTime, LessonType, CourseID, Topic, OrderLesson)
+        VALUES (@Title, @Duration, @ComplexityLevel, GETDATE(), GETDATE(), 'Document', @CourseID, @Topic, @OrderLesson);
 
         -- Get the ID of the newly created lesson
         SET @LessonsID = SCOPE_IDENTITY();
@@ -526,14 +538,19 @@ BEGIN
         INSERT INTO [LessonDocument] (LessonsID)
         VALUES (@LessonsID);
 
-
-    COMMIT TRANSACTION;
-    RAISERROR('Lesson document created successfully.',16,1);
+        COMMIT TRANSACTION;
+        
+        -- Success message
+        PRINT 'Lesson document created successfully.';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        RAISERROR('Error occurred while creating lesson document.',16,1);
-        PRINT ERROR_MESSAGE();
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        
+        -- Capture and display the error
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        SET @ErrorMessage = ERROR_MESSAGE();
+        RAISERROR(@ErrorMessage, 16, 1);
     END CATCH
 END;
 GO
@@ -576,7 +593,7 @@ BEGIN
         VALUES (@Content, @Page, @LessonDocumentID);
 
     COMMIT TRANSACTION;
-    RAISERROR('Page document added successfully.',16,1);
+    PRINT'Page document added successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -654,7 +671,8 @@ CREATE PROCEDURE create_lesson_test
     @Duration integer,
     @ComplexityLevel nvarchar(255),
     @CourseID integer,
-    @Topic nvarchar(255)
+    @Topic nvarchar(255),
+    @OrderLesson integer
 AS
 BEGIN
     BEGIN TRY
@@ -668,8 +686,8 @@ BEGIN
         
         DECLARE @LessonsID integer;
         -- Insert new lesson
-        INSERT INTO [Lessons] (Title, Duration, ComplexityLevel, CreatedTime, UpdatedTime, LessonType, CourseID, Topic)
-        VALUES (@Title, @Duration, @ComplexityLevel, GETDATE(), GETDATE(), 'Test', @CourseID, @Topic);
+        INSERT INTO [Lessons] (Title, Duration, ComplexityLevel, CreatedTime, UpdatedTime, LessonType, CourseID, Topic, OrderLesson)
+        VALUES (@Title, @Duration, @ComplexityLevel, GETDATE(), GETDATE(), 'Test', @CourseID, @Topic , @OrderLesson);
         -- Get the ID of the newly created lesson
         SET @LessonsID = SCOPE_IDENTITY();
         -- Insert new lesson test
@@ -678,7 +696,7 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Lesson test created successfully.',16,1);
+    PRINT'Lesson test created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -731,7 +749,7 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Question and answers created successfully.',16,1);
+    PRINT'Question and answers created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -835,7 +853,7 @@ BEGIN
         WHERE LessonsID = @LessonsID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Lesson updated successfully.',16,1);
+    PRINT'Lesson updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -873,7 +891,7 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Lesson and related entries deleted successfully.',16,1);
+    PRINT'Lesson and related entries deleted successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -944,7 +962,7 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Question and answers updated successfully.',16,1);
+    PRINT'Question and answers updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -982,7 +1000,7 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Question and associated answers deleted successfully.',16,1);
+    PRINT'Question and associated answers deleted successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1028,7 +1046,7 @@ BEGIN
             q.QuestionID, a.AnswerID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Questions and answers retrieved successfully.',16,1);
+    PRINT'Questions and answers retrieved successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1074,7 +1092,7 @@ BEGIN
 
         -- Hoàn thành giao dịch
         COMMIT TRANSACTION;
-        RAISERROR ('Learn process started successfully.', 16, 1);
+        PRINT'Learn process started successfully.';
     END TRY
     BEGIN CATCH
         -- Hủy bỏ giao dịch nếu có lỗi xảy ra
@@ -1125,7 +1143,7 @@ BEGIN
         WHERE LearnProcessID = @LearnProcessID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Learn process updated successfully.',16,1);
+    PRINT'Learn process updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1166,7 +1184,7 @@ BEGIN
         VALUES (@MessageContent, GETDATE(), @UserID, @DiscussionForumID);
 
     COMMIT TRANSACTION;
-    RAISERROR('Forum message created successfully.',16,1);
+    PRINT'Forum message created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1206,7 +1224,7 @@ BEGIN
         DELETE FROM [ForumMessage] WHERE ForumMessageID = @ForumMessageID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Forum message deleted successfully.',16,1);
+    PRINT'Forum message deleted successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1263,7 +1281,7 @@ BEGIN
 
 
         COMMIT TRANSACTION;
-    RAISERROR('Admin created successfully.',16,1);
+    PRINT'Admin created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1324,7 +1342,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Instructor created successfully.',16,1);
+        PRINT'Instructor created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -1390,7 +1408,7 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Admin updated successfully.',16,1);
+    PRINT'Admin updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1450,7 +1468,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Student created successfully.',16,1);
+        PRINT'Student created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -1515,7 +1533,7 @@ BEGIN
         WHERE UserID = @UserID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Student updated successfully.',16,1);
+    PRINT'Student updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1585,7 +1603,7 @@ BEGIN
 
 
     COMMIT TRANSACTION;
-    RAISERROR('Instructor updated successfully.',16,1);
+    PRINT'Instructor updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1628,7 +1646,7 @@ BEGIN
         VALUES (@Comment, @Rating, GETDATE(), @StudentID, @CourseID);
 
     COMMIT TRANSACTION;
-    RAISERROR('Review created successfully.',16,1);
+    PRINT'Review created successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1665,7 +1683,7 @@ BEGIN
         WHERE ReviewID = @ReviewID;
 
     COMMIT TRANSACTION;
-    RAISERROR('Review updated successfully.',16,1);
+    PRINT'Review updated successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1726,7 +1744,7 @@ BEGIN
         VALUES (@CartID, @CourseID);
 
     COMMIT TRANSACTION;
-    RAISERROR('Course added to cart successfully.',16,1);
+    PRINT'Course added to cart successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1760,7 +1778,7 @@ BEGIN
         WHERE CartID = @CartID AND CourseID = @CourseID;
 
     COMMIT TRANSACTION;
-        RAISERROR('Cart detail removed successfully.',16,1);
+        PRINT'Cart detail removed successfully.';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
@@ -1842,7 +1860,7 @@ BEGIN
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Invoice updated successfully.',16,1);
+        PRINT'Invoice updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback giao dịch nếu có lỗi xảy ra
@@ -1941,7 +1959,7 @@ BEGIN
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Discount applied successfully.',16,1);
+        PRINT'Discount applied successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback giao dịch nếu có lỗi xảy ra
@@ -1999,7 +2017,7 @@ BEGIN
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Invoice detail deleted and total amount updated successfully.',16,1);
+        PRINT'Invoice detail deleted and total amount updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback giao dịch nếu có lỗi xảy ra
@@ -2054,7 +2072,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Bank account created successfully.',16,1);
+        PRINT'Bank account created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2111,7 +2129,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Bank account updated successfully.',16,1);
+        PRINT'Bank account updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2154,7 +2172,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('History banking record created successfully.',16,1);
+        PRINT'History banking record created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2297,7 +2315,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Transfer created and balances updated successfully.',16,1);
+        PRINT'Transfer created and balances updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2420,13 +2438,11 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-
-        RAISERROR('Payments processed successfully and invoice status updated to paid.', 0, 1) WITH NOWAIT;
+        PRINT'Payments processed successfully and invoice status updated to paid.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
         ROLLBACK TRANSACTION;
-
         RAISERROR('Error occurred while processing payments.', 16, 1) WITH NOWAIT;
         PRINT ERROR_MESSAGE();
     END CATCH
@@ -2467,7 +2483,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Certificate created successfully.',16,1);
+        PRINT'Certificate created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2511,7 +2527,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Certificate updated successfully.',16,1);
+        PRINT'Certificate updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2551,7 +2567,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Education record created successfully.',16,1);
+        PRINT'Education record created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2594,7 +2610,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Education record updated successfully.',16,1);
+        PRINT'Education record updated successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2631,7 +2647,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Course deleted successfully.',16,1);
+        PRINT'Course deleted successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2668,7 +2684,7 @@ BEGIN
 
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Notification created successfully.',16,1);
+        PRINT'Notification created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback giao dịch nếu có lỗi xảy ra
@@ -2706,7 +2722,7 @@ BEGIN
         WHERE NotifyID = @NotifyID;
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Notification status updated to Seen.',16,1);
+        PRINT'Notification status updated to Seen.';
     END TRY
     BEGIN CATCH
         -- Rollback giao dịch nếu có lỗi xảy ra
@@ -2745,7 +2761,7 @@ BEGIN
         END
         -- Commit giao dịch
         COMMIT TRANSACTION;
-        RAISERROR('Get all notification successfully.',16,1);
+        PRINT'Get all notification successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback giao dịch nếu có lỗi xảy ra
@@ -2947,7 +2963,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        RAISERROR('Tax report created successfully.',16,1);
+        PRINT'Tax report created successfully.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
