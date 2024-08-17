@@ -25,7 +25,8 @@ Dữ liệu trong bảng này sẽ được chia thành các phân vùng dựa t
 
 
 Giải thích chi tiết:
-Partition Function (pfInvoiceDate):
+
+
 
 Đây là một Partition Function định nghĩa các giá trị ranh giới cho các phân vùng (partitions) dựa trên cột InvoiceDate.
 Range LEFT FOR VALUES chỉ định rằng mỗi phân vùng sẽ bao gồm các giá trị nhỏ hơn hoặc bằng giá trị ranh giới được định nghĩa.

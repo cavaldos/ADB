@@ -32,4 +32,4 @@ ON LessonCompositePS(PartitionKey);
 
 -- vì trong khoá học sẽ có nhiều bài học, và mỗi bài học sẽ có một loại tài liệu, video, hoặc bài kiểm tra,
 -- số lượng các bài học sẽ tăng theo thời gian, nên việc chia theo loại bài học và thời gian tạo sẽ giúp cho việc tìm kiếm và thống kê dễ dàng hơn.]
--- ở đây sử dụng Partition Composite để chia theo loại bài học và thời gian tạo
+-- Sử dụng Partition Composite để chia theo loại bài học và thời gian tạo
