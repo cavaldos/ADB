@@ -246,14 +246,8 @@ CREATE TABLE [Transfer] (
   [TransactionTime] datetime,
   [Amount] float,
   [TransferDescription] nvarchar(500),
-  [BankBeneficiaryID] integer,
-  [BankOrderingID] integer,
-  [TransferTotalID] integer DEFAULT (null)
-)
-GO
-
-CREATE TABLE [TransferTotal] (
-  [TransferTotalID] integer PRIMARY KEY IDENTITY(1, 1),
+  [BankAccountIDReceiver] integer,
+  [BankAccountIDSender] integer,
   [InvoiceID] integer
 )
 GO
@@ -285,7 +279,6 @@ CREATE TABLE [Invoice] (
   [InvoiceDate] datetime,
   [TotalAmount] float,
   [InvoiceStatus] nvarchar(255) NOT NULL CHECK ([InvoiceStatus] IN ('Paied', 'UnPaied')),
-  [TransferID] integer DEFAULT (null),
   [StudentID] integer
 )
 GO
