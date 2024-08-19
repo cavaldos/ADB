@@ -1,44 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, memo, useMemo } from "react";
 import { MdOndemandVideo } from "react-icons/md";
 import { GrDocumentText } from "react-icons/gr";
 import { SiSpeedtest } from "react-icons/si";
-import {
-  TextField,
-  Button,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  Box,
-  Typography,
-} from "@mui/material";
+
 import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/ri";
 import { FaCirclePlay } from "react-icons/fa6";
+import { useParams } from "react-router-dom";
+import LessonService from "../../services/Lesson.Service";
+import { useNavigate } from "react-router-dom";
+import { Tag } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { resetState } from "../../redux/features/resetStateSlice";
+const LessonItemList = (props) => {
+  const {
+    CourseID,
+    LessonsID,
+    ComplexityLevel,
+    CreatedTime,
+    Duration,
+    LessonType,
+    OrderLesson,
+    Title,
+    Topic,
+    UpdatedTime,
+  } = props;
 
-const LessonItemList = ({ course }) => {
   const [open, setOpen] = useState(false);
-
+  const navigate = useNavigate();
   const toggleAccordion = () => {
     open ? setOpen(false) : setOpen(true);
   };
+  const dispatch = useDispatch();
+  useEffect(() => {
+    LessonService.sortLesson(LessonsID, OrderLesson).then((res) => {
+      if (res.status === 200) {
+        dispatch(resetState());
+      }
+    });
+  }, [OrderLesson]);
 
+  const handleDetail = () => {
+    navigate(`/new-course/${CourseID}/create-lesson/${LessonsID}`);
+  };
   const ComplexTag = (props) => {
     let bgColor;
     let textColor;
     let text;
 
     switch (props.level) {
-      case "easy":
+      case "Easy":
         bgColor = "bg-green-100";
         textColor = "text-green-500";
         text = "Easy";
         break;
-      case "medium":
+      case "Medium":
         bgColor = "bg-purple-100";
         textColor = "text-purple-500";
         text = "Medium";
         break;
-      case "hard":
+      case "Hard":
         bgColor = "bg-red-100";
         textColor = "text-red-500";
         text = "Hard";
@@ -113,9 +133,19 @@ const LessonItemList = ({ course }) => {
             className="relative ml-4 cursor-pointer select-none items-center py-4 pr-2 flex "
             onClick={toggleAccordion}
           >
-            <h3 className="text-base font-bold text-gray-600 lg:text-base">
-              What are Closures
-            </h3>
+            <div className="text-base font-bold text-gray-600 lg:text-base  mr-4">
+              {OrderLesson} - {Title}
+            </div>
+            {LessonType === "Video" ? (
+              <Tag color="blue">{LessonType}</Tag>
+            ) : LessonType === "Test" ? (
+              <Tag color="red">{LessonType}</Tag>
+            ) : (
+              <Tag color="purple">{LessonType}</Tag>
+            )}
+            <button onClick={handleDetail} className=" btn btn-sm ml-auto">
+              Edit
+            </button>
             <RiArrowDropUpLine
               className={`text-3xl ml-auto mr-5 text-gray-500 transition ${
                 open ? "rotate-180" : ""
@@ -130,14 +160,26 @@ const LessonItemList = ({ course }) => {
             {open && (
               <ul className="space-y-1 font-semibold text-gray-600 mb-6 ">
                 <div className="flex px-2 sm:px-6 py-2.5 hover:bg-gray-100 items-center ">
-                  <FaCirclePlay className="text-2xl text-black mr-2 flex-shrink-0" />
-                  <span className="text-sm truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-                    Introductions sd
-                  </span>
+                  {LessonType === "Video" ? (
+                    <FaCirclePlay className="text-2xl " />
+                  ) : LessonType === "Test" ? (
+                    <SiSpeedtest className="text-2xl " />
+                  ) : (
+                    <GrDocumentText className="text-2xl " />
+                  )}
+
+                  <div className=" ml-3 text-sm truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+                    Topic:
+                    <span className="text-sm truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg italic">
+                      {" "}
+                      {Topic}
+                    </span>
+                  </div>
                   <div className="ml-auto flex items-center space-x-2">
-                    <ComplexTag level="hard" />
-                    <StatusTag status="done" />
-                    <span className="text-sm flex-shrink-0">23 min</span>
+                    <ComplexTag level={ComplexityLevel} />
+                    <span className="text-sm flex-shrink-0">
+                      {Duration} min
+                    </span>
                   </div>
                 </div>
               </ul>
@@ -149,4 +191,41 @@ const LessonItemList = ({ course }) => {
   );
 };
 
-export default LessonItemList;
+const LessonList = () => {
+  const { courseID } = useParams();
+  const [data, setData] = useState([]);
+  const resetState = useSelector((state) => state.resetState.state);
+
+  useEffect(() => {
+    LessonService.getAllLessonsByCourseID(courseID).then((response) => {
+      setData(response.data);
+    });
+  }, [courseID, resetState]);
+
+  const lessonItems = useMemo(() => {
+    return (
+      <div className="flex flex-col gap-2">
+        {data?.map((lesson, index) => (
+          <LessonItemList
+            key={index}
+            CourseID={lesson.CourseID}
+            LessonsID={lesson.LessonsID}
+            ComplexityLevel={lesson.ComplexityLevel}
+            CreatedTime={lesson.CreatedTime}
+            Duration={lesson.Duration}
+            LessonType={lesson.LessonType}
+            OrderLesson={lesson.OrderLesson}
+            Title={lesson.Title}
+            Topic={lesson.Topic}
+            UpdatedTime={lesson.UpdatedTime}
+          />
+        ))}
+      </div>
+    );
+  }, [courseID, data]);
+
+  return lessonItems;
+};
+export { LessonItemList };
+
+export default memo(LessonList);

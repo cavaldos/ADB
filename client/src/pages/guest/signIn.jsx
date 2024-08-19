@@ -7,39 +7,31 @@ import {
   Container,
   Box,
 } from "@mui/material";
-import GoogleIcon from "@mui/icons-material/Google";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import AppleIcon from "@mui/icons-material/Apple";
-import { login, setRole } from "~/redux/features/authSlice";
+import { message } from "antd";
+
+import { login } from "../../redux/features/profileSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import GuestService from "../../services/Guest.service";
 function SignIn() {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (username == "a") {
-      console.log("admin", username, password);
-      dispatch(setRole("admin"));
-      navigate("/");
-      console.log("sdafasdf");
-      return;
-    }
-    if (username == "i") {
-      dispatch(setRole("instructor"));
-      navigate("/");
-      return;
-    }
-    if (username == "s") {
-      dispatch(setRole("student"));
-      navigate("/");
-      return;
-    } else {
-      dispatch(setRole("guest"));
-      return;
+    try {
+      const response = await GuestService.login(username, password);
+      if (response.data === null) {
+        message.error("Sai tên đăng nhập hoặc mật khẩu");
+        return;
+      }
+      const result = response.data;
+      await message.success("Đăng nhập thành công");
+      await navigate("/");
+      await dispatch(login(result.profile));
+    } catch (error) {
+      console.error("Error fetching data: ", error);
     }
   };
 
@@ -56,9 +48,7 @@ function SignIn() {
         <h1>
           bấm chữ "a" or "i" or "s" để đăng nhập vào admin, instructor, student
         </h1>
-        <h1 className=" text-ret">
-         KHÔNG CẦN MẬT KHẨU
-        </h1>
+        <h1 className=" text-ret">KHÔNG CẦN MẬT KHẨU</h1>
         <Typography component="h1" variant="h5">
           Welcome back
         </Typography>
@@ -89,9 +79,6 @@ function SignIn() {
             value={password}
             onChange={(e) => setPassword(e.target.value)} // capture input
           />
-          <Link className="cursor-pointer" variant="body2">
-            Forgot password?
-          </Link>
           <Button
             onClick={handleLogin}
             type="submit"
@@ -102,38 +89,18 @@ function SignIn() {
           >
             SignIn
           </Button>
-          <Typography component="h1" variant="h5" align="center">
-            or
-          </Typography>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            startIcon={<GoogleIcon />}
-            sx={{ mt: 1, mb: 1 }}
-          >
-            Continue with Google
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            startIcon={<FacebookIcon />}
-            sx={{ mb: 1 }}
-          >
-            Continue with Facebook
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            startIcon={<AppleIcon />}
-            sx={{ mb: 1 }}
-          >
-            Continue with Apple
-          </Button>
+
           <Typography component="h1" variant="body2" align="center">
-            New to Coursera? <Link href="#">Sign up</Link>
+            New to Coursera?{" "}
+            <Link
+              className="cursor-pointer"
+              variant="body2"
+              onClick={() => {
+                navigate("/signup");
+              }}
+            >
+              Sign up
+            </Link>
           </Typography>
         </Box>
       </Box>
@@ -142,3 +109,28 @@ function SignIn() {
 }
 
 export default SignIn;
+
+// const handleLogin = (e) => {
+//   e.preventDefault();
+
+//   if (username == "a") {
+//     console.log("admin", username, password);
+//     dispatch(setRole("admin"));
+//     navigate("/");
+//     console.log("sdafasdf");
+//     return;
+//   }
+//   if (username == "i") {
+//     dispatch(setRole("instructor"));
+//     navigate("/");
+//     return;
+//   }
+//   if (username == "s") {
+//     dispatch(setRole("student"));
+//     navigate("/");
+//     return;
+//   } else {
+//     dispatch(setRole("guest"));
+//     return;
+//   }
+// };

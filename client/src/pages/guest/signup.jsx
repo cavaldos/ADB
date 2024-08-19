@@ -7,11 +7,9 @@ import {
   Container,
   Box,
 } from "@mui/material";
-import GoogleIcon from "@mui/icons-material/Google";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import AppleIcon from "@mui/icons-material/Apple";
-
+import { useNavigate } from "react-router-dom";
 function SignUp() {
+  const navigate = useNavigate();
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -70,39 +68,18 @@ function SignUp() {
           <Typography component="h1" variant="h5" align="center">
             or
           </Typography>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            startIcon={<GoogleIcon />}
-            sx={{ mt: 1, mb: 1 }}
-          >
-            Continue with Google
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            startIcon={<FacebookIcon />}
-            sx={{ mb: 1 }}
-          >
-            Continue with Facebook
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            startIcon={<AppleIcon />}
-            sx={{ mb: 1 }}
-          >
-            Continue with Apple
-          </Button>
+
           <Typography component="h1" variant="body2" align="center">
-            Already have an account? <Link href="#">Sign in</Link>
+            Already have an account?{" "}
+            <Link
+              className="cursor-pointer"
+              onClick={() => {
+                navigate("/signin");
+              }}
+            >
+              Sign in
+            </Link>
           </Typography>
-          <Link href="#" variant="body2" align="center">
-            Log in with your organization
-          </Link>
         </Box>
       </Box>
     </Container>

@@ -5,7 +5,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useDispatch } from "react-redux";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
-import { logout } from "../../redux/features/authSlice";
+import { logout } from "../../redux/features/profileSlice";
 import Notify from "./Notify";
 import ChatIcon from "../Chat/ChatIcon";
 import { Menu, MenuItem } from "@mui/material";

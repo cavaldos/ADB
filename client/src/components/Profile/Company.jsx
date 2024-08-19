@@ -1,19 +1,22 @@
 import React, { useState } from "react";
 import ItemInput from "../other/ItemInput";
-
-const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
+import { useSelector } from "react-redux";
+const CompanyItem = ({ companyID, companyName = "", position = "", instructorID }) => {
   const [formData, setFormData] = useState({
     companyID: companyID,
     companyName: companyName,
-    bankName: bankName,
+    position: position,
   });
 
+  const companyArr = useSelector((state) => state.profile.Company) || [];
+  console.log(companyArr);
   const [isEditable, setIsEditable] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log(formData);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setLoading(false);
     setIsEditable(false);
@@ -24,7 +27,7 @@ const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setLoading(false);
     setIsEditable(false);
-  }
+  };
   return (
     <div className="bg-[#F8F9FA] rounded-md w-full min-h-[150px] p-2">
       <div className="form-control w-52 mb-4 flex flex-row justify-end gap-4 items-center ml-auto h-[34px]">
@@ -74,11 +77,11 @@ const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
           isEditable={isEditable}
         />
         <ItemInput
-          label="Bank Name"
+          label="Position"
           type="text"
-          name="bankName"
+          name="Position"
           placeholder="Enter Bank Name"
-          value={formData.bankName}
+          value={formData.position}
           setValue={setFormData}
           isEditable={isEditable}
         />
@@ -88,10 +91,8 @@ const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
 };
 
 const Company = () => {
-  const companies = [
-    { id: 1, companyName: "Company 1", bankName: "Bank 1" },
-    { id: 2, companyName: "Company 2", bankName: "Bank 2" }, // Sử dụng ID khác nhau
-  ];
+  const companyArr = useSelector((state) => state.profile.Company) || [];
+
   return (
     <>
       <div className="flex gap-10 min-h-[300px]">
@@ -100,12 +101,14 @@ const Company = () => {
         </div>
         <div className="card bg-base-100 shadow-xl shadow-gray-200 rounded-md p-2 w-1/2 gap-4">
           <h1>List of Companies</h1>
-          {companies.map((company,index) => (
+          {companyArr?.map((company, index) => (
             <CompanyItem
               key={index}
-              companyID={company.id}
-              companyName={company.companyName}
-              bankName={company.bankName}
+              companyID={company.CompanyID}
+              companyName={company.CompanyName}
+              position={company.Position}
+              instructorID={company.InstructorID}
+
             />
           ))}
         </div>

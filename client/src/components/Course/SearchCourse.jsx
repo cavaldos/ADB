@@ -29,14 +29,12 @@ function SearchCourse() {
     try {
       const response = await CourseService.autoComplete(value);
       if (response.error) {
-        console.error(response.error);
         setNoResults(true);
       } else {
         setSuggestions(response.data);
         setNoResults(response.data && response.data.length === 0);
       }
     } catch (error) {
-      console.error("Error fetching data: ", error);
       setNoResults(true);
     } finally {
       setIsLoading(false);
@@ -57,7 +55,7 @@ function SearchCourse() {
   }, [inputFocused]);
 
   const debouncedFetchSuggestions = useCallback(
-    debounce(fetchSuggestions, 300),
+    debounce(fetchSuggestions, 500),
     []
   );
 
@@ -65,7 +63,6 @@ function SearchCourse() {
     const value = e.target.value;
     setSearchTerm(value);
     setInputFocused(!inputFocused);
-    setIsTyping(value.trim() !== "");
     debouncedFetchSuggestions(value);
   };
 
@@ -98,17 +95,18 @@ function SearchCourse() {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
+      dispatch(resetState());
       handleSearch();
       setInputFocused(false);
-      dispatch(resetState());
     }
   };
 
   const highlightText = (text, highlight) => {
+    if (!text) return text;
     const parts = text.split(new RegExp(`(${highlight})`, "gi"));
     return parts.map((part, index) =>
       part.toLowerCase() === highlight.toLowerCase() ? (
-        <span key={index} className="bg-yellow-300">
+        <span key={index} className="bg-yellow-300 rounded-sm ">
           {part}
         </span>
       ) : (
@@ -135,13 +133,7 @@ function SearchCourse() {
             className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 rounded-full p-2 text-black"
             onClick={handleSearch}
           >
-            {isTyping ? (
-              <FaArrowRight className="font-extrabold hover:text-gray-700 hover:scale-125 animate-bounce" />
-            ) : isLoading ? (
-              <FaSpinner className="animate-spin" />
-            ) : (
-              <FaSearch className="text-xl animate-pulse" />
-            )}
+            <FaSearch className="text-xl " />
           </button>
           {noResults && !isLoading && (
             <div className="absolute left-0 mt-2 w-full bg-white border rounded-md shadow-lg">
@@ -155,21 +147,26 @@ function SearchCourse() {
             </div>
           )}
           {suggestions.length > 0 && (
-            <div className="absolute left-0 mt-2 w-full bg-white border rounded-md shadow-lg overflow-y-auto h-[300px]">
+            <div className="absolute left-0 mt-2 w-full bg-white border rounded-md shadow-lg overflow-y-auto h-[300px] z-50">
               <ul>
                 {suggestions.map((suggestion, index) => (
                   <div
                     key={index}
                     className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
                     onClick={() => {
-                      setSearchTerm(suggestion.Title);
+                      setSearchTerm(suggestion.Phrase);
                       setSuggestions([]);
                       navigate(
-                        `/search/${encodeURIComponent(suggestion.Title)}`
+                        `/search/${encodeURIComponent(suggestion.Phrase)}`
                       );
                     }}
                   >
-                    <p>{highlightText(suggestion.Title, searchTerm)}</p>
+                    {/* <p>{highlightText(suggestion.Phrase, searchTerm)} </p> */}
+                    {suggestion.Phrase === null ? (
+                      <p>Not Found</p>
+                    ) : (
+                      <p>{highlightText(suggestion.Phrase, searchTerm)} </p>
+                    )}
                   </div>
                 ))}
               </ul>

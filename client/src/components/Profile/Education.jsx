@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import ItemInput from "../other/ItemInput";
+import { useSelector } from "react-redux";
 
-const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
+const EducationItem = (props) => {
+  const { educationID, level, marjor, schoolName, userID } = props;
   const [formData, setFormData] = useState({
-    companyID: companyID,
-    companyName: companyName,
-    bankName: bankName,
+    educationID: educationID,
+    level: level,
+    marjor: marjor,
+    schoolName: schoolName,
+    userID: userID,
   });
 
   const [isEditable, setIsEditable] = useState(false);
@@ -65,20 +69,29 @@ const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
 
       <form onSubmit={handleSubmit}>
         <ItemInput
-          label="Company Name"
+          label="Level"
           type="text"
-          name="companyName"
-          placeholder="Enter Company Name"
-          value={formData.companyName}
+          name="level"
+          placeholder="Enter Level"
+          value={formData.level}
           setValue={setFormData}
           isEditable={isEditable}
         />
         <ItemInput
-          label="Bank Name"
+          label="Major"
           type="text"
-          name="bankName"
-          placeholder="Enter Bank Name"
-          value={formData.bankName}
+          name="major"
+          placeholder="Enter Major"
+          value={formData.marjor}
+          setValue={setFormData}
+          isEditable={isEditable}
+        />
+        <ItemInput
+          label="School Name"
+          type="text"
+          name="schoolName"
+          placeholder="Enter School Name"
+          value={formData.schoolName}
           setValue={setFormData}
           isEditable={isEditable}
         />
@@ -88,10 +101,8 @@ const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
 };
 
 const Education = () => {
-  const companies = [
-    { id: 1, companyName: "Company 1", bankName: "Bank 1" },
-    { id: 2, companyName: "Company 2", bankName: "Bank 2" }, // Sử dụng ID khác nhau
-  ];
+  const educationArr = useSelector((state) => state.profile.Education) || [];
+
   return (
     <>
       <div className="flex gap-10 min-h-[300px]">
@@ -99,13 +110,20 @@ const Education = () => {
           {/* Component add company item */}
         </div>
         <div className="card bg-base-100 shadow-xl shadow-gray-200 rounded-md p-2 w-1/2 gap-4">
-          <h1>List of Companies</h1>
-          {companies.map((company, index) => (
-            <CompanyItem
+          <h1>List of Education</h1>
+          {educationArr.length === 0 && (
+            <div className="flex justify-center items-center h-52">
+              <h1 className="text-2xl text-gray-500">No Education</h1>
+            </div>
+          )}
+          {educationArr?.map((education, index) => (
+            <EducationItem
               key={index}
-              companyID={company.id}
-              companyName={company.companyName}
-              bankName={company.bankName}
+              educationID={education.EducationID}
+              level={education.Level}
+              marjor={education.Major}
+              schoolName={education.SchoolName}
+              userID={education.UserID}
             />
           ))}
         </div>

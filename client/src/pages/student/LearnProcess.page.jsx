@@ -67,7 +67,7 @@ const Sidebar = () => {
 
 const LessionContent = () => {
   return (
-    <div className=" gap-4 flex flex-col border-spacing-3 border-2 border-red-400">
+    <div className=" gap-4 flex flex-col border-spacing-3 border-2">
       <LearnProcessDoc />
       <LearnProcessVideo />
       <LearnProcessTest />
@@ -86,7 +86,7 @@ const LeesionList = () => {
   return (
     <div className="min-w-80 bg-white shadow-md p-4 rounded-md">
       <h3 className="text-lg font-bold mb-4 text-center">List of Courses</h3>
-      <LessonItemList />
+      <LessonItemList courseID={2}/>
     </div>
   );
 };

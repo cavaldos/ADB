@@ -9,14 +9,14 @@ import Finance from "../Profile/Finance";
 
 const TabMenuProService = () => {
   const dadaTab = {
-    admin: [
+    Admin: [
       {
         id: 1,
         name: "Information",
         com: Information,
       },
     ],
-    instructor: [
+    Instructor: [
       {
         id: 1,
         name: "Information",
@@ -43,7 +43,7 @@ const TabMenuProService = () => {
         com: Education,
       },
     ],
-    student: [
+    Student: [
       {
         id: 1,
         name: "Information",
@@ -64,7 +64,7 @@ const TabMenuProService = () => {
 
   const [tabRow, setTabRow] = useState([]);
   const [activeTab, setActiveTab] = useState("");
-  const userRole = "instructor";
+  const userRole = useSelector((state) => state.profile.Role);
   const dispatch = useDispatch();
   const handleReload = () => {
     const roleTabs = dadaTab[userRole];

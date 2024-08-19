@@ -9,6 +9,8 @@ const LearnProcess = lazy(() => import("~/pages/student/LearnProcess.page"));
 const Invoice = lazy(() => import("~/pages/student/Invoice.page"));
 const Profile = lazy(() => import("~/components/Profile/Profile"));
 const ChatPage = lazy(() => import("~/pages/student/ChatPage"));
+const ProfileLayout = lazy(() => import("~/components/Layout/ProfileLayout"));
+
 const StudentRouter = [
   {
     name: "Home",
@@ -49,7 +51,7 @@ const StudentRouter = [
   },
   {
     name: null,
-    path: "/course-detail/:id",
+    path: "/course-detail/:courseID",
     component: CourseDetail,
     Layout: StudentLayout,
   },
@@ -57,7 +59,7 @@ const StudentRouter = [
     name: null,
     path: "/profile",
     component: Profile,
-    Layout: StudentLayout,
+    Layout: ProfileLayout,
   },
   {
     name: null,

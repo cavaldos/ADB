@@ -1,10 +1,16 @@
 import React from "react";
 import { IoMdExit } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-
+import { useSelector } from "react-redux";
 import { TabMenuPro, TabMenuProContentProfile } from "../other/TabMenuPro";
-function ProfileLayout({ children }) {
+import { Avatar, Tag, Tooltip } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+
+function ProfileLayout() {
+  const profile = useSelector((state) => state.profile);
   const navigate = useNavigate();
+  const firstLetter = (name) => name.charAt(0).toUpperCase();
+  const myID = profile.StudentID || profile.InstructorID || profile.AdminID;
   return (
     <>
       <div className=" w-[90vw] min-h-[80vh] mx-auto pt-2 bg-[#F8F9FA] ">
@@ -22,12 +28,32 @@ function ProfileLayout({ children }) {
         </div>
         <div
           style={{ backgroundColor: "rgba(244,228,249, 0.7)" }}
-          class="relative flex  flex-auto min-w-0 w-[95%]  mx-auto bottom-14
+          className="relative flex  flex-auto min-w-0 w-[95%]  mx-auto bottom-14
           h-[130px] overflow-hidden break-words  shadow-blur rounded-2xl
           bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200 shadow-xl"
         >
           <div className="flex  w-2/5 p-2">
-            <h1>fasdf</h1>
+            <div className="flex  items-center justify-center pl-4">
+              <Tooltip
+                title={`UserID:${profile.UserID} - ${profile.Role}:${myID}`}
+              >
+                <Avatar
+                  size={100}
+                  icon={<UserOutlined />}
+                  className="border-4  text-4xl"
+                >
+                  {firstLetter(profile.FullName)}
+                </Avatar>
+              </Tooltip>
+              <Tag color="blue" className="ml-5 mt-auto mb-2 bg-transparent">
+                <h1 className="text-lg font-semibold text-gray-800 ">
+                  {profile.Role}
+                </h1>
+              </Tag>
+              <Tag color="blue" className="ml-5 mt-auto mb-2 bg-transparent">
+                <h1 className="text-lg  text-gray-800 ">{profile.UserName}</h1>
+              </Tag>
+            </div>
           </div>
           <div className="w-3/5 p-2 flex justify-end items-center pr-[50px] ">
             <TabMenuPro className=" w-[600px]" />

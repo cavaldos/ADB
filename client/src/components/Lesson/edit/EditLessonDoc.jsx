@@ -15,9 +15,9 @@ import {
 } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Card } from "antd";
 import LessonBase from "../LessonBase";
 
-import { Card } from "antd";
 function SortableItem(props) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id });
@@ -44,7 +44,11 @@ const LessonDocDrag = ({ pages }) => {
   const [lessons, setLessons] = useState(pages);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10, // Cho phép kéo sau khi di chuyển một khoảng cách
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -61,6 +65,7 @@ const LessonDocDrag = ({ pages }) => {
       });
     }
   };
+
   return (
     <DndContext
       sensors={sensors}
@@ -72,28 +77,24 @@ const LessonDocDrag = ({ pages }) => {
           return (
             <SortableItem key={page.id} id={page.id}>
               <Card
-                title={`Page ` + (index + 1)}
+                title={`Page ${index + 1}`}
                 bordered={false}
                 extra={
-                  <div className=" flex gap-3">
-                    <button
-                      onClick={() => alert("Edit")}
-                      className="btn btn-sm"
-                      type="primary"
-                    >
-                      Bấm vào đây
-                    </button>
-                    <button className="btn btn-sm" type="primary">
-                      Bấm vào đây
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => alert("You clicked on the button")}
+                    className="btn"
+                    type="primary"
+                  >
+                    Bấm vào đây
+                  </button>
                 }
-                className=" shadow-2xl mt-2"
+                className="shadow-2xl mt-2"
               >
                 <p className="text-gray-700">{page.content}</p>
                 <input
                   type="text"
                   className="w-full mt-2 p-2 border-2 border-gray-300 rounded-md"
+                  onMouseDown={(e) => e.stopPropagation()} // Ngăn chặn sự kiện kéo khi tương tác với ô nhập liệu
                 />
               </Card>
             </SortableItem>
@@ -104,7 +105,7 @@ const LessonDocDrag = ({ pages }) => {
   );
 };
 
-function EditLessonDocument() {
+function EditLessonDocument(lesson,detail) {
   const pages = [
     { id: "1", content: "Lesson 1 Content" },
     { id: "2", content: "Lesson 2 Content" },
@@ -112,10 +113,12 @@ function EditLessonDocument() {
     { id: "4", content: "Lesson 4 Content" },
     { id: "5", content: "Lesson 5 Content" },
   ];
+
+
   return (
     <div className="w-full min-h-[500px] p-6 bg-white rounded-xl shadow-lg flex flex-col gap-2">
       <div className="bg-gray-100 rounded-lg p-4">
-        <LessonBase />
+        <LessonBase {...lesson} />
       </div>
       <div className="h-full min-h-[250px] w-full rounded-md bg-gray-100 p-4">
         <LessonDocDrag pages={pages} />
@@ -125,12 +128,3 @@ function EditLessonDocument() {
 }
 
 export default EditLessonDocument;
-
-const PageDoccument = (props) => {
-  const { pageDocumentID, content, page } = props;
-  return (
-    <Card title={`Page ${page.Page}`} bordered={false} className="shadow-md">
-      <p className="text-gray-700">{page.Content}</p>
-    </Card>
-  );
-};

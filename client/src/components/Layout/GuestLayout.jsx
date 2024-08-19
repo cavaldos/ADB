@@ -1,35 +1,20 @@
-import React from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Footer from "../other/Footer";
 import { GuestRouter } from "../../routes";
-
-const ButtonItem = ({ name, path }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate(path);
-  };
-  const isActive = location.pathname === path;
-  if (name === null) {
-    return <div></div>;
-  }
-  return (
-    <button
-      onClick={handleClick}
-      className={`py-1 px-1 ease-in-out	text-gray-700 hover:text-blue-600  ${
-        isActive
-          ? "text-[#0156d1] border-b-2 border-[#0156d1]"
-          : "text-gray-600  hover:text-[#3e78c9]"
-      }`}
-    >
-      {name}
-    </button>
-  );
-};
+import SearchCourse from "../Course/SearchCourse";
 
 const GuestLayout = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [locationPath, setLocationPath] = useState(location.pathname);
+  useEffect(() => {
+    setLocationPath(location.pathname);
+  }, [location.pathname]);
+
+  const shouldHideFooter =
+    locationPath === "/signin" || locationPath === "/signup";
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-white shadow-md">
@@ -41,18 +26,9 @@ const GuestLayout = ({ children }) => {
             >
               coursera
             </h1>
-            <ul className="flex space-x-4 ml-10">
-              <ButtonItem name="For Business" path="/" />
-              <ButtonItem name="For Campus" path="/2" />
-              <ButtonItem name="Teach on Coursera" path="/3" />
-            </ul>
           </div>
-          <div className="flex items-center space-x-4">
-            <input
-              type="text"
-              placeholder="What do you want to learn?"
-              className="p-2 border border-gray-300 rounded-md"
-            />
+          {!shouldHideFooter && <SearchCourse />}
+          <div className="flex items-center space-x-4  ">
             <button
               onClick={() => navigate("/signin")}
               className="text-gray-700 hover:text-sky-600 font-semibold"

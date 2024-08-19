@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import ItemInput from "../other/ItemInput";
+import { useSelector } from "react-redux";
+import { ConvertTime } from "../../hooks/Time.utils";
+const CertificateItem = (props) => {
+  const { certificateID, certificateName, startDate, endDate, instructorID } =
+    props;
 
-const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
   const [formData, setFormData] = useState({
-    companyID: companyID,
-    companyName: companyName,
-    bankName: bankName,
+    certificateID: certificateID,
+    certificateName: certificateName,
+    startDate: startDate,
+    endDate: endDate,
+    instructorID: instructorID,
   });
 
   const [isEditable, setIsEditable] = useState(false);
@@ -65,20 +71,29 @@ const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
 
       <form onSubmit={handleSubmit}>
         <ItemInput
-          label="Company Name"
+          label="Certificate Name"
           type="text"
-          name="companyName"
-          placeholder="Enter Company Name"
-          value={formData.companyName}
+          name="certificateName"
+          placeholder="Enter Certificate Name"
+          value={formData.certificateName}
           setValue={setFormData}
           isEditable={isEditable}
         />
         <ItemInput
-          label="Bank Name"
+          label="Start Date"
           type="text"
-          name="bankName"
-          placeholder="Enter Bank Name"
-          value={formData.bankName}
+          name="startDate"
+          placeholder="Enter Start Date"
+          value={formData.startDate}
+          setValue={setFormData}
+          isEditable={isEditable}
+        />
+        <ItemInput
+          label="End Date"
+          type="text"
+          name="endDate"
+          placeholder="Enter End Date"
+          value={formData.endDate}
           setValue={setFormData}
           isEditable={isEditable}
         />
@@ -88,10 +103,8 @@ const CompanyItem = ({ companyID, companyName = "", bankName = "" }) => {
 };
 
 const Certificate = () => {
-  const companies = [
-    { id: 1, companyName: "Company 1", bankName: "Bank 1" },
-    { id: 2, companyName: "Company 2", bankName: "Bank 2" }, // Sử dụng ID khác nhau
-  ];
+  const certificateArr =
+    useSelector((state) => state.profile.Certificates) || [];
   return (
     <>
       <div className="flex gap-10 min-h-[300px]">
@@ -100,12 +113,16 @@ const Certificate = () => {
         </div>
         <div className="card bg-base-100 shadow-xl shadow-gray-200 rounded-md p-2 w-1/2 gap-4">
           <h1>List of Companies</h1>
-          {companies.map((company, index) => (
-            <CompanyItem
+          {certificateArr?.map((certificare, index) => (
+            <CertificateItem
               key={index}
-              companyID={company.id}
-              companyName={company.companyName}
-              bankName={company.bankName}
+              certificateID={certificare.CertificateID}
+              certificateName={certificare.CertificateName}
+              startDate={ConvertTime.convertDateToDDMMYYYY(
+                certificare.StartDate
+              )}
+              endDate={ConvertTime.convertDateToDDMMYYYY(certificare.EndDate)}
+              instructorID={certificare.InstructorID}
             />
           ))}
         </div>

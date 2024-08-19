@@ -19,7 +19,7 @@ const CourseService = {
     const pageSize = 15;
     const page = 1;
     try {
-      const response = await instance.post(`/public/search_course`, {
+      const response = await instance.post(`/public/auto_complete_search`, {
         searchString,
         pageSize,
         page,

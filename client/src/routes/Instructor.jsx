@@ -19,7 +19,7 @@ const MyCourse = lazy(() => import("~/pages/instructor/MyCourse"));
 const CreateLesson = lazy(() => import("~/pages/instructor/CreateLesson"));
 const Discussion = lazy(() => import("~/pages/instructor/Discussion"));
 const CourseDetail = lazy(() => import("~/pages/instructor/CourseDetail"));
-const Banking = lazy(() => import("~/pages/instructor/BankingPage"));
+const ChatPage = lazy(() => import("~/pages/instructor/ChatPage"));
 const InstructorRouter = [
   {
     name: null,
@@ -92,13 +92,14 @@ const InstructorRouter = [
     component: Discussion,
     Layout: InstructorLayout,
   },
+
   {
-    name: "Banking",
-    path: "/banking",
-    icon: <BsBank2 className="text-xl" />,
-    component: Banking,
+    name: null,
+    path: "/chat",
+    component: ChatPage,
     Layout: InstructorLayout,
   },
+
 ];
 
 export default InstructorRouter;

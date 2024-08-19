@@ -136,7 +136,7 @@ const Finance = () => {
           <div className="bg-[#F8F9FA] rounded-md w-full min-h-[150px] p-2">
             ds
           </div>
-          <VisaCard />
+          {/* <VisaCard /> */}
         </div>
         <div className="card bg-base-100 shadow-xl shadow-gray-200 rounded-xl w-1/4 p-6"></div>
       </div>

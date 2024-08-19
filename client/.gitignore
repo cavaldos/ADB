@@ -13,3 +13,5 @@ dist-ssr
 
 yarn-error.log
 yarn.lock
+.env
+.env.local

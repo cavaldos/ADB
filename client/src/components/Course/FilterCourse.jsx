@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-
+import GetCourseService from "./GetCourseService";
 function FilterComponent() {
-  const subjects = [
-    { id: 1, name: "Data Science", count: 1726 },
-    { id: 2, name: "Computer Science", count: 938 },
-    // more subjects...
-  ];
-
+  const {
+    courseData,
+    setCourseData,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+  } = GetCourseService();
   const [selectedFilters, setSelectedFilters] = useState([]);
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(1000); // Giả sử 1000 là giá trị tối đa ban đầu
 
   // Function to handle toggle
   const toggleFilter = (id) => {
@@ -49,7 +49,7 @@ function FilterComponent() {
         <input
           type="range"
           min="0"
-          max="1000"
+          max="10000"
           value={minPrice}
           onChange={handleMinPriceChange}
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer  "
@@ -58,16 +58,19 @@ function FilterComponent() {
         <input
           type="range"
           min="0"
-          max="1000"
+          max="10000"
           value={maxPrice}
           onChange={handleMaxPriceChange}
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
         />
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 hidden">
         <h3 className="font-medium">Subject</h3>
-        {subjects.map((subject) => (
+        {[
+          { id: 1, name: "Data Science", count: 1726 },
+          { id: 2, name: "Computer Science", count: 938 },
+        ].map((subject) => (
           <div key={subject.id} className="flex items-center mt-1">
             <input
               type="checkbox"

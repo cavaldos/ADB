@@ -1,19 +1,21 @@
 import React from "react";
 import { Tag } from "antd";
-
-function LearnProcessVideo() {
-  const exampleLesson = {
-    LessonsID: "1",
-    Title: "Introduction to React",
-    Duration: "45 minutes",
-    ComplexityLevel: "Beginner",
-    CreatedTime: "2023-08-01 10:00:00",
-    UpdatedTime: "2023-08-02 12:00:00",
-    LessonType: "Video",
-    Topic: "React Basics",
-    OrderLessons: "1",
-    CourseID: "101",
-  };
+import { ConvertTime } from "../../../hooks/Time.utils";
+function EditLessonVideo(props) {
+  const {
+    LessonsID,
+    Title,
+    Duration,
+    ComplexityLevel,
+    CreatedTime,
+    UpdatedTime,
+    LessonType,
+    Topic,
+    OrderLessons,
+    CourseID,
+    URL,
+  } = props;
+  console.log("props khanhvd", props);
 
   return (
     <div className="w-full min-h-[500px] p-6 bg-white rounded-xl shadow-lg flex flex-col gap-3">
@@ -22,26 +24,32 @@ function LearnProcessVideo() {
           <div className="flex gap-2 items-center">
             <h3 className="text-lg text-gray-900 font-medium">Lesson Title:</h3>
             <span className="text-lg font-semibold text-gray-700 italic">
-              {exampleLesson.Title}
+              {Title}
             </span>
           </div>
           <div className="flex gap-2 items-center mt-2">
             <h3 className="text-lg text-gray-900 font-medium">Topic:</h3>
             <span className="text-lg font-semibold text-gray-700 italic">
-              {exampleLesson.Topic}
+              {Topic}
             </span>
           </div>
         </div>
 
         <div className="flex flex-col gap-3 mb-4">
           <Tag className="w-auto inline-block max-w-max" color="blue">
-            {`Duration: ${exampleLesson.Duration}`}
+            {`Duration: ${Duration}`}
           </Tag>
           <Tag className="w-auto inline-block max-w-max" color="green">
-            {`Complexity: ${exampleLesson.ComplexityLevel}`}
+            {`Complexity: ${ComplexityLevel}`}
           </Tag>
           <Tag className="w-auto inline-block max-w-max" color="purple">
-            {`Type: ${exampleLesson.LessonType}`}
+            {`Type: ${LessonType}`}
+          </Tag>
+          <Tag className="w-auto inline-block max-w-max" color="purple">
+            {`Created Time: ${ConvertTime.convertTimeToDDMM(CreatedTime)}`}
+          </Tag>
+          <Tag className="w-auto inline-block max-w-max" color="purple">
+            {`Updated Time: ${ConvertTime.convertTimeToDDMM(UpdatedTime)}`}
           </Tag>
         </div>
       </div>
@@ -59,4 +67,4 @@ function LearnProcessVideo() {
   );
 }
 
-export default LearnProcessVideo;
+export default EditLessonVideo;

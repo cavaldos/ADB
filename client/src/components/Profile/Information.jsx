@@ -1,31 +1,26 @@
 import React, { useState } from "react";
-import { Card } from "antd";
+import { useSelector } from "react-redux";
+import { Avatar, Tag } from "antd";
 
-const InfoDetailItem = ({ title, value }) => {
+const InfoDetailItem = ({ title, value, color, openTag }) => {
   return (
     <div className="mb-2">
       <span className="font-bold text-gray-800">{title}: </span>
-      <span className="text-gray-600">{value}</span>
+      {openTag ? (
+        <Tag color={color} className="ml-2">
+          {value}
+        </Tag>
+      ) : (
+        <span className="ml-2">{value}</span>
+      )}
     </div>
   );
 };
 
 const Information = ({ user }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const profile = useSelector((state) => state.profile);
+  console.log(profile);
 
-  const [formData, setFormData] = useState({
-    fullName: "Alec M. Thompson",
-    phoneNumber: "(44) 123 1234 123",
-    email: "alecthompson@mail.com",
-    location: "USA",
-  });
   return (
     <>
       <div className=" flex gap-10 min-h-[300px]">
@@ -34,10 +29,30 @@ const Information = ({ user }) => {
             Profile Information
           </h2>
 
-          {/* <InfoDetailItem title="Full Name" value={formData.fullName} />
-          <InfoDetailItem title="Phone Number" value={formData.phoneNumber} />
-          <InfoDetailItem title="Email" value={formData.email} />
-          <InfoDetailItem title="Location" value={formData.location} /> */}
+          <InfoDetailItem title="Full Name" value={profile.FullName} />
+          <InfoDetailItem title="Phone Number" value={profile.Phone} />
+          <InfoDetailItem title="Email" value={profile.Email} />
+          <InfoDetailItem title="Address" value={profile.Address} />
+          {profile.Status ? (
+            <InfoDetailItem
+              title="Status"
+              value={profile.Status}
+              openTag={true}
+              color={"red"}
+            />
+          ) : (
+            <></>
+          )}
+          {profile.Level ? (
+            <InfoDetailItem
+              title="Level"
+              value={profile.Level}
+              openTag={true}
+              color={"blue"}
+            />
+          ) : (
+            <></>
+          )}
         </div>
         <div className="card bg-base-100  shadow-xl shadow-gray-200 rounded-md p-2 w-1/2">
           s

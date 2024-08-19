@@ -51,7 +51,9 @@ const TabMenu = (props) => {
       {tabs?.map((tab) => (
         <div
           key={tab.id}
-          className={`p-4 ${activeTab === tab.name ? "block" : "hidden"}`}
+          className={`py-4 w-full h-full   ${
+            activeTab === tab.name ? "block" : "hidden"
+          }`}
         >
           {tab.Element}
         </div>
