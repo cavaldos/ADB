@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
 import CartItem from "../../components/Course/CartItem";
+import { useSelector } from "react-redux";
+import StudentService from "../../services/Student.service";
 
-const CartService = () => {
-  const [cart, setCart] = useState([]);
-  const [total, setTotal] = useState(0);
-  return {
-    cart,
-    total,
-    setCart,
-    setTotal,
-  };
-};
-
-const TotalBill = () => {
-  const { cart, total } = CartService();
+const TotalBill = (props) => {
+  const {
+    CartDetailID,
+    CourseID,
+    CreateTime,
+    Image,
+    InstructorName,
+    Price,
+    Status,
+    Subtitle,
+    Title,
+    totalPrice,
+  } = props;
   return (
     <>
       <div class="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full bg-slate-300 shadow-sm">
@@ -27,20 +29,15 @@ const TotalBill = () => {
                 <dt class="text-base font-normal text-gray-500 dark:text-gray-400">
                   Quantity of Course
                 </dt>
-                <dd class="text-base font-medium text-green-600"> -$299.00</dd>
+                <dd class="text-base font-medium text-green-600">
+                  {" "}
+                  -$ {totalPrice.toFixed(2)}
+                </dd>
               </dl>
             </div>
 
-            <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
-              <dt class="text-base font-bold text-gray-900 dark:text-white">
-                Total
-              </dt>
-              <dd class="text-base font-bold text-gray-900 dark:text-white">
-                $8,191.00
-              </dd>
-            </dl>
+            <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700"></dl>
           </div>
-     
         </div>
       </div>
     </>
@@ -48,7 +45,19 @@ const TotalBill = () => {
 };
 
 const Cart = () => {
-  const { cart, total, setCart, setTotal } = CartService();
+  const [cart, setCart] = useState([]);
+  const [CartID, setCartID] = useState(0); 
+  const studentID = useSelector((state) => state.profile.StudentID);
+  const state = useSelector((state) => state.resetState.state);
+  useEffect(() => {
+    StudentService.Cart.selectCart(studentID).then((res) => {
+      setCart(res.data.Details);
+      setCartID(res.data.CartID);
+    });
+  }, [state]);
+
+  const totalPrice = cart.reduce((total, item) => total + item.Price, 0);
+
   return (
     <>
       <div class="mx-auto max-w-screen-xl px-4 2xl:px-0  ">
@@ -58,12 +67,24 @@ const Cart = () => {
         <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
           <div class="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
             <div class="space-y-6">
-              <CartItem />
-              <CartItem />
-              <CartItem />
+              {cart.map((item) => (
+                <CartItem
+                  key={item.CourseID}
+                  CartDetailID={item.CartDetailID}
+                  CourseID={item.CourseID}
+                  CreateTime={item.CreateTime}
+                  Image={item.Image}
+                  InstructorName={item.InstructorName}
+                  Price={item.Price}
+                  Status={item.Status}
+                  Subtitle={item.Subtitle}
+                  Title={item.Title}
+                  cartID={CartID}
+                />
+              ))}
             </div>
           </div>
-          <TotalBill />
+          <TotalBill totalPrice={totalPrice} />
         </div>
       </div>
     </>

@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import EditLessonDocument from "./edit/EditLessonDoc";
 import EditLessonVideo from "./edit/EditLessonVideo";
 import EditLessonTest from "./edit/EditLessonTest";
-
+import { useSelector } from "react-redux";
 import LessonService from "../../services/Lesson.Service";
 
 function EditLession() {
@@ -14,7 +14,7 @@ function EditLession() {
   const [type, setType] = useState("");
   const [lesson, setLesson] = useState({});
   const [detail, setDetail] = useState([]);
-
+  const resetState = useSelector((state) => state.resetState.state);
   useEffect(() => {
     LessonService.getLessonDetail(lessonID).then((res) => {
       if (res.status === 200) {
@@ -22,9 +22,8 @@ function EditLession() {
         setType(res.data.type);
         setDetail(res.data.detail);
       }
-      console.log(res.data);
     });
-  }, [lessonID]);
+  }, [lessonID, resetState]);
   return (
     <div className=" w-full h-full">
       {type === "Video" ? (
@@ -38,6 +37,7 @@ function EditLession() {
           LessonType={lesson.LessonType}
           Topic={lesson.Topic}
           OrderLessons={lesson.OrderLessons}
+          LessonVideoID={lesson.LessonVideoID}
           CourseID={lesson.CourseID}
           URL={lesson.URL}
         />
@@ -51,17 +51,3 @@ function EditLession() {
 }
 
 export default EditLession;
-
-// const {
-//   LessonsID,
-//   Title,
-//   Duration,
-//   ComplexityLevel,
-//   CreatedTime,
-//   UpdatedTime,
-//   LessonType,
-//   Topic,
-//   OrderLessons,
-//   CourseID,
-//   URL,
-// } = props;

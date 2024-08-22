@@ -8,26 +8,26 @@ import { Box, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import LessonServiceAPI from "../../services/Lesson.Service";
 import TabMenu from "../../components/other/TabMenu";
-import CreateLessonVideo from "../../components/Lesson/edit/EditLessonVideo";
-import CreateLessonDocument from "../../components/Lesson/edit/EditLessonDoc";
-import CreateLessonTest from "../../components/Lesson/edit/EditLessonTest";
+import CreateLessonVideo from "../../components/Lesson/create/LessonVideo";
+import CreateLessonDocument from "../../components/Lesson/create/LessonDoc";
+import CreateLessonTest from "../../components/Lesson/create/LessonTest";
 
 import LessonItemList from "../../components/Lesson/LessonItemList";
 import LessonDrag from "../../components/Lesson/LessonDrag";
-import LessonService from "../../components/Lesson/LessonService";
 import EditLession from "../../components/Lesson/EditLession";
 import CourseService from "../../services/Course.service";
 import { Button, Modal, Form, Input, Tag } from "antd";
+import { useNavigate } from "react-router-dom";
+
 const InforCourse = () => {
   const { courseID } = useParams();
   const [data, setData] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [form] = Form.useForm(); // Tạo instance của form
+  const [form] = Form.useForm();
 
   useEffect(() => {
     CourseService.getCourseDetail(courseID).then((res) => {
       setData(res.data[0]);
-      console.log(res.data[0]);
     });
   }, [courseID]);
 
@@ -38,9 +38,10 @@ const InforCourse = () => {
 
   const handleOk = async () => {
     try {
-      const values = await form.validateFields(); 
-      setData(values); 
-      console.log(values);
+      // const response = await CourseService.updateCourse(courseID, data);
+
+      const values = await form.validateFields();
+      setData(values);
 
       setIsModalVisible(false);
     } catch (error) {
@@ -158,7 +159,8 @@ const InforCourse = () => {
   );
 };
 const CreateLesson = () => {
-  const { courseID, lessonID, navigate } = LessonService();
+  const { courseID, lessonID } = useParams();
+  const navigate = useNavigate();
   const tabs = [
     {
       id: 1,
@@ -186,7 +188,7 @@ const CreateLesson = () => {
         <div className=" flex flex-col w-full">
           <button
             onClick={() => {
-              navigate(`/new-course/${courseID}/create-lesson`);
+              navigate(`/new-course/${courseID}/create-lesson/`);
             }}
             className=" btn btn-small flex hover:cursor-pointer rounded-md w-1/5 mb-2"
           >

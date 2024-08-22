@@ -16,6 +16,8 @@ import CourseService from "../../services/Course.service";
 import { ConvertTime } from "../../hooks/Time.utils";
 import { renderUrl } from "../../hooks/GetURLImage";
 import LessonItemList from "../Lesson/LessonItemList";
+import StudentService from "../../services/Student.service";
+import { useSelector } from "react-redux";
 const CourseDetail = () => {
   const { courseID } = useParams();
   const [courseData, setCourseData] = useState({
@@ -29,7 +31,7 @@ const CourseDetail = () => {
     CategoryName: "",
     FullName: "",
   });
-
+  const studentID = useSelector((state) => state.profile.StudentID);
   const fetchCourseDetail = async () => {
     try {
       const response = await CourseService.getCourseDetail(courseID);
@@ -42,8 +44,14 @@ const CourseDetail = () => {
     fetchCourseDetail();
   }, [courseID]);
 
-  const handleAddToCart = () => {
-    message.success("Added to cart");
+  const handleAddToCart = async () => {
+    await StudentService.Cart.addtoCart(studentID, courseID).then((res) => {
+      if (res.status === 200) {
+        message.success("Add to cart success");
+      } else {
+        message.error("Course already in cart");
+      }
+    });
   };
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll to the top of the page
@@ -95,7 +103,7 @@ const CourseDetail = () => {
 
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
               <h2 className="text-xl font-bold mb-4">What you'll learn</h2>
-                <LessonItemList />
+              <LessonItemList />
             </div>
           </div>
 

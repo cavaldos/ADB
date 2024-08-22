@@ -19,7 +19,6 @@ const InfoDetailItem = ({ title, value, color, openTag }) => {
 
 const Information = ({ user }) => {
   const profile = useSelector((state) => state.profile);
-  console.log(profile);
 
   return (
     <>
@@ -55,7 +54,7 @@ const Information = ({ user }) => {
           )}
         </div>
         <div className="card bg-base-100  shadow-xl shadow-gray-200 rounded-md p-2 w-1/2">
-          s
+          
         </div>
       </div>
     </>

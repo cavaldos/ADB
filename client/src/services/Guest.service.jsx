@@ -13,7 +13,15 @@ const GuestService = {
       return { data: null, error: error.message || "An error occurred" };
     }
   },
-  register: async (userName, password, email, fullName, phone, address, role) => {
+  register: async (
+    userName,
+    password,
+    email,
+    fullName,
+    phone,
+    address,
+    role
+  ) => {
     try {
       const response = await instance.post(`/guest/register`, {
         userName: userName,

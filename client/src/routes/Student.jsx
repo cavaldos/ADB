@@ -18,19 +18,6 @@ const StudentRouter = [
     component: HomeStudent,
     Layout: StudentLayout,
   },
-
-  {
-    name: "Learning",
-    path: "/learning",
-    component: Learning,
-    Layout: StudentLayout,
-  },
-  {
-    name: "LearnProcess",
-    path: "/learn-process",
-    component: LearnProcess,
-    Layout: StudentLayout,
-  },
   {
     name: "Cart",
     path: "/cart",
@@ -43,6 +30,19 @@ const StudentRouter = [
     component: Invoice,
     Layout: StudentLayout,
   },
+  {
+    name: "Learning",
+    path: "/learning",
+    component: Learning,
+    Layout: StudentLayout,
+  },
+  {
+    name: "LearnProcess",
+    path: "/learn-process",
+    component: LearnProcess,
+    Layout: StudentLayout,
+  },
+
   {
     name: null,
     path: "/search/:search",

@@ -135,7 +135,7 @@ const Advertisement = () => {
   return (
     <div className="w-full h-full p-6 flex flex-col gap-2">
       <CourseCarousel time={2000} />
-      <CourseCarousel time={3000} IsButton={true} />
+      {/* <CourseCarousel time={3000} IsButton={true} /> */}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import {
   DndContext,
   closestCenter,
@@ -18,9 +18,9 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card } from "antd";
 import LessonBase from "../LessonBase";
 
-function SortableItem(props) {
+function SortableItem({ id, index, children }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: props.id });
+    useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -28,14 +28,8 @@ function SortableItem(props) {
   };
 
   return (
-    <div
-      className=""
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-    >
-      {props.children}
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {children(index)} {/* Pass index to the children */}
     </div>
   );
 }
@@ -46,7 +40,7 @@ const LessonDocDrag = ({ pages }) => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 10, // Cho phép kéo sau khi di chuyển một khoảng cách
+        distance: 10, // Allow drag after moving a certain distance
       },
     }),
     useSensor(KeyboardSensor, {
@@ -59,8 +53,12 @@ const LessonDocDrag = ({ pages }) => {
 
     if (active.id !== over.id) {
       setLessons((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
+        const oldIndex = items.findIndex(
+          (item) => item.PageDocumentID === active.id
+        );
+        const newIndex = items.findIndex(
+          (item) => item.PageDocumentID === over.id
+        );
         return arrayMove(items, oldIndex, newIndex);
       });
     }
@@ -75,28 +73,34 @@ const LessonDocDrag = ({ pages }) => {
       <SortableContext items={lessons} strategy={verticalListSortingStrategy}>
         {lessons.map((page, index) => {
           return (
-            <SortableItem key={page.id} id={page.id}>
-              <Card
-                title={`Page ${index + 1}`}
-                bordered={false}
-                extra={
-                  <button
-                    onClick={() => alert("You clicked on the button")}
-                    className="btn"
-                    type="primary"
-                  >
-                    Bấm vào đây
-                  </button>
-                }
-                className="shadow-2xl mt-2"
-              >
-                <p className="text-gray-700">{page.content}</p>
-                <input
-                  type="text"
-                  className="w-full mt-2 p-2 border-2 border-gray-300 rounded-md"
-                  onMouseDown={(e) => e.stopPropagation()} // Ngăn chặn sự kiện kéo khi tương tác với ô nhập liệu
-                />
-              </Card>
+            <SortableItem
+              key={page.PageDocumentID}
+              id={page.PageDocumentID}
+              index={index}
+            >
+              {(index) => (
+                <Card
+                  title={`Page ${index + 1}`}
+                  bordered={false}
+                  extra={
+                    <button
+                      onClick={() => alert("You clicked on the button")}
+                      className="btn"
+                      type="primary"
+                    >
+                      Click here
+                    </button>
+                  }
+                  className="shadow-2xl mt-2"
+                >
+                  <p className="text-gray-700">{page.Content}</p>
+                  <input
+                    type="text"
+                    className="w-full mt-2 p-2 border-2 border-gray-300 rounded-md"
+                    onMouseDown={(e) => e.stopPropagation()} // Prevent drag event when interacting with the input
+                  />
+                </Card>
+              )}
             </SortableItem>
           );
         })}
@@ -105,20 +109,24 @@ const LessonDocDrag = ({ pages }) => {
   );
 };
 
-function EditLessonDocument(lesson,detail) {
-  const pages = [
-    { id: "1", content: "Lesson 1 Content" },
-    { id: "2", content: "Lesson 2 Content" },
-    { id: "3", content: "Lesson 3 Content" },
-    { id: "4", content: "Lesson 4 Content" },
-    { id: "5", content: "Lesson 5 Content" },
-  ];
-
+function EditLessonDocument(props) {
+  const pages = props.detail; 
 
   return (
     <div className="w-full min-h-[500px] p-6 bg-white rounded-xl shadow-lg flex flex-col gap-2">
       <div className="bg-gray-100 rounded-lg p-4">
-        <LessonBase {...lesson} />
+        <LessonBase
+          LessonsID={props.lesson.LessonsID}
+          Title={props.lesson.Title}
+          Duration={props.lesson.Duration}
+          ComplexityLevel={props.lesson.ComplexityLevel}
+          CreatedTime={props.lesson.CreatedTime}
+          UpdatedTime={props.lesson.UpdatedTime}
+          LessonType={props.lesson.LessonType}
+          Topic={props.lesson.Topic}
+          OrderLessons={props.lesson.OrderLessons}
+          CourseID={props.lesson.CourseID}
+        />
       </div>
       <div className="h-full min-h-[250px] w-full rounded-md bg-gray-100 p-4">
         <LessonDocDrag pages={pages} />
@@ -127,4 +135,4 @@ function EditLessonDocument(lesson,detail) {
   );
 }
 
-export default EditLessonDocument;
+export default memo(EditLessonDocument);

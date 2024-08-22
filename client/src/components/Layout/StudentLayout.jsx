@@ -59,7 +59,8 @@ const StudentLayout = ({ children }) => {
   }, [location.pathname]);
 
   const shouldHideFooter =
-    locationPath === "/learn-process" || locationPath === "/chat";
+    locationPath.startsWith("/chat") || locationPath === "/learn-process";
+
 
   return (
     <div className="min-h-screen flex flex-col">

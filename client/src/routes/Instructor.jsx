@@ -4,7 +4,7 @@ import BuildIcon from "@mui/icons-material/Build";
 import HelpIcon from "@mui/icons-material/Help";
 import { SiCoursera } from "react-icons/si";
 import { IoHomeSharp } from "react-icons/io5";
-import { BsBank2 } from "react-icons/bs";
+import { BiCategory } from "react-icons/bi";
 
 const InstructorLayout = lazy(() =>
   import("~/components/Layout/InstructorLayout")
@@ -20,6 +20,10 @@ const CreateLesson = lazy(() => import("~/pages/instructor/CreateLesson"));
 const Discussion = lazy(() => import("~/pages/instructor/Discussion"));
 const CourseDetail = lazy(() => import("~/pages/instructor/CourseDetail"));
 const ChatPage = lazy(() => import("~/pages/instructor/ChatPage"));
+const ManagerCategory = lazy(() =>
+  import("~/pages/instructor/ManagerCategory")
+);
+const HistoryCourse = lazy(() => import("~/pages/instructor/HistoryCourse"));
 const InstructorRouter = [
   {
     name: null,
@@ -85,6 +89,22 @@ const InstructorRouter = [
     component: Discussion,
     Layout: InstructorLayout,
   },
+
+  {
+    name: "Manager Category",
+    path: "/manager-category",
+    icon: <BiCategory className="text-2xl" />,
+    component: ManagerCategory,
+    Layout: InstructorLayout,
+  },
+
+  {
+    name: null,
+    path: "/history-course/:hisCourseID",
+    icon: <HelpIcon />,
+    component: HistoryCourse,
+    Layout: InstructorLayout,
+  },
   {
     name: null,
     path: "/discussion/:discussionID",
@@ -99,7 +119,12 @@ const InstructorRouter = [
     component: ChatPage,
     Layout: InstructorLayout,
   },
-
+  {
+    name: null,
+    path: "/chat/:chatID",
+    component: ChatPage,
+    Layout: InstructorLayout,
+  },
 ];
 
 export default InstructorRouter;

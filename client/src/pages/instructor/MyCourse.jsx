@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from "react";
 import InstructorService from "../../services/Instructor.service";
-import axios from "axios";
-import { Space, Table, Tag } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Tag,
+  message,
+  Space,
+} from "antd";
+import { ConvertTime } from "../../hooks/Time.utils";
 import ColumnSearch from "~/hooks/useSortTable";
 import { useNavigate, useNavigation } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const SearchComponent = () => {
   return (
@@ -23,83 +34,115 @@ const SearchComponent = () => {
 
 const CreateCourse = () => {
   const [data, setData] = useState([]);
+  const profile = useSelector((state) => state.profile);
+  const [categories, setCategories] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  // useEffect(() => {
-  //   InstructorService.getAllCOurseByInstructor(1)
-  //     .then((res) => {
-  //       setData(res.data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, []);
+  const [form] = Form.useForm(); // Use Form hook
+
+  const showEditModal = (course) => {
+    console.log(course);
+    setSelectedCourse(course);
+    form.setFieldsValue({
+      // Set form values with selected course data
+      title: course.Title,
+      subtitle: course.Subtitle,
+      description: course.Description,
+      language: course.Language,
+      image: course.Image,
+      price: course.Price,
+      status: course.Status,
+      categoryID: course.CategoryID,
+      historyMessage: "", // Reset or set to an empty string for a new history message
+    });
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setSelectedCourse(null);
+    form.resetFields(); // Reset form fields on cancel
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const response = await InstructorService.getAllCOurseByInstructor(
+        profile.InstructorID
+      );
+      setData(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    // Replace API call with demo data
-    const demoData = [
-      {
-        CourseID: 1,
-        CategoryName: "React",
-        CreateTime: "2021-09-01",
-        Description: "Learn the basics of React",
-        Language: "English",
-        Price: "$50",
-        FullName: "John Doe",
-        Status: "Published",
-        Title: "Introduction to React",
-      },
-      {
-        CourseID: 2,
-        CategoryName: "Node.js",
-        CreateTime: "2021-10-15",
-        Description: "Master backend development with Node.js",
-        Language: "English",
-        Price: "$70",
-        FullName: "Jane Smith",
-        Status: "Published",
-        Title: "Node.js Mastery",
-      },
-      {
-        CourseID: 3,
-        CategoryName: "Python",
-        CreateTime: "2021-11-10",
-        Description: "Python for beginners",
-        Language: "English",
-        Price: "$60",
-        FullName: "Alice Johnson",
-        Status: "Draft",
-        Title: "Python 101",
-      },
-    ];
+    fetchCourses();
 
-    setData(demoData);
+    InstructorService.Category.getAllCategory()
+      .then((res) => {
+        setCategories(res.data);
+      })
+      .catch((err) => {});
   }, []);
+
+  const handleUpdate = async (values) => {
+    try {
+      const response = await InstructorService.updateCourse(
+        selectedCourse.CourseID,
+        values.title,
+        values.subtitle,
+        values.description,
+        values.language,
+        values.image,
+        values.price,
+        values.status,
+        values.historyMessage
+      );
+      if (response.status === 200) {
+        message.success("Course updated successfully!");
+        setIsModalVisible(false);
+        fetchCourses(); // Reload courses after update
+      } else {
+        message.error("Failed to update course.");
+      }
+    } catch (error) {
+      message.error("An error occurred while updating the course.");
+      console.error(error);
+    }
+  };
+
   const columns = [
     {
       title: "CourseID",
       dataIndex: "CourseID",
       key: "CourseID",
+      sorter: (a, b) => a.CourseID - b.CourseID,
+    },
+    {
+      title: "Title",
+      dataIndex: "Title",
+      key: "Title",
+      ...ColumnSearch("Title"),
     },
     {
       title: "CategoryName",
       dataIndex: "CategoryName",
       key: "CategoryName",
+      ...ColumnSearch("CategoryName"),
     },
     {
       title: "CreateTime",
       dataIndex: "CreateTime",
       key: "CreateTime",
+      render: (text) => ConvertTime.convertTimeToHHMM(text),
     },
     {
       title: "Description",
       dataIndex: "Description",
       key: "Description",
     },
-    // {
-    //   title: "Image",
-    //   dataIndex: "Image",
-    //   key: "Image",
-    // },
     {
       title: "Language",
       dataIndex: "Language",
@@ -109,6 +152,8 @@ const CreateCourse = () => {
       title: "Price",
       dataIndex: "Price",
       key: "Price",
+      // sort
+      sorter: (a, b) => a.Price - b.Price,
     },
     {
       title: "FullName",
@@ -119,32 +164,56 @@ const CreateCourse = () => {
       title: "Status",
       dataIndex: "Status",
       key: "Status",
+      render: (text) => {
+        if (text === "Free") {
+          return <Tag color="green">{text}</Tag>;
+        } else if (text === "Plus") {
+          return <Tag color="blue">{text}</Tag>;
+        } else {
+          return <Tag color="red">{text}</Tag>;
+        }
+      },
     },
-    {
-      title: "Title",
-      dataIndex: "Title",
-      key: "Title",
-    },
+
     {
       title: "Manage",
-      key: "action",
+      key: "manage",
       fixed: "center",
       render: (text, record) => (
         <Space size="middle">
           <button
-            onClick={() => navigate(`/edit-course/${record.CourseID}`)}
-            className="btn btn-xs bg-gray-300 "
-          >
-            Edit Course
-          </button>
-          <button
-            onClick={() => navigate(`/new-course/${1}/create-lesson`)}
+            onClick={() =>
+              navigate(`/new-course/${record.CourseID}/create-lesson`)
+            }
             className="btn btn-xs bg-gray-300 "
           >
             Edit Lesson
           </button>
         </Space>
       ),
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <button className="btn btn-sm" onClick={() => showEditModal(record)}>
+          Edit
+        </button>
+      ),
+    },
+    {
+      title: "View History",
+      key: "history",
+      render: (_, record) => {
+        return (
+          <button
+            className="btn btn-sm"
+            onClick={() => navigate(`/history-course/${record.CourseID}`)}
+          >
+            View
+          </button>
+        );
+      },
     },
   ];
 
@@ -166,6 +235,154 @@ const CreateCourse = () => {
           tableLayout="auto"
           dataSource={data?.map((item, index) => ({ ...item, key: index }))}
         />
+
+        <Modal
+          title="Edit Course"
+          open={isModalVisible}
+          onCancel={handleCancel}
+          footer={null}
+        >
+          {selectedCourse && (
+            <Form layout="vertical" form={form} onFinish={handleUpdate}>
+              <Form.Item
+                name="title"
+                label="Title"
+                rules={[
+                  { required: true, message: "Please enter the course title" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                name="subtitle"
+                label="Subtitle"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the course subtitle",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                name="description"
+                label="Description"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the course description",
+                  },
+                ]}
+              >
+                <Input.TextArea rows={4} />
+              </Form.Item>
+              <Form.Item
+                name="image"
+                label="Image URL"
+                rules={[
+                  {
+                    required: false,
+                    message: "Please enter the course image URL",
+                  },
+                ]}
+              >
+                <Input type="text" />
+              </Form.Item>
+
+              <Form.Item
+                name="language"
+                label="Language"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select the course language",
+                  },
+                ]}
+              >
+                <Select>
+                  <Select.Option value="English">English</Select.Option>
+                  <Select.Option value="Vietnamese">Vietnamese</Select.Option>
+                  <Select.Option value="Spanish">Spanish</Select.Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="status"
+                label="Status"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select the course status",
+                  },
+                ]}
+              >
+                <Select>
+                  <Select.Option value="Hide">Hide</Select.Option>
+                  <Select.Option value="Free">Free</Select.Option>
+                  <Select.Option value="Plus">Plus</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="price"
+                label="Price"
+                rules={[
+                  { required: true, message: "Please enter the course price" },
+                ]}
+              >
+                <Input type="number" />
+              </Form.Item>
+
+              {/* <Form.Item
+                name="categoryID"
+                label="Category"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select the course category",
+                  },
+                ]}
+              >
+                <Select>
+                  {categories.map((category) => (
+                    <Select.Option
+                      key={category.CategoryID}
+                      value={category.CategoryID}
+                    >
+                      {category.CategoryName}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item> */}
+
+              <Form.Item
+                name="historyMessage"
+                label="History Message"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the history message",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  block
+                >
+                  {loading ? "Updating..." : "Update Course"}
+                </Button>
+              </Form.Item>
+            </Form>
+          )}
+        </Modal>
       </div>
     </div>
   );

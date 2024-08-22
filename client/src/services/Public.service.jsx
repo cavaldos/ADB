@@ -1,4 +1,4 @@
-import { auto } from "@popperjs/core";
+import Upload from "antd/es/upload/Upload";
 import instance from "./axios.config";
 
 const PublicService = {
@@ -29,6 +29,126 @@ const PublicService = {
       console.error("Error fetching data: ", error);
       return { data: null, error: error.message || "An error occurred" };
     }
+  },
+  getAllCourse: async (pageSize, page) => {
+    try {
+      const response = await instance.post(`/public/get_all_course`, {
+        pageSize,
+        page,
+      });
+      return response;
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+      return { data: null, error: error.message || "An error occurred" };
+    }
+  },
+
+  Chat: {
+    createChat: async (chatContent, sendChatID, receiveChatID) => {
+      try {
+        const response = await instance.post(`/public/create_chat`, {
+          chatContent,
+          sendChatID,
+          receiveChatID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    getAllChat: async (sendChatID, receiveChatID) => {
+      try {
+        const response = await instance.post(`/public/get_all_chat`, {
+          sendChatID,
+          receiveChatID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    getAllUserChat: async (userID) => {
+      try {
+        const response = await instance.post(`/public/get_all_user_chat`, {
+          userID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    deleteChat: async (chatID) => {
+      try {
+        const response = await instance.post(`/public/delete_chat`, {
+          chatID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+  },
+  Banking: {
+    createBanking: async (
+      userID,
+      accountNumber,
+      accountHolderName,
+      accountBalance,
+      bankName
+    ) => {
+      try {
+        const response = await instance.post(`/public/create_bank_account`, {
+          userID,
+          accountNumber,
+          accountHolderName,
+          accountBalance,
+          bankName,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    getBankAccount: async (userID) => {
+      try {
+        const response = await instance.post(`/public/get_bank_account`, {
+          userID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+
+    updateBankAccount: async (
+      bankAccountID,
+      userID,
+      accountNumber,
+      accountHolderName,
+      accountBalance,
+      bankName
+    ) => {
+      try {
+        const response = await instance.post(`/public/update_bank_account`, {
+          bankAccountID,
+          userID,
+          accountNumber,
+          accountHolderName,
+          accountBalance,
+          bankName,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
   },
 };
 

@@ -3,19 +3,18 @@ import { IoSend } from "react-icons/io5";
 import { Avatar } from "antd";
 import Tooltip from "@mui/material/Tooltip";
 import useChatSocket from "../../hooks/userChatSocket";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const text =
-  "mess age Ch at Cont esad fsd afd saf sf sdf sdaf sd f sdf sd f sdf sdf sd sdf  sdf s df sdf sd fds f sdf sd fs df sdf sd f sdf sd f sdf sd fds af sdaf sd f sdf sad f sdf sad f sadf sd f dsf sd f dssdf s df sd fs df sd f sdf sdf sd f sdaf sadf sadf asd fsad fnt";
-
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import PublicService from "../../services/Public.service";
+import { ConvertTime } from "../../hooks/Time.utils";
 const AnymousMessage = memo(() => {
-  const firstLetter = useCallback((name) => name.charAt(0).toUpperCase(), []);
+  // const firstLetter = useCallback((name) => name.charAt(0).toUpperCase(), []);
   return (
     <div className="flex flex-col rounded-md mb-1">
       <div className={`p-2 gap-1my-auto`}>
         <Tooltip title={`Anynomus`} arrow placement="top-start">
-          <Avatar className="mr-2 mt-auto">{firstLetter("khandh")}</Avatar>
+          <Avatar className="mr-2 mt-auto">{"A"}</Avatar>
         </Tooltip>
         <Tooltip title={`inputing`} arrow placement="right-start">
           <div
@@ -29,51 +28,64 @@ const AnymousMessage = memo(() => {
   );
 });
 const Message = memo(({ message }) => {
-  const myId = 1;
-  const firstLetter = useCallback((name) => name.charAt(0).toUpperCase(), []);
-  const myMessage = message.userid === myId;
+  const { ChatID, SenderID, ChatContent, time, SenderName, ReceiverName } =
+    message;
+  const profile = useSelector((state) => state.profile);
+  // const firstLetter = useCallback((name) => name.charAt(0).toUpperCase(), []);
+  const myMessage = SenderID === profile.UserID;
+
   const GuestMessage = useCallback(() => {
     return (
       <div className="flex flex-col rounded-md mb-1">
         <div className={`p-2 gap-1my-auto`}>
-          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="top-start">
-            <Avatar className="mr-2 mt-auto">{firstLetter("khandh")}</Avatar>
+          <Tooltip title={`${ReceiverName}`} arrow placement="top-start">
+            <Avatar className="mr-2 mt-auto">{ReceiverName}</Avatar>
           </Tooltip>
-          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="right-start">
+          <Tooltip
+            title={`${ConvertTime.convertDateToDDMMYYYY(time)}`}
+            arrow
+            placement="right-start"
+          >
             <div
               className={`inline-block py-1 px-2 min-h-5 my-auto min-w-[40px] rounded-md  max-w-[70%] break-words text-left bg-gray-300 text-black `}
             >
-              {text}
+              {ChatContent}
             </div>
           </Tooltip>
         </div>
       </div>
     );
-  }, [firstLetter, message.content]);
+  }, [ChatContent]);
 
   const MyMessage = useCallback(() => {
     return (
       <div className="flex flex-col rounded-md mb-1 ">
         <div className={`p-2 gap-1 flex justify-end my-auto`}>
-          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="left-start">
+          <Tooltip
+            title={`${ConvertTime.convertDateToDDMMYYYY(time)}`}
+            arrow
+            placement="left-start"
+          >
             <div
               className={`inline-block py-1 px-2 min-h-5 my-auto min-w-[40px] rounded-md  max-w-[70%] break-words text-left bg-gray-400 text-black `}
             >
-              {text}
+              {ChatContent}
             </div>
           </Tooltip>
-          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="top-start">
-            <Avatar className="mr-2 mt-auto">{firstLetter("khandh")}</Avatar>
+          <Tooltip title={`${profile.UserName}`} arrow placement="right-start">
+            <Avatar className="mr-2 mt-auto">{"khandh"}</Avatar>
           </Tooltip>
         </div>
       </div>
     );
-  }, [firstLetter, message.content]);
+  }, [ChatContent]);
 
   return (
-    <div className="flex flex-col">
-      {myMessage ? <MyMessage /> : <GuestMessage />}
-    </div>
+    <>
+      <div className="flex flex-col">
+        {myMessage ? <MyMessage /> : <GuestMessage />}
+      </div>
+    </>
   );
 });
 function ChatBox() {
@@ -85,28 +97,23 @@ function ChatBox() {
   const [senderId, setSenderId] = useState(0);
   const [receiverId, setReceiverId] = useState(0);
   const [messagesBase, setMessagesBase] = useState([]);
-
+  const myuserId = useSelector((state) => state.profile.UserID);
+  const { chatID } = useParams();
+  const [resetStateChat, setResetStateChat] = useState(false);
   const { messages, typingUsers, sendMessage, handleTyping } =
     useChatSocket(senderId);
-  const message = [
-    {
-      userid: 1,
-      username: "user1",
-      content: "Hello",
-      createdAt: "2021-09-20",
-    },
-    {
-      userid: 2,
-      username: "user2",
-      content: "Hi",
-      createdAt: "2021-09-20",
-    },
-  ];
+
+  useEffect(() => {
+    PublicService.Chat.getAllChat(myuserId, chatID).then((res) => {
+      setMessagesBase(res.data);
+    });
+  }, [chatID, resetStateChat]);
+
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        handleSendMessage();
+        handleSendMessageAPI();
       }
     },
     [newMessage, receiverId]
@@ -128,28 +135,16 @@ function ChatBox() {
     }
   }, []);
 
-  const fetchMessages = useCallback(() => {
-    setLoading(true);
-    axios
-      .post("http://113.173.71.43:5001/public/get_all_chat", {
-        sendChatID: senderId,
-        receiveChatID: receiverId,
-      })
-      .then((res) => {
-        setMessagesBase(res.data.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching messages:", error);
-        setLoading(false);
-        setTimeout(fetchMessages, 10000); // Retry after 10 seconds
-      });
-  }, [senderId, receiverId]);
-  useEffect(() => {
-    if (senderId && receiverId) {
-      fetchMessages();
-    }
-  }, [senderId, receiverId]);
+  const handleSendMessageAPI = async () => {
+    await PublicService.Chat.createChat(newMessage, myuserId, chatID).then(
+      (res) => {
+        if (res.status === 200) {
+          setNewMessage("");
+          setResetStateChat(!resetStateChat);
+        }
+      }
+    );
+  };
 
   const messageEnd = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -168,51 +163,15 @@ function ChatBox() {
         <div
           className="bg-white p-1 rounded-md h-[60px]  opacity-65 bg-opacity-95
         flex items-center shadow-xl  shadow-blur backdrop-blur-2xl overflow-hidden"
-        >
-          dsf
-        </div>
+        ></div>
         {/*  */}
         <div className="flex-1 overflow-y-auto rounded-t-lg p-2 relative h-full pb-24 ">
-          {/*  */}
-          <div className="flex w-full max-w-md mb-4">
-            {/*  */}
-            <input
-              type="text"
-              value={senderId}
-              onChange={(e) => setSenderId(e.target.value)}
-              className="flex-grow border p-2 mr-2"
-              placeholder="Your ID"
-            />
-            <input
-              type="text"
-              value={receiverId}
-              onChange={(e) => setReceiverId(e.target.value)}
-              className="flex-grow border p-2"
-              placeholder="Receiver ID"
-            />
-            {/*  */}
-          </div>
-          {/*  */}
           {!loading &&
-            message.map((discussion, index) => (
-              <Message key={index} message={discussion} />
+            messagesBase?.map((item, index) => (
+              <Message key={index} message={item} />
             ))}
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
-          <Message message={message} />
 
-          <AnymousMessage />
+          {/* <AnymousMessage /> */}
           {Array.from(typingUsers).map((userId, index) => (
             <AnymousMessage key={index} />
           ))}
@@ -234,7 +193,7 @@ function ChatBox() {
           />
 
           <button
-            onClick={handleSendMessage}
+            onClick={handleSendMessageAPI}
             className="ml-2 p-2 bg-blue-500 rounded-lg"
           >
             <IoSend className="hover:text-gray-950 text-gray-800" size={24} />

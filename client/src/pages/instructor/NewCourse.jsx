@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   Button,
@@ -7,8 +7,10 @@ import {
   InputLabel,
   Select,
 } from "@mui/material";
-import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import InstructorService from "../../services/Instructor.service";
+import { useSelector } from "react-redux";
+import { message } from "antd";
 
 function NewCourse() {
   const [course, setCourse] = useState({
@@ -20,27 +22,59 @@ function NewCourse() {
     price: 0,
     status: "Hide",
     categoryID: 0,
-    instructorID: 0,
   });
+
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // Add a loading state
+  const profile = useSelector((state) => state.profile);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setCourse((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(course);
+  const fetchCategories = () => {
+    InstructorService.Category.getAllCategory()
+      .then((res) => {
+        setCategories(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
-  // khi bam new course thi se nhan lai id coures
-  const handleNewCourse = () => {
-    navigate(`/new-course/${1}/create-lesson/${2}`);
-  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true); // Set loading state to true
+    const response = await InstructorService.createCourse(
+      course.title,
+      course.subtitle,
+      course.description,
+      course.language,
+      course.image,
+      course.price,
+      course.status,
+      course.categoryID,
+      profile.InstructorID
+    );
+    if (response.status === 200) {
+      setLoading(false); // Set loading state to false
+      message.success("Course created successfully!");
+      navigate(-1);
+    } else {
+      setLoading(false); // Set loading state to false
+      message.error("Failed to create course.");
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   return (
     <div className="">
       <div className="flex gap-3">
-    
         <h1 className="text-2xl font-bold">Create new course</h1>
       </div>
       <form
@@ -104,37 +138,31 @@ function NewCourse() {
           required
           margin="normal"
         />
-        <TextField
-          label="Category ID"
-          variant="outlined"
-          name="categoryID"
-          type="number"
-          value={course.categoryID}
-          onChange={handleChange}
-          fullWidth
-          required
-          margin="normal"
-        />
-        <TextField
-          label="Instructor ID"
-          variant="outlined"
-          name="instructorID"
-          type="number"
-          value={course.instructorID}
-          onChange={handleChange}
-          fullWidth
-          required
-          margin="normal"
-        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Category</InputLabel>
+          <Select
+            name="categoryID"
+            value={course.categoryID}
+            onChange={handleChange}
+            label="Category"
+            required
+          >
+            {categories.map((category) => (
+              <MenuItem key={category.CategoryID} value={category.CategoryID}>
+                {category.CategoryName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <Button
           type="submit"
           variant="contained"
           color="primary"
           fullWidth
           sx={{ mt: 2 }}
-          onClick={handleNewCourse}
+          disabled={loading} // Disable button when loading
         >
-          Create Course
+          {loading ? "Creating..." : "Create Course"}
         </Button>
       </form>
     </div>

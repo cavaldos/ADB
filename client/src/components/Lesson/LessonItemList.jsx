@@ -42,6 +42,7 @@ const LessonItemList = (props) => {
   const handleDetail = () => {
     navigate(`/new-course/${CourseID}/create-lesson/${LessonsID}`);
   };
+
   const ComplexTag = (props) => {
     let bgColor;
     let textColor;
@@ -72,12 +73,13 @@ const LessonItemList = (props) => {
 
     return (
       <li
-        className={` rounded-full border px-2 py-1 text-xs font-semibold ${bgColor} ${textColor}`}
+        className={`rounded-full border px-2 py-1 text-xs font-semibold ${bgColor} ${textColor}`}
       >
         {text}
       </li>
     );
   };
+
   const StatusTag = (props) => {
     let bgColor;
     let textColor;
@@ -116,8 +118,8 @@ const LessonItemList = (props) => {
   };
 
   return (
-    <ul className=" shadow-inner">
-      <li className="text-left ">
+    <ul className="shadow-inner">
+      <li className="text-left">
         <label
           htmlFor="accordion-1"
           className="relative flex flex-col rounded-md border border-gray-100 shadow-md"
@@ -130,7 +132,7 @@ const LessonItemList = (props) => {
             onChange={toggleAccordion}
           />
           <div
-            className="relative ml-4 cursor-pointer select-none items-center py-4 pr-2 flex "
+            className="relative ml-4 cursor-pointer select-none items-center py-4 pr-2 flex"
             onClick={toggleAccordion}
           >
             <div className="text-base font-bold text-gray-600 lg:text-base  mr-4">
@@ -143,14 +145,16 @@ const LessonItemList = (props) => {
             ) : (
               <Tag color="purple">{LessonType}</Tag>
             )}
-            <button onClick={handleDetail} className=" btn btn-sm ml-auto">
-              Edit
-            </button>
-            <RiArrowDropUpLine
-              className={`text-3xl ml-auto mr-5 text-gray-500 transition ${
-                open ? "rotate-180" : ""
-              }`}
-            />
+            <div className="ml-auto flex items-center space-x-2">
+              <button onClick={handleDetail} className="btn btn-sm">
+                Edit
+              </button>
+              <RiArrowDropUpLine
+                className={`text-3xl text-gray-500 transition ${
+                  open ? "rotate-180" : ""
+                }`}
+              />
+            </div>
           </div>
           <div
             className={`max-h-0 overflow-hidden transition-all duration-500 ${
@@ -158,17 +162,17 @@ const LessonItemList = (props) => {
             }`}
           >
             {open && (
-              <ul className="space-y-1 font-semibold text-gray-600 mb-6 ">
-                <div className="flex px-2 sm:px-6 py-2.5 hover:bg-gray-100 items-center ">
+              <ul className="space-y-1 font-semibold text-gray-600 mb-6">
+                <div className="flex px-2 sm:px-6 py-2.5 hover:bg-gray-100 items-center">
                   {LessonType === "Video" ? (
-                    <FaCirclePlay className="text-2xl " />
+                    <FaCirclePlay className="text-2xl" />
                   ) : LessonType === "Test" ? (
-                    <SiSpeedtest className="text-2xl " />
+                    <SiSpeedtest className="text-2xl" />
                   ) : (
-                    <GrDocumentText className="text-2xl " />
+                    <GrDocumentText className="text-2xl" />
                   )}
 
-                  <div className=" ml-3 text-sm truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+                  <div className="ml-3 text-sm truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
                     Topic:
                     <span className="text-sm truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg italic">
                       {" "}
@@ -190,7 +194,6 @@ const LessonItemList = (props) => {
     </ul>
   );
 };
-
 const LessonList = () => {
   const { courseID } = useParams();
   const [data, setData] = useState([]);

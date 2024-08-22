@@ -19,6 +19,7 @@ import { CSS } from "@dnd-kit/utilities";
 import LessonService from "../../services/Lesson.Service";
 import { useParams } from "react-router-dom";
 import { LessonItemList } from "./LessonItemList";
+import { useSelector } from "react-redux";
 
 function SortableItem(props) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -45,7 +46,9 @@ function SortableItem(props) {
 const LessonDrag = () => {
   const { courseID } = useParams();
   const [lessons, setLessons] = useState([]);
-
+  const lessonDragState = useSelector(
+    (state) => state.resetState.lessonDragState
+  );
   useEffect(() => {
     LessonService.getAllLessonsByCourseID(courseID).then((response) => {
       const formattedData = response.data.map((lesson) => ({
@@ -62,7 +65,7 @@ const LessonDrag = () => {
       }));
       setLessons(formattedData);
     });
-  }, [courseID]);
+  }, [courseID, lessonDragState]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),

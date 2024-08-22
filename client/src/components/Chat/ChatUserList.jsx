@@ -1,31 +1,44 @@
 import React, { useState, useEffect, useRef, memo, useCallback } from "react";
 import { IoSearch } from "react-icons/io5";
 import { AiFillCloseCircle } from "react-icons/ai";
-import { Avatar } from "antd";
-
-const UserChat = ({ open }) => {
-  const khah = "khandh";
+import { Avatar, Tag, Tooltip } from "antd";
+import PublicService from "../../services/Public.service";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+const UserChat = ({ props }) => {
+  const { UserID, UserName, FullName, Role, Email } = props;
+  console.log(UserID, UserName, FullName, Role, Email);
   const firstLetter = useCallback((name) => name.charAt(0).toUpperCase(), []);
-  const [chosen, setChosen] = useState(true);
+  const navigate = useNavigate();
+  const { chatID } = useParams();
+  const handleChooseUser = () => {
+    navigate(`/chat/${UserID}`);
+  };
   return (
     <button
+      onClick={handleChooseUser}
       className={`w-full text-left py-2 px-4  rounded 
          border-transparent flex justify-start items-center  btn  h-[65px] ${
-           open ? "bg-gray-400" : ""
+           chatID == UserID ? "bg-gray-400" : ""
          }`}
     >
-      <Avatar className="" size={"large"}>
-        {firstLetter("khandh")}
-      </Avatar>
+      <Tooltip title={`UserID ${UserID}`} arrow placement="left-start">
+        <Avatar className="" size={"large"}>
+          {firstLetter(FullName)}
+        </Avatar>
+      </Tooltip>
+
       <div className="flex flex-col min-w-[120px] h-full p-1 rounded-sm">
         <span className="font-semibold  break-words text-black truncate max-w-full">
-          {"usercNsdcasds f ame"}
+          {FullName}
         </span>
         <div className="flex items-center text-gray-600 mt-auto">
-          <span className="truncate max-w-full overflow-hidden text-ellipsis">
-            {"lastMessage"}
-          </span>
-          <span className="ml-2 text-xs">{"time"}</span>
+          <Tag>
+            <span className="truncate max-w-full overflow-hidden text-ellipsis">
+              {Role}
+            </span>
+          </Tag>
+          {/* <span className="ml-2 text-xs">{"time"}</span> */}
         </div>
       </div>
     </button>
@@ -34,6 +47,13 @@ const UserChat = ({ open }) => {
 
 function ChatUserList() {
   const [searchTerm, setSearchTerm] = useState("");
+  const profile = useSelector((state) => state.profile);
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    PublicService.Chat.getAllUserChat(profile.UserID).then((res) => {
+      setUsers(res.data);
+    });
+  }, []);
 
   const handleInputChange = (e) => {
     setSearchTerm(e.target.value);
@@ -64,10 +84,9 @@ function ChatUserList() {
         </div>
       </div>
       <div className="overflow-y-hidden flex flex-col gap-1 ">
-        <UserChat open={true} />
-        <UserChat open={false} />
-        <UserChat />
-        <UserChat />
+        {users?.map((user, index) => (
+          <UserChat key={index} props={user} />
+        ))}
       </div>
     </div>
   );

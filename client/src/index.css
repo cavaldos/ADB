@@ -101,3 +101,19 @@ input[type="range"]::-moz-range-thumb {
 .discussion-container:hover {
   overflow-y: auto; /* Chỉ cho phép cuộn theo chiều dọc khi hover */
 }
+
+/* Custom CSS for the radio text when disabled */
+.custom-radio .ant-radio-disabled + span {
+  color: inherit !important; /* Keep the text color normal */
+  opacity: 1 !important; /* Override the faded text */
+}
+
+/* Optional: Custom styling for the entire disabled state */
+.custom-radio .ant-radio-disabled .ant-radio-inner {
+  background-color: #f5f5f5; /* Optional: Keep the radio button visually disabled */
+  border-color: #d9d9d9; /* Optional: Keep the border color normal */
+}
+
+.custom-radio .ant-radio-disabled .ant-radio-inner:after {
+  background-color: #1890ff; /* Optional: Maintain the original selected color */
+}
