@@ -31,7 +31,7 @@ class DataConnect {
       }
       if (!this.pool.connected) {
         await this.pool.connect();
-       
+
         console.log(
           `\n  🚀  ➜ Connected to SQL Server at  `,
           color.yellow(
@@ -108,6 +108,38 @@ class DataConnect {
       try {
         const result: IResult<any> = await request.execute(procedureName);
         return result.recordset;
+      } catch (error) {
+        throw error;
+      }
+    } catch (error: any) {
+      throw new Error(`Procedure failed: ${error.message}`);
+    } finally {
+      if (this.pool && this.pool.connected) {
+        await this.pool.close();
+        this.pool = null;
+      }
+    }
+  }
+  async executeProcedureMulti(
+    procedureName: string,
+    params: { [key: string]: any }
+  ): Promise<any> {
+    try {
+      if (!this.pool) {
+        this.pool = new sql.ConnectionPool(config);
+      }
+      if (!this.pool.connected) {
+        await this.pool.connect();
+      }
+      const request = this.pool.request();
+      for (const paramName in params) {
+        if (params.hasOwnProperty(paramName)) {
+          request.input(paramName, params[paramName]);
+        }
+      }
+      try {
+        const result: IResult<any> = await request.execute(procedureName);
+        return result.recordsets;
       } catch (error) {
         throw error;
       }

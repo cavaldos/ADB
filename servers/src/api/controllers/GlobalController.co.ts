@@ -4,6 +4,7 @@ import UserService from "../services/User.sv";
 import CourseRepo from "../../repositories/course.repo";
 import BankAccountRepo from "../../repositories/bankAccount.repo";
 import ChatRepo from "../../repositories/chat.repo";
+import ProfileRepo from "../../repositories/profile.repo";
 import _ from "lodash";
 const GlobalController = {
   //1. get all courses with pagination
@@ -17,9 +18,11 @@ const GlobalController = {
       return res.status(200).json({
         message: "Get all courses public",
         status: 200,
-        data: result,
-        page,
-        pageSize,
+        data: {
+          ...result,
+          page,
+          pageSize,
+        },
       });
     } catch (error: any) {
       return res.status(500).json({
@@ -84,13 +87,15 @@ const GlobalController = {
         offset,
         pageSize
       );
-
+      await CourseRepo.logSearch(searchString);
       return res.status(200).json({
         message: `Search results for: ${searchString}`,
         status: 200,
-        data: result,
-        page,
-        pageSize,
+        data: {
+          ...result,
+          page,
+          pageSize,
+        },
       });
     } catch (error: any) {
       return res.status(500).json({
@@ -100,20 +105,29 @@ const GlobalController = {
       });
     }
   },
-  // auto compelete course
+  // 4. auto compelete course
   async autoCompleteCourse(req: Request, res: Response) {
     try {
       const { searchString } = req.body;
 
+      let topSearch = await CourseRepo.getTopSearchedCourses(searchString);
+      topSearch = _.map(topSearch, (item) => {
+        return _.mapKeys(item, (value, key) => {
+          return key === "SearchString" ? "Phrase" : key;
+        });
+      });
+
+      // Filter out items where Phrase is an empty string
+      topSearch = _.filter(topSearch, (item) => item.Phrase !== "");
+
       if (!searchString) {
-        return res.status(400).json({
-          message: "Invalid search string",
-          status: 400,
-          data: {
-            Title: "Invalid search string",
-          },
+        return res.status(200).json({
+          message: `Top search results`,
+          status: 200,
+          data: topSearch,
         });
       }
+
       const result = await CourseRepo.autoCompleteSearch(searchString);
       return res.status(200).json({
         message: `Auto complete results for: ${searchString}`,
@@ -152,7 +166,7 @@ const GlobalController = {
     try {
       const { userID, role } = req.body;
       var result;
-      if (role !== "instructor" && role !== "student" && role !== "admin") {
+      if (role !== "Instructor" && role !== "Student" && role !== "Admin") {
         console.log("role is not valid");
         return res.status(400).json({
           message: "Invalid role",
@@ -160,11 +174,11 @@ const GlobalController = {
           data: null,
         });
       }
-      if (role === "instructor") {
+      if (role === "Instructor") {
         result = await UserService.getInstructorByID(userID);
-      } else if (role === "student") {
+      } else if (role === "Student") {
         result = await UserService.getStudentByID(userID);
-      } else if (role === "admin") {
+      } else if (role === "Admin") {
         result = await UserService.getAdminByID(userID);
       }
       return res.status(200).json({
@@ -368,6 +382,306 @@ const GlobalController = {
       });
     }
   },
+
+  // get all user chat
+  async getAllUserChat(req: Request, res: Response) {
+    try {
+      const { userID } = req.body;
+      const result = await ChatRepo.getAllUserChat(userID);
+      return res.status(200).json({
+        message: `Get all user chat`,
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
+  },
+
+  async deleteChat(req: Request, res: Response) {
+    try {
+      const { chatID } = req.body;
+      await ChatRepo.deleteChat(chatID);
+      return res.status(200).json({
+        message: `Delete chat ID: ${chatID}`,
+        status: 200,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+      });
+    }
+  },
+
+  Profile: {
+    // 1. Create Education
+    async createEducation(req: Request, res: Response) {
+      try {
+        const { level, major, schoolName, userID } = req.body;
+        const result = await ProfileRepo.createEducation(
+          level,
+          major,
+          schoolName,
+          userID
+        );
+        return res.status(200).json({
+          message: `Created education for UserID: ${userID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 2. Update Education
+    async updateEducation(req: Request, res: Response) {
+      try {
+        const { educationID, level, major, schoolName } = req.body;
+        const result = await ProfileRepo.updateEducation(
+          educationID,
+          level,
+          major,
+          schoolName
+        );
+        return res.status(200).json({
+          message: `Updated education ID: ${educationID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 3. Delete Education
+    async deleteEducation(req: Request, res: Response) {
+      try {
+        const { educationID } = req.body;
+        const result = await ProfileRepo.deleteEducation(Number(educationID));
+        return res.status(200).json({
+          message: `Deleted education ID: ${educationID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 4. Get Education by UserID
+    async getEducationByUserID(req: Request, res: Response) {
+      try {
+        const { userID } = req.body;
+        const result = await ProfileRepo.getEducationByUserID(Number(userID));
+        return res.status(200).json({
+          message: `Fetched education for UserID: ${userID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 5. Create Certificate
+    async createCertificate(req: Request, res: Response) {
+      try {
+        const { certificateName, startDate, endDate, instructorID } = req.body;
+        const result = await ProfileRepo.createCertificate(
+          certificateName,
+          startDate,
+          endDate,
+          instructorID
+        );
+        return res.status(200).json({
+          message: `Created certificate for InstructorID: ${instructorID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 6. Update Certificate
+    async updateCertificate(req: Request, res: Response) {
+      try {
+        const { certificateID, certificateName, startDate, endDate } = req.body;
+        const result = await ProfileRepo.updateCertificate(
+          certificateID,
+          certificateName,
+          startDate,
+          endDate
+        );
+        return res.status(200).json({
+          message: `Updated certificate ID: ${certificateID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 7. Delete Certificate
+    async deleteCertificate(req: Request, res: Response) {
+      try {
+        const { certificateID } = req.body;
+        const result = await ProfileRepo.deleteCertificate(
+          Number(certificateID)
+        );
+        return res.status(200).json({
+          message: `Deleted certificate ID: ${certificateID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 8. Get Certificate by InstructorID
+    async getCertificateByInstructorID(req: Request, res: Response) {
+      try {
+        const { instructorID } = req.body;
+        const result = await ProfileRepo.getCertificateByInstructorID(
+          Number(instructorID)
+        );
+        return res.status(200).json({
+          message: `Fetched certificate for InstructorID: ${instructorID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 9. Create Company
+    async createCompany(req: Request, res: Response) {
+      try {
+        const { companyName, position, instructorID } = req.body;
+        const result = await ProfileRepo.createCompany(
+          companyName,
+          position,
+          instructorID
+        );
+        return res.status(200).json({
+          message: `Created company for InstructorID: ${instructorID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 10. Update Company
+    async updateCompany(req: Request, res: Response) {
+      try {
+        const { companyID, companyName, position } = req.body;
+        const result = await ProfileRepo.updateCompany(
+          companyID,
+          companyName,
+          position
+        );
+        return res.status(200).json({
+          message: `Updated company ID: ${companyID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 11. Delete Company
+    async deleteCompany(req: Request, res: Response) {
+      try {
+        const { companyID } = req.body;
+        const result = await ProfileRepo.deleteCompany(Number(companyID));
+        return res.status(200).json({
+          message: `Deleted company ID: ${companyID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+
+    // 12. Get Company by InstructorID
+    async getCompanyByInstructorID(req: Request, res: Response) {
+      try {
+        const { instructorID } = req.body;
+        const result = await ProfileRepo.getCompanyByInstructorID(
+          Number(instructorID)
+        );
+        return res.status(200).json({
+          message: `Fetched company for InstructorID: ${instructorID}`,
+          status: 200,
+          data: result,
+        });
+      } catch (error: any) {
+        return res.status(500).json({
+          message: `Error: ${error.message}`,
+          status: 500,
+          data: null,
+        });
+      }
+    },
+  },
+  //
 };
 
 export default GlobalController;

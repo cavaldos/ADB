@@ -18,6 +18,7 @@ const InstructorController = {
         categoryID,
         instructorID,
       } = req.body;
+      console.log(req.body);
       // Validate the status
       if (status !== "Free" && status !== "Hide" && status !== "Plus") {
         return res.status(400).json({
@@ -61,7 +62,7 @@ const InstructorController = {
         status,
         historyMessage,
       } = req.body;
-      // Validate the status
+      console.log(req.body);
       if (status !== "Free" && status !== "Hide" && status !== "Plus") {
         return res.status(400).json({
           message: "Status must be Free, Hide, or Plus",
@@ -170,23 +171,23 @@ const InstructorController = {
     }
   },
   //6. get all Category
-  async getAllCategory(req: Request,res: Response) {
-   try {
-    const result = await CategoryRepo.getAllCategory();
-    console.log(req.body);
-    return res.status(200).json({
-      message: "Get all category",
-      status: 200,
-      data: result,
-    });
-  } catch (error: any) {
-    // Handle any errors and return a 500 status
-    return res.status(500).json({
-      message: `Error: ${error.message}`,
-      status: 500,
-      data: null,
-    });
-  }
+  async getAllCategory(req: Request, res: Response) {
+    try {
+      const result = await CategoryRepo.getAllCategory();
+      console.log(req.body);
+      return res.status(200).json({
+        message: "Get all category",
+        status: 200,
+        data: result,
+      });
+    } catch (error: any) {
+      // Handle any errors and return a 500 status
+      return res.status(500).json({
+        message: `Error: ${error.message}`,
+        status: 500,
+        data: null,
+      });
+    }
   },
   //7. get category by ID
   async getCategoryByID(req: Request, res: Response) {
@@ -327,7 +328,7 @@ const InstructorController = {
     }
   },
   //4. get all discounts
-  async getAllDiscounts(req:Request ,res: Response) {
+  async getAllDiscounts(req: Request, res: Response) {
     try {
       const { courseID } = req.body;
       const result = await CategoryRepo.getAllDiscounts(courseID);

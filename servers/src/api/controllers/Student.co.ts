@@ -190,15 +190,20 @@ const StudentController = {
   // update learn process
   async updateLearnProcess(req: Request, res: Response) {
     try {
-      const { learnProcessID, status, studentID, courseID } = req.body;
-      await LearnRepo.updateLearnProcess(
-        learnProcessID,
-        status,
-        studentID,
-        courseID
-      );
+      const { learnProcessID, status, studentID } = req.body;
+
+      // Kiểm tra giá trị của status
+      const validStatuses = ["NotStarted", "InProcess", "Done"];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({
+          message:
+            "Invalid status value. Status must be 'NotStarted', 'InProcess', or 'Done'.",
+          status: 400,
+        });
+      }
+      await LearnRepo.updateLearnProcess(learnProcessID, status, studentID);
       return res.status(200).json({
-        message: "Lesson process marked as done successfully",
+        message: "Lesson process updated successfully",
         status: 200,
       });
     } catch (error: any) {
@@ -210,46 +215,14 @@ const StudentController = {
   },
 
   // 4. get all  Learn Process Detail
-  async getLearnProcessDetail(req: Request, res: Response) {
+  async getAllLearnProcess(req: Request, res: Response) {
     try {
-      const { learnProcessID } = req.body;
-      const result = await LearnRepo.getLearnProcessDetail(learnProcessID);
+      const { studentID } = req.body;
+      const result = await LearnRepo.getAllLearnProcess(studentID);
       return res.status(200).json({
         message: "Lesson process marked as done successfully",
         status: 200,
         data: result,
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        message: `Error: ${error.message}`,
-        status: 500,
-      });
-    }
-  },
-  // start lesson process
-  async startLessonProcess(req: Request, res: Response) {
-    try {
-      const { lessonProcessID, learnProcessID } = req.body;
-      await LearnRepo.startLessonProcess(lessonProcessID, learnProcessID);
-      return res.status(200).json({
-        message: "Lesson process marked as done successfully",
-        status: 200,
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        message: `Error: ${error.message}`,
-        status: 500,
-      });
-    }
-  },
-  // done lesson process
-  async doneLessonProcess(req: Request, res: Response) {
-    try {
-      const { lessonProcessID } = req.body;
-      await LearnRepo.doneLessonProcess(lessonProcessID);
-      return res.status(200).json({
-        message: "Lesson process marked as done successfully",
-        status: 200,
       });
     } catch (error: any) {
       return res.status(500).json({
@@ -259,23 +232,7 @@ const StudentController = {
     }
   },
 
-  //statisticalLearnProcess
-  async statisticalLearnProcess(req: Request, res: Response) {
-    try {
-      const { learnProcessID } = req.body;
-      const result = await LearningService.statisticalLearnProcess(learnProcessID);
-      return res.status(200).json({
-        message: "Lesson process marked as done successfully",
-        status: 200,
-        data: result,
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        message: `Error: ${error.message}`,
-        status: 500,
-      });
-    }
-  },
+
 };
 
 export default StudentController;

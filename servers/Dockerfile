@@ -19,7 +19,7 @@ COPY .env ./
 RUN yarn build
 
 # Mở cổng mà ứng dụng sẽ chạy trên đó
-EXPOSE 5001 5002
+EXPOSE 3000
 
 
 # Chạy ứng dụng

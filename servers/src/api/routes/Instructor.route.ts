@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { InstructorController, LessonController } from "../controllers";
+import LessonService from "../services/Lesson.sv";
 const InstructorRouter = Router();
 //1.
 InstructorRouter.post("/create_course", InstructorController.createCourse);
@@ -21,101 +22,83 @@ InstructorRouter.post(
   InstructorController.editStatusCourse
 );
 
+// LESSON
+
+//1. get lesson by ID
+InstructorRouter.post("/get_lesson_detail", LessonService.getLessonDetail);
+
 //6. create lesson video
 InstructorRouter.post(
   "/create_lesson_video",
-  LessonController.createLessonVideo
+  LessonController.LessonVideo.createLessonVideo
 );
 //7. update lesson video
 InstructorRouter.post(
   "/update_lesson_video",
-  LessonController.updateLessonVideo
-);
-//9. get all lesson video by courseID
-InstructorRouter.post(
-  "/get_all_lessons_video",
-  LessonController.getAllLessonsVideo
-);
-//10. get lesson video by lessonID
-InstructorRouter.post(
-  "/get_lesson_video_by_id",
-  LessonController.getLessonsVideoByID
+  LessonController.LessonVideo.updateLessonVideo
 );
 
 //11. create lesson document
 InstructorRouter.post(
   "/create_lesson_document",
-  LessonController.createLessonDocument
+  LessonController.LessonDocument.createLessonDocument
 );
 //12. add page to  document
 InstructorRouter.post(
   "/add_page_to_lesson_document",
-  LessonController.addPageToDocument
+  LessonController.LessonDocument.addPage
 );
 //13. update page  document
 InstructorRouter.post(
   "/update_page_to_lesson_document",
-  LessonController.updatePageDocument
+  LessonController.LessonDocument.updatePage
 );
 //14. delete page  document
 InstructorRouter.post(
   "/delete_page_to_lesson_document",
-  LessonController.deletePageDocument
+  LessonController.LessonDocument.deletePage
 );
 
-//15. get all lesson document by courseID
-InstructorRouter.post(
-  "/get_all_lesson_document",
-  LessonController.getAllLessonsDocument
-);
 //16. get lesson document by lessonID
 InstructorRouter.post(
-  "/get_lesson_document_by_id",
-  LessonController.getLessonDocumentByID
-);
-//16.1. get Page document by lessonDocumentID
-InstructorRouter.post(
   "/get_all_page_document_by_id",
-  LessonController.getAllPagesDocument
+  LessonController.LessonDocument.getAllPages
 );
 
-///================================================================================================
 //16. create lesson test
-InstructorRouter.post("/create_lesson_test", LessonController.createLessonTest);
+InstructorRouter.post(
+  "/create_lesson_test",
+  LessonController.LessonTest.createLessonTest
+);
 //17. add question to lesson test
 InstructorRouter.post(
   "/add_question_to_lesson_test",
-  LessonController.addQuestionToTest
+  LessonController.LessonTest.addQuestion
 );
-//18. update question to lesson test
+// //18. update question to lesson test
 InstructorRouter.post(
   "/update_question_to_lesson_test",
-  LessonController.updateQuestionToTest
+  LessonController.LessonTest.updateQuestion
 );
-//19. get all lesson test by courseID
-InstructorRouter.post(
-  "/get_all_lesson_test",
-  LessonController.getAllLessonsTest
-);
-//20. get lesson test by lessonID
-InstructorRouter.post(
-  "/get_lesson_test_by_id",
-  LessonController.getLessonsTestByID
-);
+
 //21. get all Question test by lessonTestID
 InstructorRouter.post(
   "/get_all_question_test_by_id",
-  LessonController.getAllQuestionsByTest
+  LessonController.LessonTest.getAllQuestions
 );
-//========
+
 //21. get all Lesson by courseID
 InstructorRouter.post(
   "/get_all_lessons_by_courseID",
-  LessonController.getAllLessonsByCourseID
+  LessonController.getAllLessons
 );
 
-//20. Delete lesson
 InstructorRouter.post("/delete_lesson", LessonController.deleteLesson);
+InstructorRouter.post("/update_lesson", LessonController.upDateLesson);
+InstructorRouter.post("/sort_lesson", LessonController.sortLesson);
+
+
+
 
 
 //=====================Category=========================
@@ -131,7 +114,10 @@ InstructorRouter.post(
   InstructorController.getAllCategory
 );
 //5. get category by ID
-InstructorRouter.post("/get_category_by_id", InstructorController.getCategoryByID);
+InstructorRouter.post(
+  "/get_category_by_id",
+  InstructorController.getCategoryByID
+);
 
 //=====================Discount=========================
 //1. create discount
@@ -147,9 +133,11 @@ InstructorRouter.post(
 );
 
 // create tax report
-InstructorRouter.post("/create_tax_report", InstructorController.createTaxReport);
+InstructorRouter.post(
+  "/create_tax_report",
+  InstructorController.createTaxReport
+);
 // get tax report by instructorID
 InstructorRouter.post("/get_tax_report", InstructorController.getTaxReport);
-
 
 export default InstructorRouter;

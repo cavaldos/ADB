@@ -61,7 +61,6 @@ const UserRepo = {
     fullName: string,
     phone: string,
     address: string,
-    schoolYear: string
   ) {
     try {
       const proc = "create_student";
@@ -72,7 +71,6 @@ const UserRepo = {
         FullName: fullName,
         Phone: phone,
         Address: address,
-        SchoolYear: schoolYear,
       };
       return await DataConnect.executeProcedure(proc, params);
     } catch (error: any) {
@@ -89,7 +87,6 @@ const UserRepo = {
     fullName: string,
     phone: string,
     address: string,
-    schoolYear: string
   ) {
     try {
       const proc = "update_student";
@@ -101,7 +98,6 @@ const UserRepo = {
         FullName: fullName,
         Phone: phone,
         Address: address,
-        SchoolYear: schoolYear,
       };
       return await DataConnect.executeProcedure(proc, params);
     } catch (error: any) {
@@ -168,7 +164,19 @@ const UserRepo = {
       throw new Error(`Error updating instructor: ${error.message}`);
     }
   },
-  //7
+  //7 login 
+  async login(userName: string, password: string) {
+    try {
+      const proc = "check_user_login";
+      const params = {
+        UserName: userName,
+        Password: password,
+      };
+      return await DataConnect.executeProcedure(proc, params);
+    } catch (error: any) {
+      throw new Error(`Error login: ${error.message}`);
+    }
+  },
 };
 
 export default UserRepo;

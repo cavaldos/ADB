@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { GuestController } from "../controllers";
 const GuestRouter = Router();
-GuestRouter.post("/get_all_course", GuestController.createProduct);
+GuestRouter.post("/login", GuestController.login);
+GuestRouter.post("/register", GuestController.register);
+
 
 // register user
 // register admin

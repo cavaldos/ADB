@@ -46,7 +46,8 @@ const CartRepo = {
   // 43. Select Cart
   async selectCart(cartID: number) {
     try {
-      const query = `SELECT ca.CartID,cd.CartDetailID,co.CourseID,ca.CartStatus,co.Title,co.Subtitle, u.UserName as [InstructorName] ,co.Price,co.[Image],co.CreateTime,co.[Status] from CartDetail cd
+      const query = `SELECT ca.CartID,cd.CartDetailID,co.CourseID,co.Title,co.Subtitle, u.UserName as [InstructorName],
+                      co.Price,co.[Image],co.CreateTime,co.[Status] from CartDetail cd
                       JOIN Cart ca on ca.CartID = cd.CartID
                       join [Course] co on co.CourseID = cd.CourseID
                       JOIN [Instructor] i on co.InstructorID = i.InstructorID

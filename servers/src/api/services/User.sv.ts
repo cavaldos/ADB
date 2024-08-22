@@ -49,7 +49,7 @@ const UserService = {
     async getStudentByID(userID: number) {
         try {
         const proc = `select u.UserID,u.UserName,u.FullName,u.[Password],u.Email,u.Phone,u.Address,u.Role,u.CreatedTime,u.UpdateTime,
-                        s.StudentID,s.SchoolYear
+                        s.StudentID
                         from [User] u 
                         join [Student] s on u.UserID = s.UserID
                         where u.UserID = @UserID;`;

@@ -1,27 +1,59 @@
 import LearnRepo from "../../repositories/learn.repo";
+import { Request, Response } from "express";
 import _ from "lodash";
 
 const LearningService = {
   // Thống kê quá trình học
-  async statisticalLearnProcess(learnProcessID: number) {
+  async statisticalLearnProcess(req: Request, res: Response) {
     try {
-      const data: any = await LearnRepo.getLearnProcessDetail(learnProcessID); // Ensure that this call is awaited
-      const totalLessons = data.length;
+      const { studentID, courseID } = req.body;
+      const allLearnProcess = await LearnRepo.getAllLearnProcess(studentID);
+      const learnProcessDetail = await LearnRepo.getLearnProcessDetail(
+        courseID,
+        studentID
+      );
 
-      const statusCounts = _.countBy(data, "Status");
+      // Tính toán phần trăm học tập của từng khóa học sử dụng Lodash
+      const courseProgress = _.map(allLearnProcess, (course) => {
+        const courseLessons = _.filter(learnProcessDetail, {
+          CourseID: course.CourseID,
+        });
 
-      const statusPercentages = {
-        NotStarted: ((statusCounts.NotStarted || 0) / totalLessons) * 100,
-        InProcess: ((statusCounts.InProcess || 0) / totalLessons) * 100,
-        Done: ((statusCounts.Done || 0) / totalLessons) * 100,
-      };
+        const totalLessons = _.size(courseLessons);
+        const completedLessons = _.filter(courseLessons, {
+          StatusProcess: "Done",
+        }).length;
 
-      console.log("Status Percentages:", statusPercentages);
-      return statusPercentages; // Return the percentages
+        // Tính toán phần trăm hoàn thành
+        const progressPercentage =
+          totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
+
+        return {
+          ...course,
+          progressPercentage,
+        };
+      });
+
+      // Sắp xếp learnProcessDetail theo OrderLesson
+      const sortedLearnProcessDetail = _.orderBy(
+        learnProcessDetail,
+        ["OrderLesson"],
+        ["asc"]
+      );
+
+      return res.status(200).json({
+        message: "Statistical learn process successfully",
+        status: 200,
+        data: {
+          allLearnProcess: courseProgress,
+          learnProcessDetail: sortedLearnProcessDetail, // Trả về tất cả trạng thái và sắp xếp theo OrderLesson
+        },
+      });
     } catch (error: any) {
       throw new Error(`Error statistical learn process: ${error.message}`);
     }
   },
 };
+
 
 export default LearningService;

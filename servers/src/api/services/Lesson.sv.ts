@@ -1,43 +1,48 @@
 import LessonRepo from "../../repositories/lessson.repo";
 import _ from "lodash";
 import { VW_Lesson } from "../../interfaces/view.interface";
+import { Request, Response } from "express";
 
 const LessonService = {
   //1. get all lessons by courseID
-  async getAllLessonsByCourseID(courseID: number) {
+  async getLessonDetail(req: Request, res: Response) {
     try {
-      const lessonsVideo = await LessonRepo.getAllLessonsVideo(courseID);
-      const lessonsDocument = await LessonRepo.getAllLessonsDocument(courseID);
-      const lessonsTest = await LessonRepo.getAllLessonsTest(courseID);
+      const { lessonID } = req.body;
 
-      // Combine all lessons into one array
-      const allLessons: VW_Lesson[] = [
-        ...lessonsVideo,
-        ...lessonsDocument,
-        ...lessonsTest,
-      ];
-
-      // Group lessons by TopicName
-      const groupedByTopic = _.groupBy(allLessons, "TopicName");
-
-      // Define the order of complexity levels
-      const complexityOrder = ["Easy", "Medium", "Hard"];
-
-      // For each topic, group lessons by ComplexityLevel and sort the groups
-      const groupedLessons: Record<string, Record<string, VW_Lesson[]>> = {};
-      for (const [topic, lessons] of Object.entries(groupedByTopic)) {
-        const groupedByComplexity = _.groupBy(lessons, "ComplexityLevel");
-
-        // Sort the complexity levels
-        groupedLessons[topic] = {};
-        for (const level of complexityOrder) {
-          if (groupedByComplexity[level]) {
-            groupedLessons[topic][level] = groupedByComplexity[level];
-          }
-        }
+      let data: any = await LessonRepo.GetLessonDetailBase(lessonID);
+      const type = data[0]?.LessonType;
+    
+      let result: any;
+      if (type === "Video") {
+        result = await LessonRepo.LessonVideo.getLessonVideoByID(lessonID);
+        return res.status(200).json({
+          message: "Get lesson video successfully",
+          status: 200,
+          data: {
+            type: data[0]?.LessonType,
+            lesson: result[0],
+          },
+        });
+      } else if (type === "Document") {
+        let lessonDocumentID = data?.[0]?.LessonDocumentID;
+   
+        result = await LessonRepo.LessonDoc.getAllPagesDocument(
+          lessonDocumentID
+        );
+   
+      } else if (type === "Test") {
+        let lessonTestID = data[0].LessonTestID;
+        result = await LessonRepo.LessonTest.getAllQuestionsTest(lessonTestID);
       }
-
-      return groupedLessons;
+      return res.status(200).json({
+        message: "Get lesson detail successfully",
+        status: 200,
+        data: {
+          type: data[0]?.LessonType,
+          lesson: data[0],
+          detail: result,
+        },
+      });
     } catch (error: any) {
       throw new Error(
         `Error getting all lessons by courseID: ${error.message}`

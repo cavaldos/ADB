@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { StudentController } from "../controllers";
+import LearningService from "../services/Learing.sv";
 const StudentRouter = Router();
 StudentRouter.post("/add_to_card", StudentController.addToCart);
 StudentRouter.post("/update_cart", StudentController.updateCart);
@@ -28,19 +29,15 @@ StudentRouter.post(
   StudentController.updateLearnProcess
 );
 StudentRouter.post(
-  "/get_learn_process_detail",
-  StudentController.getLearnProcessDetail
+  "/get_all_learn_process",
+  StudentController.getAllLearnProcess
 );
-StudentRouter.post(
-  "/start_lesson_process",
-  StudentController.startLessonProcess
-);
-StudentRouter.post("/done_lesson_process", StudentController.doneLessonProcess);
 
 //statistical LearnProcess
 StudentRouter.post(
   "/statistical_learn_process",
-  StudentController.statisticalLearnProcess
+  LearningService.statisticalLearnProcess
+
 );
 
 export default StudentRouter;

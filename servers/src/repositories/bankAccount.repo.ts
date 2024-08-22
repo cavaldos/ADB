@@ -87,7 +87,7 @@ const BankAccountRepo = {
   // get bank account by userID
   async getBankAccountByUserID(userID: number) {
     try {
-      const query = `SELECT ba.BankAccountID,ba.AccountHolderName,ba.AccountBalance,ba.BankName,u.UserName,u.FullName,u.Role 
+      const query = `SELECT ba.BankAccountID,ba.AccountHolderName,ba.AccountNumber,ba.AccountBalance,ba.BankName,u.UserName,u.FullName,u.Role 
                       from BankAccount  ba
                       JOIN [User] u ON ba.UserID = [u].UserID
                       WHERE u.UserID = @userID;`;
@@ -97,7 +97,7 @@ const BankAccountRepo = {
       throw new Error(`Error fetching bank account: ${error.message}`);
     }
   },
-  // get all transfer 
+  // get all transfer
   async getAllTransfer(userID: number) {
     try {
       console.log("userID", userID);
