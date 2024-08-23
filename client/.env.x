@@ -1,6 +1,5 @@
 
 SERVER_URL=http://localhost:5001
-SERVER_SOCKET_URL=http://localhost:5002
-GroqAikey=<your_groq_ai_key>
-
-
+# SERVER_URL=http://coursera.zapto.org:5001
+SERVER_SOCKET=http://localhost:5000
+GroqAikey=sss
