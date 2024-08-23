@@ -28,7 +28,6 @@ const CourseDetail = () => {
     Image: 0,
     Price: 0,
     CreateTime: 0,
-    CategoryName: "",
     FullName: "",
   });
   const studentID = useSelector((state) => state.profile.StudentID);

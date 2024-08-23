@@ -31,7 +31,7 @@ const FinanceItem = (props) => {
   const [isEditable, setIsEditable] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const profile = useSelector((state) => state.profile);
   useEffect(() => {
     setFormData({
       BankAccountID: BankAccountID,
@@ -61,6 +61,22 @@ const FinanceItem = (props) => {
     setIsModalVisible(true);
     console.log(formData);
 
+    try {
+      const res = await PublicService.Banking.updateBankAccount(
+        formData.BankAccountID,
+        profile.UserID,
+        formData.AccountNumber,
+        formData.AccountHolderName,
+        formData.AccountBalance,
+        formData.BankName
+      );
+      if (res.status === 200) {
+        message.success("Update bank account successfully");
+        setIsModalVisible(false);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
 
   const handleRemove = async (e) => {

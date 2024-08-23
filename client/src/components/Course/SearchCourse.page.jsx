@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, memo } from "react";
 import { useLocation } from "react-router-dom";
-import { Pagination } from "@mui/material";
+import { avatarClasses, Pagination } from "@mui/material";
 import { useSelector } from "react-redux";
 
 import CourseItem from "./CourseItem";
@@ -24,12 +24,10 @@ function SearchCoursePage() {
     fetchData2,
   } = GetCourseService();
 
-
   useEffect(() => {
     setSearchString(stringTemp || "");
     fetchData2();
   }, [searchString, page, pageSize, stringTemp, state]);
-
 
   const handleChange = (event, value) => {
     setPage(value);
