@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import CartRepo from "../../repositories/cart.repo";
 import InvoiceRepo from "../../repositories/invoice.repo";
 import LearnRepo from "../../repositories/learn.repo";
-import LearningService from "../services/Learing.sv";
 const StudentController = {
   // 1. add to cart
   async addToCart(req: Request, res: Response) {

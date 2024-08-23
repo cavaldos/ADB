@@ -1,6 +1,5 @@
 import LessonRepo from "../../repositories/lessson.repo";
 import _ from "lodash";
-import { VW_Lesson } from "../../interfaces/view.interface";
 import { Request, Response } from "express";
 
 const LessonService = {

@@ -113,6 +113,7 @@ const GlobalController = {
       let topSearch = await CourseRepo.getTopSearchedCourses(searchString);
       topSearch = _.map(topSearch, (item) => {
         return _.mapKeys(item, (value, key) => {
+          console.log("key", key,value);
           return key === "SearchString" ? "Phrase" : key;
         });
       });
@@ -264,6 +265,14 @@ const GlobalController = {
   async transferMoney(req: Request, res: Response) {
     try {
       const { bankAccountID, amount, type } = req.body;
+
+      if (type !== "Deposit" && type !== "Withdraw") {
+        return res.status(400).json({
+          message: "Invalid type",
+          status: 400,
+          data: null,
+        });
+      }
       const result = await BankAccountRepo.transferMoney(
         bankAccountID,
         amount,

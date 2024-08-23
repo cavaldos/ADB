@@ -51,10 +51,10 @@ export interface VW_Answer {
   QuestionID: number;
 }
 
-export interface VW_LessonTest {
-  LessonTestID: number;
-  LessonsID: number;
-}
+// export interface VW_LessonTest {
+//   LessonTestID: number;
+//   LessonsID: number;
+// }
 
 export interface VW_LessonVideo {
   LessonVideoID: number;

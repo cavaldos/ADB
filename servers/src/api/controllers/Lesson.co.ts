@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import LessonRepo from "../../repositories/lessson.repo";
-import LessonService from "../services/Lesson.sv";
 import _ from "lodash";
 const LessonController = {
   // 1. Get All Lesson Base
@@ -24,22 +23,24 @@ const LessonController = {
       });
     }
   },
-  async getLessonDetail(req: Request, res: Response) {
-    try {
-      // const { lessonID } = req.body;
-      // const lesson = await LessonRepo.getLessonDetail(Number(lessonID));
-      // return res.status(200).json({
-      //   message: "Lesson fetched successfully",
-      //   status: 200,
-      //   data: lesson,
-      // });
-    } catch (error: any) {
-      return res.status(500).json({
-        message: `Error: ${error.message}`,
-        status: 500,
-      });
-    }
-  },
+  // async getLessonDetail(req: Request, res: Response) {
+  //   try {
+  //     const { lessonID } = req.body;
+  //     console.log("lessonID", lessonID);
+  //     // const { lessonID } = req.body;
+  //     // const lesson = await LessonRepo.getLessonDetail(Number(lessonID));
+  //     // return res.status(200).json({
+  //     //   message: "Lesson fetched successfully",
+  //     //   status: 200,
+  //     //   data: lesson,
+  //     // });
+  //   } catch (error: any) {
+  //     return res.status(500).json({
+  //       message: `Error: ${error.message}`,
+  //       status: 500,
+  //     });
+  //   }
+  // },
   LessonVideo: {
     async createLessonVideo(req: Request, res: Response) {
       try {
@@ -303,6 +304,7 @@ const LessonController = {
     async deleteQuestion(req: Request, res: Response) {
       try {
         const { questionID } = req.body;
+        console.log("questionID", questionID);
         // const lesson = await LessonRepo.LessonTest.(
         //   Number(questionID)
         // );
