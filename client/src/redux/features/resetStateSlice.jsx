@@ -5,6 +5,7 @@ export const resetStateSlice = createSlice({
   initialState: {
     state: true,
     lessonDragState: true,
+    updateBankAccount: true,
   },
   reducers: {
     resetState: (state) => {
@@ -13,8 +14,12 @@ export const resetStateSlice = createSlice({
     resetStateLessonDrag: (state) => {
       state.lessonDragState = !state.lessonDragState;
     },
+    resetStateUpdateBankAccount: (state) => {
+      state.updateBankAccount = !state.updateBankAccount;
+    },
   },
 });
 
-export const { resetState, resetStateLessonDrag } = resetStateSlice.actions;
+export const { resetState, resetStateLessonDrag, resetStateUpdateBankAccount } =
+  resetStateSlice.actions;
 export default resetStateSlice.reducer;

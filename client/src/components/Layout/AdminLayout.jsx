@@ -86,7 +86,7 @@ const AdminLayout = ({ children }) => {
       <div className="flex-1 flex">
         <Sidebar togglemenu={togglemenu} />
         <main
-          className={`flex-1 p-6 mt-headerh transition-all ${
+          className={`flex-1 p-6 mt-headerh  transition-all ${
             togglemenu ? "ml-64" : "ml-20"
           } `}
         >

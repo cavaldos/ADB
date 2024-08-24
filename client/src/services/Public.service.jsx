@@ -149,6 +149,67 @@ const PublicService = {
         return { data: null, error: error.message || "An error occurred" };
       }
     },
+    transferMoney: async (bankAccountID, amount, type) => {
+      try {
+        const response = await instance.post(`/public/transfer_money`, {
+          bankAccountID,
+          amount,
+          type: type,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    getHistoryBanking: async (bankAccountID) => {
+      try {
+        const response = await instance.post(`/public/get_history_banking`, {
+          bankAccountID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+  },
+  Forum: {
+    createDisForum: async (courseID) => {
+      try {
+        const response = await instance.post(`/public/create_forum`, {
+          courseID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    sendForumMessage: async (discussionForumID, messageContent, userID) => {
+      try {
+        const response = await instance.post(`/public/create_message_forum`, {
+          discussionForumID,
+          messageContent,
+          userID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    getAllMesForum: async (courseID) => {
+      try {
+        const response = await instance.post(`/public/get_all_mess_forum`, {
+          courseID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
   },
 };
 

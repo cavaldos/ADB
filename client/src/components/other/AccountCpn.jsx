@@ -88,7 +88,6 @@ const AccountDropdown = ({ children }) => {
 const AdminAccount = () => {
   const studentItems = [
     { name: "Profile", path: "/profile" },
-    { name: "Cart", path: "/cart" },
   ];
 
   return (

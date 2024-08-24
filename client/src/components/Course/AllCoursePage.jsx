@@ -12,8 +12,7 @@ function AllCoursePage() {
   const fetchData = async () => {
     try {
       const response = await PublicService.getAllCourse(pageSize, page);
-      console.log(response.data);
-      setCourseData(response.data.courses);
+      setCourseData(response.data.courses || []);
       setTotalCount(response.data.totalCount);
       setPage(response.data.page);
       setPageSize(response.data.pageSize);

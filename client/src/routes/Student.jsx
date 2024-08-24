@@ -42,7 +42,12 @@ const StudentRouter = [
     component: LearnProcess,
     Layout: StudentLayout,
   },
-
+  {
+    name: null,
+    path: "/learn-process/:learnProcessID",
+    component: LearnProcess,
+    Layout: StudentLayout,
+  },
   {
     name: null,
     path: "/search/:search",

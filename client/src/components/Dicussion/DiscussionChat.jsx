@@ -1,48 +1,36 @@
 import React, { useState, useEffect, useRef } from "react";
-import DiscusiionService from "./DiscusiionService";
 import { IoSend } from "react-icons/io5";
 import { Avatar, Space } from "antd";
 import Tooltip from "@mui/material/Tooltip";
 import { UserOutlined } from "@ant-design/icons";
-
-const text =
-  "message.ChatContesadfsdafdsaf sf sdf sdaf sd f sdf sd f sdf sdf sd sdf  sdf s df sdf sd fds f sdf sd fs df sdf sd f sdf sd f sdf sd fds af sdaf sd f sdf sad f sdf sad f sadf sd f dsf sd f dssdf s df sd fs df sd f sdf sdf sd f sdaf sadf sadf asd fsad fnt";
-
-const AnymousMessage = () => {
-  return (
-    <div className="flex flex-col rounded-md mb-1">
-      <div className={`p-2 gap-1my-auto`}>
-        <Tooltip title={`Anynomus`} arrow placement="top-start">
-          <Avatar className="mr-2 mt-auto" icon={<UserOutlined />} />
-        </Tooltip>
-        <Tooltip title={`inputing`} arrow placement="right-start">
-          <div
-            className={`inline-block py-1 px-2 min-h-5 my-auto min-w-[40px] rounded-md  max-w-[70%] break-words text-left bg-gray-400 text-black `}
-          >
-            <span className="loading loading-dots loading-md "></span>
-          </div>
-        </Tooltip>
-      </div>
-    </div>
-  );
-};
-
+import PublicService from "../../services/Public.service";
+import { ConvertTime } from "../../hooks/Time.utils";
 const MessageForum = ({ message }) => {
   const myId = 1; // lay my tu redux
   const firstLetter = (name) => name.charAt(0).toUpperCase();
-  const myMessage = message.userid === myId;
+  const myMessage = message.SenderID === myId;
   const GuestMessage = () => {
     return (
       <div className="flex flex-col rounded-md mb-1">
         <div className={`p-2 gap-1my-auto`}>
-          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="top-start">
-            <Avatar className="mr-2 mt-auto">{firstLetter("khandh")}</Avatar>
+          <Tooltip
+            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(message.SendTime)} - ${message.SenderName}`}
+            arrow
+            placement="top-start"
+          >
+            <Avatar className="mr-2 mt-auto">
+              {firstLetter(message.SenderName)}
+            </Avatar>
           </Tooltip>
-          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="right-start">
+          <Tooltip
+            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(message.SendTime)} - ${message.SenderName}`}
+            arrow
+            placement="right-start"
+          >
             <div
               className={`inline-block py-1 px-2 min-h-5 my-auto min-w-[40px] rounded-md  max-w-[70%] break-words text-left bg-gray-300 text-black `}
             >
-              {text}
+              {message.MessageContent}
             </div>
           </Tooltip>
         </div>
@@ -53,15 +41,25 @@ const MessageForum = ({ message }) => {
     return (
       <div className="flex flex-col rounded-md mb-1 ">
         <div className={`p-2 gap-1 flex justify-end my-auto`}>
-          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="left-start">
+          <Tooltip
+            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(message.SendTime)} - ${message.SenderName}`}
+            arrow
+            placement="left-start"
+          >
             <div
               className={`inline-block py-1 px-2 min-h-5 my-auto min-w-[40px] rounded-md  max-w-[70%] break-words text-left bg-gray-400 text-black `}
             >
-              {text}
+              {message.MessageContent}
             </div>
           </Tooltip>
-          <Tooltip title={`${"ddd"} - ${"ddd"}`} arrow placement="top-start">
-            <Avatar className="mr-2 mt-auto">{firstLetter("khandh")}</Avatar>
+          <Tooltip
+            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(message.SendTime)} - ${message.SenderName}`}
+            arrow
+            placement="top-start"
+          >
+            <Avatar className="mr-2 mt-auto">
+              {firstLetter(message.SenderName)}
+            </Avatar>
           </Tooltip>
         </div>
       </div>
@@ -76,25 +74,29 @@ const MessageForum = ({ message }) => {
 };
 
 function DiscussionChat() {
-  const { discussionID, discussions, setDiscussions } = DiscusiionService();
   const [loading, setLoading] = useState(false);
+  const [forumMesage, setForumMessage] = useState([]);
+
+  const fetchForumMessage = async () => {
+    setLoading(true);
+    try {
+      const response = await PublicService.Forum.getAllMesForum(1);
+      setForumMessage(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    fetchForumMessage();
+  }, []);
+
+  const sendForumMessage = async () => {
+    await PublicService.Forum.sendForumMessage(1, "message", 1);
+  }
+
 
   const containerRef = useRef(null);
-
-  const message = [
-    {
-      userid: 1,
-      username: "user1",
-      content: "Hello",
-      createdAt: "2021-09-20",
-    },
-    {
-      userid: 2,
-      username: "user2",
-      content: "Hi",
-      createdAt: "2021-09-20",
-    },
-  ];
 
   const handleScroll = () => {
     const container = containerRef.current;
@@ -122,9 +124,7 @@ function DiscussionChat() {
         <div
           className="bg-white p-1 rounded-md h-[80px]  opacity-65 bg-opacity-95
         flex items-center shadow-xl  shadow-blur backdrop-blur-2xl overflow-hidden"
-        >
-          dsf
-        </div>
+        ></div>
         <div className="flex-1 overflow-y-auto rounded-t-lg p-2 relative h-full pb-24 ">
           {loading && (
             <div className="flex justify-left items-left">
@@ -132,27 +132,9 @@ function DiscussionChat() {
             </div>
           )}
           {!loading &&
-            message.map((discussion, index) => (
+            forumMesage?.map((discussion, index) => (
               <MessageForum key={index} message={discussion} />
             ))}
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-          <MessageForum message={message} />
-
-          <AnymousMessage />
         </div>
         <div className="bg-white flex border rounded-3xl absolute bottom-4 right-4 left-4  min-w-auto shadow-2xl ">
           <input

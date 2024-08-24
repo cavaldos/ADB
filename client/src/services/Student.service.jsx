@@ -1,4 +1,3 @@
-import { auto } from "@popperjs/core";
 import instance from "./axios.config";
 
 const StudentService = {
@@ -49,6 +48,64 @@ const StudentService = {
           courseID: courseID,
           studentID: studentID,
         });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+  },
+
+  Learn: {
+    statisticalLearnProcess: async (studentID, courseID) => {
+      try {
+        const response = await instance.post(
+          `/student/statistical_learn_process`,
+          {
+            courseID: courseID,
+            studentID: studentID,
+          }
+        );
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+
+    startLearnProcess: async (studentID, courseID) => {
+      try {
+        const response = await instance.post(`/student/start_learn_process`, {
+          courseID: courseID,
+          studentID: studentID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    updateLearnProcess: async (learnProcessID, status, studentID) => {
+      try {
+        const response = await instance.post(`/student/update_learn_process`, {
+          learnProcessID: learnProcessID,
+          status: status,
+          studentID: studentID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    getLearnReady: async (studentID) => {
+      try {
+        const response = await instance.post(
+          `/student/get_my_course_to_learn`,
+          {
+            studentID: studentID,
+          }
+        );
         return response;
       } catch (error) {
         console.error("Error fetching data: ", error);
