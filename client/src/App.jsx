@@ -20,7 +20,7 @@ function App() {
     if (role === "Guest" || role === "") return GuestRouter;
     else return GuestRouter;
   };
-
+  console.log("khanh",import.meta.env.SERVER_URL);
   return (
     <>
       <Router>
