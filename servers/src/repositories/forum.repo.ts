@@ -32,7 +32,11 @@ const ForumRepo = {
     }
   },
   // 3. delete DiscussionForum
-  async deleteDiscussionForum(DiscussionForumID: number, forumMessageID: number,userID: number) {
+  async deleteDiscussionForum(
+    DiscussionForumID: number,
+    forumMessageID: number,
+    userID: number
+  ) {
     try {
       const proc = "delete_message_forum";
       const params = {
@@ -41,6 +45,17 @@ const ForumRepo = {
         UserID: userID,
       };
       return await DataConnect.executeProcedure(proc, params);
+    } catch (error: any) {
+      throw new Error(`Error starting learn process: ${error.message}`);
+    }
+  },
+  getAllMessageForum(courseID: number) {
+    try {
+      const query = `select fr.*,[u].FullName as SenderName from [ForumMessage] fr 
+                    join [DiscussionForum] df on fr.DiscussionForumID = df.ForumID
+                    join [User] u on fr.SenderID = u.UserID
+                    where df.CourseID = @courseID`;
+      return DataConnect.executeWithParams(query, { courseID });
     } catch (error: any) {
       throw new Error(`Error starting learn process: ${error.message}`);
     }

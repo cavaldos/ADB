@@ -94,7 +94,7 @@ const LearnRepo = {
   },
   async getLearnProcessDetail(courseID: number, studentID: number) {
     try {
-      const query = `SELECT lp.StatusProcess,l.* FROM LearnProcess lp
+      const query = `SELECT lp.StatusProcess,lp.LearnProcessID,l.* FROM LearnProcess lp
                     join Course c on lp.CourseID = c.CourseID
                     join Student s on lp.StudentID = s.StudentID
                     join Lessons l on lp.LessonsID = l.LessonsID 

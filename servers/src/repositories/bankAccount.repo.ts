@@ -107,6 +107,15 @@ const BankAccountRepo = {
       throw new Error(`Error fetching transfer: ${error.message}`);
     }
   },
+
+  getHistoryBanking: async (bankAccountID: number) => {
+    try {
+      const query = `select * from [HistoryBanking] WHERE BankAccountID = @bankAccountID;`;
+      return await DataConnect.executeWithParams(query, { bankAccountID });
+    } catch (error: any) {
+      throw new Error(`Error fetching transfer: ${error.message}`);
+    }
+  },
 };
 
 export default BankAccountRepo;

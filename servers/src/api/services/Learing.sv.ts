@@ -12,9 +12,13 @@ const LearningService = {
         courseID,
         studentID
       );
+      // Lọc ra khóa học có courseID trùng với courseID được truyền vào
+      const filteredLearnProcess = _.filter(allLearnProcess, {
+        CourseID: courseID,
+      });
 
       // Tính toán phần trăm học tập của từng khóa học sử dụng Lodash
-      const courseProgress = _.map(allLearnProcess, (course) => {
+      const courseProgress = _.map(filteredLearnProcess, (course) => {
         const courseLessons = _.filter(learnProcessDetail, {
           CourseID: course.CourseID,
         });
@@ -45,7 +49,7 @@ const LearningService = {
         message: "Statistical learn process successfully",
         status: 200,
         data: {
-          allLearnProcess: courseProgress,
+          allLearnProcess: courseProgress, // Chỉ trả về các khóa học có courseID trùng với courseID đầu vào
           learnProcessDetail: sortedLearnProcessDetail, // Trả về tất cả trạng thái và sắp xếp theo OrderLesson
         },
       });
@@ -54,6 +58,5 @@ const LearningService = {
     }
   },
 };
-
 
 export default LearningService;

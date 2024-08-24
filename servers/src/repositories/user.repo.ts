@@ -60,7 +60,7 @@ const UserRepo = {
     email: string,
     fullName: string,
     phone: string,
-    address: string,
+    address: string
   ) {
     try {
       const proc = "create_student";
@@ -86,7 +86,7 @@ const UserRepo = {
     email: string,
     fullName: string,
     phone: string,
-    address: string,
+    address: string
   ) {
     try {
       const proc = "update_student";
@@ -164,7 +164,7 @@ const UserRepo = {
       throw new Error(`Error updating instructor: ${error.message}`);
     }
   },
-  //7 login 
+  //7 login
   async login(userName: string, password: string) {
     try {
       const proc = "check_user_login";
@@ -177,6 +177,40 @@ const UserRepo = {
       throw new Error(`Error login: ${error.message}`);
     }
   },
+
+  async getAllInstructor() {
+    try {
+      const query = `SELECT u.*,i.InstructorID, i.[Level],i.[Status]
+                    FROM [User] u
+                    JOIN Instructor i ON u.UserID = i.UserID;
+                    `;
+      const params = {};
+      return await DataConnect.executeWithParams(query, params);
+    } catch (error: any) {
+      throw new Error(`Error getting all instructors: ${error.message}`);
+    }
+  },
+
+
+
+
+  async upDateInstructorByAdmin(instructorID: number, level: string, status: string) {
+    try {
+      const query = `
+                  UPDATE [Instructor]
+                  SET [Level] = @level,
+                      [Status] = @status
+                  WHERE [InstructorID] = @instructorID;`;
+      const params = {
+        InstructorID: instructorID,
+        Level: level,
+        Status: status,
+      };
+      return await DataConnect.executeWithParams(query, params);
+    } catch (error: any) {
+      throw new Error(`Error updating instructor: ${error.message}`);
+    }
+  }
 };
 
 export default UserRepo;
