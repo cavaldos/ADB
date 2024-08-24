@@ -15,7 +15,11 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: [
       "Content-Type",
-      "Authorization, Origin, X-Requested-With, Accept",
+      "Content-Type",
+      "Authorization",
+      "Origin",
+      "X-Requested-With",
+      "Accept",
       "X-HTTP-Method-Override",
       "x-access-token",
       "x-custom-header",
