@@ -10,30 +10,45 @@
 
 # Function to remove Docker container
 remove_container() {
-    docker rm -f coursera-client
-    docker rmi -f coursera-app-image
-
+    # Xóa container nếu tồn tại
+    docker rm -f coursera-client 2>/dev/null || true
+    # Xóa image nếu tồn tại
+    docker rmi -f coursera-app-image 2>/dev/null || true
 }
+
 rebuild_container() {
-    docker rm -f coursera-client
-    docker rmi -f coursera-vite
+    # Xóa container nếu tồn tại
+    docker rm -f coursera-client 2>/dev/null || true
+    # Xóa image nếu tồn tại
+    docker rmi -f coursera-vite 2>/dev/null || true
+    # Xây dựng lại Docker image
     docker build -t coursera-vite .
-    docker run -p 81:5173   --name coursera-client --restart always coursera-vite
+    # Kiểm tra và chạy container
+    if [ "$(docker ps -q -f name=coursera-client)" ]; then
+        echo "Container coursera-client is already running."
+    else
+        docker run -p 81:5173 --name coursera-client --restart always coursera-vite
+    fi
 }
+
 build_container() {
+    # Xây dựng Docker image
     docker build -t coursera-vite .
-    docker run -p 81:5173   --name coursera-client --restart always coursera-vite
+    # Kiểm tra và chạy container
+    if [ "$(docker ps -q -f name=coursera-client)" ]; then
+        echo "Container coursera-client is already running."
+    else
+        docker run -p 81:5173 --name coursera-client --restart always coursera-vite
+    fi
 }
 
-
-
-# Main menu
+# Menu chính
 echo "What do you want to do?"
 echo "1. Remove Docker container"
 echo "2. Rebuild Docker container"
 echo "3. Build Docker container"
 
-read -p "Please enter your choice [1-2]: " choice
+read -p "Please enter your choice [1-3]: " choice
 
 case $choice in
   1)
@@ -49,6 +64,6 @@ case $choice in
     build_container
     ;;
   *)
-    echo "Invalid option, please select a number between 1 and 5."
+    echo "Invalid option, please select a number between 1 and 3."
     ;;
 esac

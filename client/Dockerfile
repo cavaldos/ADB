@@ -2,13 +2,14 @@
 FROM node:20-alpine
 
 # Thiết lập thư mục làm việc trong container
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Sao chép file package.json và yarn.lock vào thư mục làm việc
-COPY package.json yarn.lock ./
+COPY package*.json ./
+COPY yarn.lock ./
 
 # Cài đặt các dependencies
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 # Sao chép toàn bộ mã nguồn vào container
 COPY . .
@@ -20,4 +21,4 @@ RUN yarn build
 EXPOSE 5173
 
 # Lệnh khởi động Vite server
-CMD ["yarn", "dev"]
+CMD ["yarn", "preview"]
