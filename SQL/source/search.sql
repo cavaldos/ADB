@@ -92,6 +92,9 @@ GO
 
 
 
+
+
+
 -- Check if the procedure already exists, and drop it if it does
 IF OBJECT_ID('sudo_reset_log_search', 'P') IS NOT NULL
     DROP PROCEDURE sudo_reset_log_search;

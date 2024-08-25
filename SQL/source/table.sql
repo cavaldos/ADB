@@ -50,7 +50,7 @@ GO
 CREATE TABLE [PageDocument] (
   [PageDocumentID] integer PRIMARY KEY IDENTITY(1, 1),
   [Content] nvarchar(500),
-  [Page] integer UNIQUE,
+  [Page] integer,
   [LessonDocumentID] integer
 )
 GO
@@ -246,8 +246,8 @@ CREATE TABLE [Transfer] (
   [TransactionTime] datetime,
   [Amount] float,
   [TransferDescription] nvarchar(500),
-  [BankAccountIDReceiver] integer,
-  [BankAccountIDSender] integer,
+  [BankBeneficiaryID] integer,
+  [BankOrderingID] integer,
   [InvoiceID] integer
 )
 GO
@@ -255,10 +255,10 @@ GO
 CREATE TABLE [BankAccount] (
   [BankAccountID] integer PRIMARY KEY IDENTITY(1, 1),
   [AccountNumber] varchar(20) UNIQUE,
-  [AccountHolderName] varchar(20),
+  [AccountHolderName] varchar(50),
   [AccountBalance] float,
-  [BankName] varchar(10),
-  [UserID] integer
+  [BankName] varchar(50),
+  [UserID] integer UNIQUE
 )
 GO
 
@@ -279,6 +279,7 @@ CREATE TABLE [Invoice] (
   [InvoiceDate] datetime,
   [TotalAmount] float,
   [InvoiceStatus] nvarchar(255) NOT NULL CHECK ([InvoiceStatus] IN ('Paied', 'UnPaied')),
+  [TransferID] integer DEFAULT (null),
   [StudentID] integer
 )
 GO
@@ -295,6 +296,7 @@ GO
 
 CREATE TABLE [Tax] (
   [TaxID] integer PRIMARY KEY IDENTITY(1, 1),
+  [TaxCode] nvarchar(25),
   [TaxPercentage] float DEFAULT (10),
   [EffectiveDate] datetime,
   [InstructorID] integer
@@ -412,10 +414,7 @@ GO
 ALTER TABLE [Transfer] ADD FOREIGN KEY ([BankOrderingID]) REFERENCES [BankAccount] ([BankAccountID])
 GO
 
-ALTER TABLE [Transfer] ADD FOREIGN KEY ([TransferTotalID]) REFERENCES [TransferTotal] ([TransferTotalID])
-GO
-
-ALTER TABLE [TransferTotal] ADD FOREIGN KEY ([InvoiceID]) REFERENCES [Invoice] ([InvoiceID])
+ALTER TABLE [Transfer] ADD FOREIGN KEY ([InvoiceID]) REFERENCES [Invoice] ([InvoiceID])
 GO
 
 ALTER TABLE [BankAccount] ADD FOREIGN KEY ([UserID]) REFERENCES [User] ([UserID])

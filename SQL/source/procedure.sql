@@ -217,39 +217,41 @@ BEGIN
 END;
 GO
 
+
+
 -- 10. Create the procedure to update course
 IF OBJECT_ID('update_course', 'P') IS NOT NULL
     DROP PROCEDURE update_course;
 GO
 CREATE PROCEDURE update_course
-    @CourseID integer,
-    @Title varchar(255),
-    @Subtitle varchar(255),
-    @Description nvarchar(max),
-    @Language varchar(20),
-    @Image varchar(50),
-    @Price float,
-    @Status nvarchar(20),
-    @HistoryMessage nvarchar(255)
+    @CourseID INTEGER,
+    @Title VARCHAR(255),
+    @Subtitle VARCHAR(255),
+    @Description NVARCHAR(MAX),
+    @Language VARCHAR(20),
+    @Image VARCHAR(50),
+    @Price FLOAT,
+    @Status NVARCHAR(20),
+    @HistoryMessage NVARCHAR(255)
 AS
 BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
         
-        DECLARE @OldTitle varchar(255),
-                @OldSubtitle varchar(255),
-                @OldDescription nvarchar(max),
-                @OldLanguage varchar(20),
-                @OldImage varchar(50),
-                @OldPrice float,
-                @OldStatus nvarchar(20),
-                @NewTitle varchar(255),
-                @NewSubtitle varchar(255),
-                @NewDescription nvarchar(max),
-                @NewLanguage varchar(20),
-                @NewImage varchar(50),
-                @NewPrice float,
-                @NewStatus nvarchar(20);
+        DECLARE @OldTitle VARCHAR(255),
+                @OldSubtitle VARCHAR(255),
+                @OldDescription NVARCHAR(MAX),
+                @OldLanguage VARCHAR(20),
+                @OldImage VARCHAR(50),
+                @OldPrice FLOAT,
+                @OldStatus NVARCHAR(20),
+                @NewTitle VARCHAR(255),
+                @NewSubtitle VARCHAR(255),
+                @NewDescription NVARCHAR(MAX),
+                @NewLanguage VARCHAR(20),
+                @NewImage VARCHAR(50),
+                @NewPrice FLOAT,
+                @NewStatus NVARCHAR(20);
 
         -- Get the current course information
         SELECT @OldTitle = Title, @OldSubtitle = Subtitle, @OldDescription = Description, 
@@ -286,19 +288,20 @@ BEGIN
                 Price = @NewPrice,
                 Status = @NewStatus
             WHERE CourseID = @CourseID;
-            RAISERROR ('Course updated successfully.',16,1);
+
+            PRINT 'Course updated successfully.';
         END
         ELSE
         BEGIN
-        RAISERROR ('Information has not been changed.',16,1);
+            PRINT 'No changes were made as the information provided is the same as the existing one.';
         END
-        
+
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR ('Error occurred while updating course.',16,1);
-        PRINT ERROR_MESSAGE();
+        RAISERROR ('Error occurred while updating course.', 16, 1);
+        RETURN;
     END CATCH
 END;
 GO
@@ -2084,7 +2087,6 @@ END;
 GO
 
 
-
 -- 49. Create the procedure update bank account (update account number, account holder name, account balance, bank name)
 IF OBJECT_ID('update_bank_account', 'P') IS NOT NULL
     DROP PROCEDURE update_bank_account;
@@ -2265,7 +2267,6 @@ IF OBJECT_ID('create_transfer_course', 'P') IS NOT NULL
     DROP PROCEDURE create_transfer_course;
 GO
 CREATE PROCEDURE create_transfer_course
-    @TransferTotalID integer = NULL,
     @Amount float,
     @TransferDescription nvarchar(255) = NULL,
     @BankBeneficiaryID integer = NULL,
@@ -2306,8 +2307,8 @@ BEGIN
         END
 
         -- Insert a new transfer record
-        INSERT INTO [Transfer] (TransactionTime, Amount, TransferDescription, BankBeneficiaryID, BankOrderingID, TransferTotalID)
-        VALUES (GETDATE(), @Amount, @TransferDescription, @BankBeneficiaryID, @BankOrderingID, @TransferTotalID);
+        INSERT INTO [Transfer] (TransactionTime, Amount, TransferDescription, BankBeneficiaryID, BankOrderingID, InvoiceID)
+        VALUES (GETDATE(), @Amount, @TransferDescription, @BankBeneficiaryID, @BankOrderingID, NULL);
 
         -- Update the bank balances
         EXEC transfer_money @BankOrderingID, @Amount, 'Withdrawal';
@@ -2344,15 +2345,7 @@ BEGIN
         -- Check if the invoice exists and is unpaid
         IF NOT EXISTS (SELECT 1 FROM [Invoice] WHERE InvoiceID = @InvoiceID AND InvoiceStatus = 'UnPaied')
         BEGIN
-            RAISERROR('Invoice does not exist or is already paid.',16,1);
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-
-        -- if hoa don da thanh thoan roi thi khong the thanh toan nua
-        IF EXISTS (SELECT 1 FROM [Invoice] WHERE InvoiceID = @InvoiceID AND InvoiceStatus = 'Paied')
-        BEGIN
-            RAISERROR('Invoice is already paid.',16,1);
+            RAISERROR('Invoice does not exist or is already paid.', 16, 1);
             ROLLBACK TRANSACTION;
             RETURN;
         END
@@ -2369,19 +2362,14 @@ BEGIN
         FROM [BankAccount] ba
         JOIN [Student] s ON ba.UserID = s.UserID
         WHERE s.StudentID = @StudentID;
-  
+
         -- Check if the student has a bank account
         IF @StudentBankAccountID IS NULL
         BEGIN
-            RAISERROR('Student does not have a bank account.',16,1);
+            RAISERROR('Student does not have a bank account.', 16, 1);
             ROLLBACK TRANSACTION;
             RETURN;
         END
-         -- Create a TransferTotal entry for the invoice
-        DECLARE @TransferTotalIDnew integer;
-        INSERT INTO TransferTotal (InvoiceID)
-        VALUES (@InvoiceID);
-        SET @TransferTotalIDnew = SCOPE_IDENTITY();
 
         -- Retrieve the course and instructor details from the invoice
         DECLARE @CourseID integer, @InstructorID integer, @Amount float;
@@ -2407,7 +2395,7 @@ BEGIN
             -- Check if the instructor has a bank account
             IF @InstructorBankAccountID IS NULL
             BEGIN
-                RAISERROR('Instructor does not have a bank account.',16,1);
+                RAISERROR('Instructor does not have a bank account.', 16, 1);
                 ROLLBACK TRANSACTION;
                 CLOSE course_cursor;
                 DEALLOCATE course_cursor;
@@ -2418,12 +2406,8 @@ BEGIN
             DECLARE @TransferDescription nvarchar(255);
             SET @TransferDescription = 'Payment for course ' + CAST(@CourseID AS nvarchar(50));
 
-            EXEC create_transfer_course
-                @TransferTotalID = @TransferTotalIDnew,
-                @Amount = @Amount,
-                @TransferDescription = @TransferDescription,
-                @BankBeneficiaryID = @InstructorBankAccountID,
-                @BankOrderingID = @StudentBankAccountID;
+            INSERT INTO [Transfer] (TransactionTime, Amount, TransferDescription, BankBeneficiaryID, BankOrderingID, InvoiceID)
+            VALUES (GETDATE(), @Amount, @TransferDescription, @InstructorBankAccountID, @StudentBankAccountID, @InvoiceID);
 
             FETCH NEXT FROM course_cursor INTO @CourseID, @InstructorID, @Amount;
         END
@@ -2438,7 +2422,7 @@ BEGIN
 
         -- Commit the transaction
         COMMIT TRANSACTION;
-        PRINT'Payments processed successfully and invoice status updated to paid.';
+        PRINT 'Payments processed successfully and invoice status updated to paid.';
     END TRY
     BEGIN CATCH
         -- Rollback the transaction if an error occurs
@@ -2448,6 +2432,7 @@ BEGIN
     END CATCH
 END;
 GO
+
 
 
 

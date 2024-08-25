@@ -91,7 +91,7 @@ Table LessonDocument {
 Table PageDocument {
   PageDocumentID integer [primary key , increment]
   Content nvarchar(500)
-  Page integer [unique]// delete on ascade
+  Page integer 
   LessonDocumentID integer [ref: > LessonDocument.LessonDocumentID]
 }
 
@@ -264,22 +264,17 @@ Table Transfer {
   TransferDescription nvarchar(500)
   BankBeneficiaryID integer [ref:> BankAccount.BankAccountID]
   BankOrderingID integer [ref:> BankAccount.BankAccountID]
-  TransferTotalID integer [ref: > TransferTotal.TransferTotalID, default:null]
-}
-
-//
-Table TransferTotal {
-  TransferTotalID integer [primary key , increment]
   InvoiceID integer [ref:> Invoice.InvoiceID] 
 }
-///
+
+
 Table BankAccount {
   BankAccountID integer [primary key, increment]
   AccountNumber varchar(20) [unique]
-  AccountHolderName varchar(20)
+  AccountHolderName varchar(50)
   AccountBalance float
-  BankName varchar(10)
-  UserID integer [ref: > User.UserID]
+  BankName varchar(50)
+  UserID integer [ref: > User.UserID, unique]
 }
 Table HistoryBanking{
   HistoryBankingID integer [primary key, increment]
@@ -307,7 +302,7 @@ Table Invoice {
 Table InvoiceDetail {
   InvoiceDetailID integer [primary key , increment]
   Price float
-  DiscountPrice float
+  DiscountPrice float 
   DiscountID integer [ref:> Discount.DiscountID, default: null]
   InvoiceID integer [ref: > Invoice.InvoiceID]
   CourseID integer [ref: > Course.CourseID]
@@ -315,6 +310,7 @@ Table InvoiceDetail {
 
 Table Tax {
   TaxID integer [primary key , increment]
+  TaxCode nvarchar(25)
   TaxPercentage float [default: 10]
   EffectiveDate datetime
   InstructorID integer [ref: > Instructor.InstructorID]

@@ -24,7 +24,7 @@ GO
 -- 2. trigger để kiểm tra xem khóa học đã được thanh toán trong Invoice chưa
 CREATE TRIGGER trg_PreventDuplicateCourseInInvoiceDetail
 ON InvoiceDetail
-BEFORE INSERT
+AFTER INSERT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -62,7 +62,7 @@ GO
 -- 3. trigger để kiểm tra xem người gửi và người nhận trong Chat có phải là cùng một người không
 CREATE TRIGGER trg_PreventSelfMessaging
 ON Chat
-BEFORE INSERT
+AFTER INSERT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -80,10 +80,11 @@ BEGIN
 END
 GO
 
+
 -- 4. trigger để kiểm tra xem mã giảm giá đã hết hạn chưa
 CREATE TRIGGER trg_PreventExpiredDiscount
 ON InvoiceDetail
-BEFORE INSERT
+AFTER INSERT
 AS
 BEGIN
     SET NOCOUNT ON;
