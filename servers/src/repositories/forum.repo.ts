@@ -15,14 +15,14 @@ const ForumRepo = {
   },
   // 2. create DiscussionForum message
   async createDiscussionForumMessage(
-    discussionForumID: number,
+    courseID: number,
     messageContent: string,
     userID: number
   ) {
     try {
       const proc = "create_message_forum";
       const params = {
-        DiscussionForumID: discussionForumID,
+        CourseID: courseID,
         MessageContent: messageContent,
         UserID: userID,
       };

@@ -734,9 +734,9 @@ const GlobalController = {
     },
     async createMess(req: Request, res: Response) {
       try {
-        const { discussionForumID, messageContent, userID } = req.body;
+        const { courseID, messageContent, userID } = req.body;
         await ForumRepo.createDiscussionForumMessage(
-          discussionForumID,
+          courseID,
           messageContent,
           userID
         );
