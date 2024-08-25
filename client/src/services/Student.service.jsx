@@ -42,6 +42,7 @@ const StudentService = {
     },
   },
   Invoice: {
+
     createInvoice: async (studentID, courseID) => {
       try {
         const response = await instance.post(`/student/create_invoice`, {
@@ -54,6 +55,66 @@ const StudentService = {
         return { data: null, error: error.message || "An error occurred" };
       }
     },
+
+    applyDiscountCode: async (discountCode, invoiceDetailID) => {
+      try {
+        const response = await instance.post(`/student/apply_discount_code`, {
+          discountCode: discountCode,
+          invoiceDetailID: invoiceDetailID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    deleteInvoiceDetail: async (invoiceDetailID) => {
+      try {
+        const response = await instance.post(`/student/delete_invoice_detail`, {
+          invoiceDetailID: invoiceDetailID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    getInvoiceDetails: async (invoiceID) => {
+      try {
+        const response = await instance.post(`/student/get_invoice_details`, {
+          invoiceID: invoiceID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    getAllInvoiceByStudentID: async (studentID) => {
+      try {
+        const response = await instance.post(
+          `/student/get_all_invoice_by_studentid`,
+          {
+            studentID: studentID,
+          }
+        );
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    },
+    paymentInvoice: async (invoiceID) => {
+      try {
+        const response = await instance.post(`/student/payment_invoice`, {
+          invoiceID: invoiceID,
+        });
+        return response;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        return { data: null, error: error.message || "An error occurred" };
+      }
+    }
   },
 
   Learn: {

@@ -7,6 +7,7 @@ const Cart = lazy(() => import("~/pages/student/Cart.page"));
 const Learning = lazy(() => import("~/pages/student/LearningPage"));
 const LearnProcess = lazy(() => import("~/pages/student/LearnProcess.page"));
 const Invoice = lazy(() => import("~/pages/student/Invoice.page"));
+const InvoiceDetail = lazy(() => import("~/pages/student/InvoiceDetails.page"));
 const Profile = lazy(() => import("~/components/Profile/Profile"));
 const ChatPage = lazy(() => import("~/pages/student/ChatPage"));
 const ProfileLayout = lazy(() => import("~/components/Layout/ProfileLayout"));
@@ -28,6 +29,12 @@ const StudentRouter = [
     name: "Invoice",
     path: "/invoice",
     component: Invoice,
+    Layout: StudentLayout,
+  },
+  {
+    name: null,
+    path: "/invoice-detail/:invoiceID",
+    component: InvoiceDetail,
     Layout: StudentLayout,
   },
   {

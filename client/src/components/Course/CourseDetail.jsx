@@ -15,9 +15,10 @@ import { useParams } from "react-router-dom";
 import CourseService from "../../services/Course.service";
 import { ConvertTime } from "../../hooks/Time.utils";
 import { renderUrl } from "../../hooks/GetURLImage";
-import LessonItemList from "../Lesson/LessonItemList";
+import LessonItemListPro from "../Lesson/LessonItemListPro";
 import StudentService from "../../services/Student.service";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 const CourseDetail = () => {
   const { courseID } = useParams();
   const [courseData, setCourseData] = useState({
@@ -31,6 +32,8 @@ const CourseDetail = () => {
     FullName: "",
   });
   const studentID = useSelector((state) => state.profile.StudentID);
+  const profile = useSelector((state) => state.profile);
+  const navigate = useNavigate();
   const fetchCourseDetail = async () => {
     try {
       const response = await CourseService.getCourseDetail(courseID);
@@ -44,6 +47,14 @@ const CourseDetail = () => {
   }, [courseID]);
 
   const handleAddToCart = async () => {
+    if (profile.Role === "Guest") {
+      message.error("Please login to add to cart");
+      setTimeout(() => {
+        navigate("/signin");
+      }, 1000);
+      return;
+    }
+
     await StudentService.Cart.addtoCart(studentID, courseID).then((res) => {
       if (res.status === 200) {
         message.success("Add to cart success");
@@ -102,7 +113,7 @@ const CourseDetail = () => {
 
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
               <h2 className="text-xl font-bold mb-4">What you'll learn</h2>
-              <LessonItemList />
+              <LessonItemListPro />
             </div>
           </div>
 
