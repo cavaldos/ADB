@@ -1,36 +1,44 @@
+# docker rm -f cousera
+
+# docker rmi -f coursera-app-image
+
+# docker build -t coursera-app-image .
+
+# docker run -p 5001:5001 -p 5002:5002  --name cousera --restart always coursera-app-image
+
 #!/bin/bash
 
 # Function to remove Docker container
 remove_container() {
     # Xóa container nếu tồn tại
-    sudo docker rm -f coursera-client 2>/dev/null || true
+    docker rm -f coursera-client 2>/dev/null || true
     # Xóa image nếu tồn tại
-    sudo docker rmi -f coursera-app-image 2>/dev/null || true
+    docker rmi -f coursera-app-image 2>/dev/null || true
 }
 
 rebuild_container() {
     # Xóa container nếu tồn tại
-    sudo docker rm -f coursera-client 2>/dev/null || true
+    docker rm -f coursera-client 2>/dev/null || true
     # Xóa image nếu tồn tại
-    sudo docker rmi -f coursera-vite 2>/dev/null || true
+    docker rmi -f coursera-vite 2>/dev/null || true
     # Xây dựng lại Docker image
-    sudo docker build -t coursera-vite .
+    docker build -t coursera-vite .
     # Kiểm tra và chạy container
-    if [ "$(sudo docker ps -q -f name=coursera-client)" ]; then
+    if [ "$(docker ps -q -f name=coursera-client)" ]; then
         echo "Container coursera-client is already running."
     else
-        sudo docker run -p 80:5173 --name coursera-client --restart always coursera-vite
+        docker run -p 5173:5173 --name coursera-client --restart always coursera-vite
     fi
 }
 
 build_container() {
     # Xây dựng Docker image
-    sudo docker build -t coursera-vite .
+    docker build -t coursera-vite .
     # Kiểm tra và chạy container
-    if [ "$(sudo docker ps -q -f name=coursera-client)" ]; then
+    if [ "$(docker ps -q -f name=coursera-client)" ]; then
         echo "Container coursera-client is already running."
     else
-        sudo docker run -p 80:5173 --name coursera-client --restart always coursera-vite
+        docker run -p 5173:5173 --name coursera-client --restart always coursera-vite
     fi
 }
 
