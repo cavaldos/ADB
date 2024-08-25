@@ -15,7 +15,7 @@ remove_container() {
 
 }
 rebuild_container() {
-    docker rm -f cousera
+    docker rm -f coursera-client
     docker rmi -f coursera-vite
     docker build -t coursera-vite .
     docker run -p 81:5173   --name coursera-client --restart always coursera-vite
