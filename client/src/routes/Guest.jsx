@@ -2,8 +2,11 @@ import { lazy } from "react";
 const GuestLayout = lazy(() => import("~/components/Layout/GuestLayout"));
 
 const HomeGuest = lazy(() => import("~/pages/guest/index"));
-const SignIn = lazy(() => import("~/pages/guest/signin"));
-const SignUp = lazy(() => import("~/pages/guest/signup"));
+// const SignIn = lazy(() => import("~/pages/guest/signin"));
+// const SignUp = lazy(() => import("~/pages/guest/signup"));
+import SignIn from "../pages/guest/signIn";
+
+import SignUp from "../pages/guest/signUp";
 const SearchCourse = lazy(() => import("~/pages/guest/SearchCourse"));
 const CourseDetail = lazy(() => import("~/pages/guest/CourseDetail.page"));
 const GuestRouter = [
