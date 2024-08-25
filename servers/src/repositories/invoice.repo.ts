@@ -57,7 +57,7 @@ const InvoiceRepo = {
   //get Invoice by studentID
   async getALlInvoiceByStudentID(studentID: number) {
     try {
-      const query = `select iv.InvoiceID,iv.InvoiceDate,iv.TotalAmount, iv.TransferID, iv.[Status],
+      const query = `select iv.InvoiceID,iv.InvoiceDate,iv.TotalAmount, iv.TransferID, iv.[InvoiceStatus],
                       t.TransactionTime,t.TransferDescription,
                       u.UserName,u.Address,u.FullName,u.Email,u.Phone
                       from Invoice iv 
@@ -66,10 +66,25 @@ const InvoiceRepo = {
                       LEFT JOIN Transfer t ON iv.TransferID = t.TransferID
                       where s.StudentID = @studentID;`;
       const reslut = await DataConnect.executeWithParams(query, { studentID });
-      const data = _.groupBy(reslut, "Status");
-      return data;
+      const data = _.groupBy(reslut, "InvoiceStatus");
+      return {
+        type1: reslut,
+        type2: data,
+      };
     } catch (error: any) {
       throw new Error(`Error fetching invoice: ${error.message}`);
+    }
+  },
+  //5. payment invoice
+  async paymentInvoice(invoiceID: number) {
+    try {
+      const proc = "process_payment";
+      const params = {
+        InvoiceID: invoiceID,
+      };
+      return await DataConnect.executeProcedure(proc, params);
+    } catch (error: any) {
+      throw new Error(`Error updating total amount: ${error.message}`);
     }
   },
 };

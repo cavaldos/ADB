@@ -5,7 +5,7 @@ FROM node:18.12.1
 WORKDIR /usr/src/app
 
 # Copy package.json và package-lock.json (hoặc yarn.lock nếu bạn sử dụng Yarn)
-COPY package*.json ./
+# COPY package*.json ./
 COPY yarn.lock ./
 
 # Cài đặt các phụ thuộc
