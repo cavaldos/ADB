@@ -27,7 +27,7 @@ rebuild_container() {
     if [ "$(docker ps -q -f name=coursera-client)" ]; then
         echo "Container coursera-client is already running."
     else
-        docker run -p 81:5173 --name coursera-client --restart always coursera-vite
+        docker run -p 5173:5173 --name coursera-client --restart always coursera-vite
     fi
 }
 
@@ -38,7 +38,7 @@ build_container() {
     if [ "$(docker ps -q -f name=coursera-client)" ]; then
         echo "Container coursera-client is already running."
     else
-        docker run -p 81:5173 --name coursera-client --restart always coursera-vite
+        docker run -p 5173:5173 --name coursera-client --restart always coursera-vite
     fi
 }
 
