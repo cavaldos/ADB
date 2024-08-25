@@ -5,7 +5,7 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 # Sao chép file package.json và yarn.lock vào thư mục làm việc
-COPY package*.json ./
+# COPY package*.json ./
 COPY yarn.lock ./
 
 # Cài đặt các dependencies
