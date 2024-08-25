@@ -1,6 +1,5 @@
 import React from "react";
 import DicussionList from "../../components/Dicussion/DicussionList";
-import DiscusiionService from "../../components/Dicussion/DiscusiionService";
 import DiscussionChat from "../../components/Dicussion/DiscussionChat";
 function Discussion() {
   return (

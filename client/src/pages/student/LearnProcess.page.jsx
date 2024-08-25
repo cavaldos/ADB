@@ -8,7 +8,8 @@ import { setActiveTabSlice } from "../../redux/features/globalState";
 import { MdOutlineForum } from "react-icons/md";
 import { IoDocumentText } from "react-icons/io5";
 import StudentService from "../../services/Student.service";
-
+import { useParams } from "react-router-dom";
+import {setForumID} from "../../redux/features/globalState";
 const Sidebar = (props) => {
   const {
     CourseID,
@@ -31,6 +32,8 @@ const Sidebar = (props) => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     dispatch(setActiveTabSlice(tab));
+    dispatch(setForumID(CourseID));
+
   };
   return (
     <div className="w-72 bg-white shadow-md p-4 rounded-md">
@@ -102,11 +105,13 @@ const LeesionList = () => {
 const LearningProcess = () => {
   const [allLearnProcess, setAllLearnProcess] = useState([]);
   const [learnProcessDetail, setLearnProcessDetail] = useState([]);
+
+  const { learnProcessID } = useParams();
   const profile = useSelector((state) => state.profile);
   const fetchStaticLeaProcess = async () => {
     const response = await StudentService.Learn.statisticalLearnProcess(
-      4,
-      1115
+      profile?.StudentID,
+      learnProcessID
     );
     if (response.status === 200) {
       setAllLearnProcess(response.data.allLearnProcess[0]);
@@ -122,7 +127,7 @@ const LearningProcess = () => {
     const res = await StudentService.Learn.updateLearnProcess(
       learnProcessID,
       status,
-      4
+      profile?.StudentID
     );
     if (res.status === 200) {
       fetchStaticLeaProcess();
@@ -213,18 +218,18 @@ const LearningProcess = () => {
   return (
     <div className="flex h-[85vh] bg-gray-100 mx-4  ">
       <Sidebar
-        CourseID={allLearnProcess.CourseID}
-        Title={allLearnProcess.Title}
-        Subtitle={allLearnProcess.Subtitle}
-        Description={allLearnProcess.Description}
-        Language={allLearnProcess.Language}
-        Image={allLearnProcess.Image}
-        Price={allLearnProcess.Price}
-        CreateTime={allLearnProcess.CreateTime}
-        Status={allLearnProcess.Status}
-        CategoryID={allLearnProcess.CategoryID}
-        InstructorID={allLearnProcess.InstructorID}
-        progressPercentage={allLearnProcess.progressPercentage}
+        CourseID={allLearnProcess?.CourseID}
+        Title={allLearnProcess?.Title}
+        Subtitle={allLearnProcess?.Subtitle}
+        Description={allLearnProcess?.Description}
+        Language={allLearnProcess?.Language}
+        Image={allLearnProcess?.Image}
+        Price={allLearnProcess?.Price}
+        CreateTime={allLearnProcess?.CreateTime}
+        Status={allLearnProcess?.Status}
+        CategoryID={allLearnProcess?.CategoryID}
+        InstructorID={allLearnProcess?.InstructorID}
+        progressPercentage={allLearnProcess?.progressPercentage}
       />
       <div className=" shadow-md rounded-lg   mx-3 w-full  ">
         {lessonProcessTab === "lesson" ? (

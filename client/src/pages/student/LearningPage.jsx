@@ -8,26 +8,17 @@ const Learning = () => {
 
   const profile = useSelector((state) => state.profile);
   const [learnReady, setLearnReady] = useState([]);
-  const [statisticalLearn, setStatisticalLearn] = useState([]);
 
-  const fetchData = async () => {
-    const response = await StudentSetvice.Learn.statisticalLearnProcess(
-      profile.studentID,
-      1
-    );
-    if (response.status === 200) {
-      setStatisticalLearn(response.data);
-    }
-  };
   const fetchLeaarnReady = async () => {
-    const response = await StudentSetvice.Learn.getLearnReady(4);
+    const response = await StudentSetvice.Learn.getLearnReady(
+      profile.StudentID
+    );
     if (response.status === 200) {
       setLearnReady(response.data);
     }
   };
 
   useEffect(() => {
-    fetchData();
     fetchLeaarnReady();
   }, []);
 

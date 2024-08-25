@@ -20,10 +20,12 @@ const CreateLesson = lazy(() => import("~/pages/instructor/CreateLesson"));
 const Discussion = lazy(() => import("~/pages/instructor/Discussion"));
 const CourseDetail = lazy(() => import("~/pages/instructor/CourseDetail"));
 const ChatPage = lazy(() => import("~/pages/instructor/ChatPage"));
+
 const ManagerCategory = lazy(() =>
   import("~/pages/instructor/ManagerCategory")
 );
 const HistoryCourse = lazy(() => import("~/pages/instructor/HistoryCourse"));
+
 const InstructorRouter = [
   {
     name: null,
@@ -89,7 +91,13 @@ const InstructorRouter = [
     component: Discussion,
     Layout: InstructorLayout,
   },
-
+  {
+    name: null,
+    path: "/discussion/:discussionID",
+    icon: <ForumIcon />,
+    component: Discussion,
+    Layout: InstructorLayout,
+  },
   {
     name: "Manager Category",
     path: "/manager-category",

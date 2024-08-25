@@ -5,6 +5,9 @@ import Tooltip from "@mui/material/Tooltip";
 import { UserOutlined } from "@ant-design/icons";
 import PublicService from "../../services/Public.service";
 import { ConvertTime } from "../../hooks/Time.utils";
+import { useSelector, useDispatch } from "react-redux";
+// import { setForumID } from "../../redux/features/globalState";
+
 const MessageForum = ({ message }) => {
   const myId = 1; // lay my tu redux
   const firstLetter = (name) => name.charAt(0).toUpperCase();
@@ -14,7 +17,9 @@ const MessageForum = ({ message }) => {
       <div className="flex flex-col rounded-md mb-1">
         <div className={`p-2 gap-1my-auto`}>
           <Tooltip
-            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(message.SendTime)} - ${message.SenderName}`}
+            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(
+              message.SendTime
+            )} - ${message.SenderName}`}
             arrow
             placement="top-start"
           >
@@ -23,7 +28,9 @@ const MessageForum = ({ message }) => {
             </Avatar>
           </Tooltip>
           <Tooltip
-            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(message.SendTime)} - ${message.SenderName}`}
+            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(
+              message.SendTime
+            )} - ${message.SenderName}`}
             arrow
             placement="right-start"
           >
@@ -42,7 +49,9 @@ const MessageForum = ({ message }) => {
       <div className="flex flex-col rounded-md mb-1 ">
         <div className={`p-2 gap-1 flex justify-end my-auto`}>
           <Tooltip
-            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(message.SendTime)} - ${message.SenderName}`}
+            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(
+              message.SendTime
+            )} - ${message.SenderName}`}
             arrow
             placement="left-start"
           >
@@ -53,7 +62,9 @@ const MessageForum = ({ message }) => {
             </div>
           </Tooltip>
           <Tooltip
-            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(message.SendTime)} - ${message.SenderName}`}
+            title={`${message.ForumMessageID} - ${ConvertTime.convertTimeToHHMM(
+              message.SendTime
+            )} - ${message.SenderName}`}
             arrow
             placement="top-start"
           >
@@ -68,7 +79,7 @@ const MessageForum = ({ message }) => {
 
   return (
     <div className="flex flex-col">
-      {myMessage ? <MyMessage /> : <GuestMessage />}
+      {myMessage ? <GuestMessage /> : <MyMessage />}
     </div>
   );
 };
@@ -76,11 +87,13 @@ const MessageForum = ({ message }) => {
 function DiscussionChat() {
   const [loading, setLoading] = useState(false);
   const [forumMesage, setForumMessage] = useState([]);
-
+  const [messageFR, setMessageFR] = useState("");
+  const idForum = useSelector((state) => state.globalState.forumID);
+  const profile = useSelector((state) => state.profile);
   const fetchForumMessage = async () => {
     setLoading(true);
     try {
-      const response = await PublicService.Forum.getAllMesForum(1);
+      const response = await PublicService.Forum.getAllMesForum(idForum);
       setForumMessage(response.data);
     } catch (error) {
       console.log(error);
@@ -92,9 +105,17 @@ function DiscussionChat() {
   }, []);
 
   const sendForumMessage = async () => {
-    await PublicService.Forum.sendForumMessage(1, "message", 1);
-  }
-
+    console.log(messageFR, idForum, profile.UserID);
+    const res = await PublicService.Forum.sendForumMessage(
+      idForum,
+      messageFR,
+      profile.UserID
+    );
+    if (res.status === 200) {
+      setMessageFR("");
+      fetchForumMessage();
+    }
+  };
 
   const containerRef = useRef(null);
 
@@ -142,9 +163,14 @@ function DiscussionChat() {
             className="rounded-3xl w-full py-2 px-3 text-gray-700 focus:outline-none  
             overflow-hidden break-words bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200  "
             placeholder="Type a message"
+            value={messageFR}
+            onChange={(e) => setMessageFR(e.target.value)}
           />
 
-          <button className="ml-2 p-2 bg-blue-500 rounded-lg">
+          <button
+            onClick={sendForumMessage}
+            className="ml-2 p-2 bg-blue-500 rounded-lg"
+          >
             <IoSend className="hover:text-gray-950 text-gray-800" size={24} />
           </button>
         </div>

@@ -186,10 +186,10 @@ const PublicService = {
         return { data: null, error: error.message || "An error occurred" };
       }
     },
-    sendForumMessage: async (discussionForumID, messageContent, userID) => {
+    sendForumMessage: async (courseID, messageContent, userID) => {
       try {
         const response = await instance.post(`/public/create_message_forum`, {
-          discussionForumID,
+          courseID,
           messageContent,
           userID,
         });

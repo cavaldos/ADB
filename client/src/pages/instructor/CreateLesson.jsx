@@ -16,41 +16,43 @@ import LessonItemList from "../../components/Lesson/LessonItemList";
 import LessonDrag from "../../components/Lesson/LessonDrag";
 import EditLession from "../../components/Lesson/EditLession";
 import CourseService from "../../services/Course.service";
-import { Button, Modal, Form, Input, Tag } from "antd";
+import { Button, Modal, Form, Input, Tag, Select } from "antd";
+
+import InstructorService from "../../services/Instructor.service";
+import PublicService from "../../services/Public.service";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { setForumID } from "../../redux/features/globalState";
 
 const InforCourse = () => {
   const { courseID } = useParams();
   const [data, setData] = useState({});
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [form] = Form.useForm();
 
-  useEffect(() => {
-    CourseService.getCourseDetail(courseID).then((res) => {
-      setData(res.data[0]);
-    });
-  }, [courseID]);
-
-  const showModal = () => {
-    form.setFieldsValue(data); // Đặt giá trị ban đầu cho form
-    setIsModalVisible(true);
-  };
-
-  const handleOk = async () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const fetchData = async () => {
     try {
-      // const response = await CourseService.updateCourse(courseID, data);
-
-      const values = await form.validateFields();
-      setData(values);
-
-      setIsModalVisible(false);
-    } catch (error) {
-      console.log("Validate Failed:", error);
+      CourseService.getCourseDetail(courseID).then((res) => {
+        setData(res.data[0]);
+      });
+    } catch (e) {
+      console.log(e);
     }
   };
+  useEffect(() => {
+    fetchData();
+  }, [courseID]);
+  console.log(data);
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const createForum = async () => {
+    const res = await PublicService.Forum.createDisForum(courseID);
+    if (res.status === 200) {
+      console.log("Create forum success");
+    }
+  };
+  const goToForum = async () => {
+    dispatch(setForumID(courseID));
+    navigate(`/discussion`);
   };
 
   return (
@@ -75,86 +77,13 @@ const InforCourse = () => {
         <p className="mb-2">
           <em>Instructor:</em> <strong>{data.FullName}</strong>
         </p>
-        <Button type="primary" onClick={showModal}>
-          Edit Course Information
+        <Button type="primary" onClick={goToForum}>
+          Go to Forum
+        </Button>{" "}
+        <Button type="primary" onClick={createForum}>
+          Create Forum
         </Button>
       </div>
-
-      <Modal
-        title="Edit Course Information"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <Form
-          form={form}
-          initialValues={{
-            Title: data.Title,
-            Description: data.Description,
-            Language: data.Language,
-            Status: data.Status,
-            Price: data.Price,
-            CategoryName: data.CategoryName,
-            FullName: data.FullName,
-          }}
-        >
-          <Form.Item
-            label="Title"
-            name="Title"
-            rules={[{ required: true, message: "Please input the title!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Description"
-            name="Description"
-            rules={[
-              { required: true, message: "Please input the description!" },
-            ]}
-          >
-            <Input.TextArea />
-          </Form.Item>
-          <Form.Item
-            label="Language"
-            name="Language"
-            rules={[{ required: true, message: "Please input the language!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Status"
-            name="Status"
-            rules={[{ required: true, message: "Please input the status!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Price"
-            name="Price"
-            rules={[{ required: true, message: "Please input the price!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Category"
-            name="CategoryName"
-            rules={[
-              { required: true, message: "Please input the category name!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Instructor"
-            name="FullName"
-            rules={[
-              { required: true, message: "Please input the instructor name!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 };

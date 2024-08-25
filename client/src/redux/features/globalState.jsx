@@ -8,6 +8,7 @@ export const globalStateSlice = createSlice({
     lessonProcess: {
       process: "",
     },
+    forumID: 0,
   },
   reducers: {
     setActiveTabSlice: (state, action) => {
@@ -15,8 +16,13 @@ export const globalStateSlice = createSlice({
     },
 
     setLessonProcess: (state, action) => {},
+    setForumID: (state, action) => {
+      console.log(action.payload);
+      state.forumID = action.payload;
+    },
   },
 });
 
-export const { setActiveTabSlice, setLessonProcess } = globalStateSlice.actions;
+export const { setActiveTabSlice, setLessonProcess, setForumID } =
+  globalStateSlice.actions;
 export default globalStateSlice.reducer;
