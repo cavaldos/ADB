@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 
-const socket = io(import.meta.env.SERVER_SOCKET); 
+const socket = io("http://coursera.zapto.org:5002"); 
 
 const useChatSocket = (senderId) => {
   const [messages, setMessages] = useState([]);

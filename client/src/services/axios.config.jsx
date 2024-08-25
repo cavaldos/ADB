@@ -2,7 +2,7 @@ import axios from "axios";
 import GetCookie from "../hooks/GetCookie";
 
 const instance = axios.create({
-  baseURL: import.meta.env.SERVER_URL || "192.168.1.16:5001",
+  baseURL: "http://coursera.zapto.org:5001",
 
   timeout: 5000,
   headers: { "X-Custom-Header": "foobar" },
