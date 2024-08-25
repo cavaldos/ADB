@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   preview: {
-    port: 80,
+    port: 5173,
   },
   resolve: {
     alias: [
