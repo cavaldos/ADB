@@ -1,5 +1,5 @@
 # Sử dụng image node chính thức
-FROM node:18.12.1
+FROM node:20-alpine
 
 # Thiết lập thư mục làm việc trong container
 WORKDIR /app
