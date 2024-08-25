@@ -9,7 +9,7 @@ COPY package*.json ./
 COPY yarn.lock ./
 
 # Cài đặt các dependencies
-RUN yarn install --frozen-lockfile
+RUN yarn install
 
 # Sao chép toàn bộ mã nguồn vào container
 COPY . .
