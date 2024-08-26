@@ -17,7 +17,7 @@ function generateSQL(numCategories, procedureName) {
 }
 
 // Số lượng danh mục cần tạo
-const numCategories = 10000; // Số lượng danh mục
+const numCategories = 100; // Số lượng danh mục
 const procedureName = 'create_category'; // Tên thủ tục
 
 // Tạo các câu lệnh SQL
