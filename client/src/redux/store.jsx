@@ -1,5 +1,8 @@
 import countSlice from "./features/countSlice";
 import authSlice from "./features/authSlice";
+import globalStateSlice from "./features/globalState";
+import profileSlice from "./features/profileSlice";
+import resetStateSlice from "./features/resetStateSlice";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
   persistStore,
@@ -16,11 +19,14 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage,
-  whitelist: ["count", "auth"],
+  whitelist: ["count", "auth", "profile", "globalState"],
 };
 const rootReducer = combineReducers({
   count: countSlice,
   auth: authSlice,
+  resetState: resetStateSlice,
+  globalState: globalStateSlice,
+  profile: profileSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

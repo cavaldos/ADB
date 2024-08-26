@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { InstructorRouter } from "../../routes";
-import { InstructorAccount } from "../AccountCpn";
+import { InstructorAccount } from "../other/AccountCpn";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 const ButtonItem = ({ isHovered, name, icon, path }) => {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ const ButtonItem = ({ isHovered, name, icon, path }) => {
     navigate(path);
   };
   const isActive = location.pathname === path;
-  if (name === null) {
+  if (name === null || icon === null) {
     return <div></div>;
   }
   return (
@@ -29,7 +30,7 @@ const ButtonItem = ({ isHovered, name, icon, path }) => {
         {icon ? icon : <h1 className="text-2xl font-bold">U</h1>}
       </div>
       <h3
-        className={`truncate overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-300 ${
+        className={`truncate overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-300 ml-4 ${
           isHovered ? "inline-block" : "hidden"
         }`}
       >
@@ -69,10 +70,22 @@ const Sidebar = () => {
 };
 
 const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <>
       <div className="fixed flex  left-14 top-0 right-0 h-16  justify-end  ">
-        <div className="container mx-auto px-6 py-3 flex  items-center justify-end ">
+        <div className="flex gap-3 text-center  w-[100px] justify-center">
+          <FaArrowLeft
+            onClick={() => navigate(-1)}
+            className="my-auto text-xl hover:text-blue-gray-700 hover:cursor-pointer"
+          />
+          <FaArrowRight
+            onClick={() => navigate(1)}
+            className="my-auto text-xl hover:text-blue-gray-700 hover:cursor-pointer"
+          />
+        </div>
+        <div className="container mx-auto px-6 py-3 flex  items-center justify-end">
           <InstructorAccount />
         </div>
       </div>

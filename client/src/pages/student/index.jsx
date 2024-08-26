@@ -1,14 +1,12 @@
-import React, { useState } from "react";
-
-import ProductCard from "../../components/ProductCard";
+import React, { useRef, useState } from "react";
+import Advertisement from "../../components/Course/Advertisement";
+import AllCoursePage from "../../components/Course/AllCoursePage";
 const StudentPage = () => {
   return (
-    <>
-      <div className=" m-5">
-        <ProductCard />
-
-      </div>
-    </>
+    <div>
+      <Advertisement />
+      <AllCoursePage />
+    </div>
   );
 };
 

@@ -3,8 +3,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate, useLocation } from "react-router-dom";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import AdminRouter from "../../routes/Admin";
-import { AdminAccount } from "../AccountCpn";
-import Bread from "../Breadcrum";
+import { AdminAccount } from "../other/AccountCpn";
+import Bread from "../other/Breadcrum";
 const NavbarItem = ({ name, togglemenu, icon, path }) => {
   const navigate = useNavigate();
   const handleClick = (path) => {
@@ -86,7 +86,7 @@ const AdminLayout = ({ children }) => {
       <div className="flex-1 flex">
         <Sidebar togglemenu={togglemenu} />
         <main
-          className={`flex-1 p-6 mt-headerh transition-all ${
+          className={`flex-1 p-6 mt-headerh  transition-all ${
             togglemenu ? "ml-64" : "ml-20"
           } `}
         >

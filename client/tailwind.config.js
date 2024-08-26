@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+const withMT = require("@material-tailwind/react/utils/withMT");
+export default withMT({
   content: [
     "./src/pages/**/*.{html,js,jsx}",
     "./src/components/**/*.{html,js,jsx}",
@@ -21,10 +22,10 @@ export default {
         info: "#0DCAF0",
         blue: "#1577FF",
         ret: "red",
-        test:"#fecaca",
+        test: "#fecaca",
         grin: "#24A65F",
         'grey': "#ACACAC",
-        '#4B4B4B':"#4B4B4B",
+        '#4B4B4B': "#4B4B4B",
         'darkblue': "#296dcd",
         'lightblue': "#f0f7ff", // màu nền 
         'orange': "#ff7f16",
@@ -77,5 +78,17 @@ export default {
       },
     },
   },
-  plugins: [],
-};
+  plugins: [
+    require('daisyui'),
+  ],
+  daisyui: {
+    themes: false, // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
+    darkTheme: "light", // name of one of the included themes for dark mode
+    base: false, // applies background color and foreground color for root element by default
+    styled: true, // include daisyUI colors and design decisions for all components
+    utils: true, // adds responsive and modifier utility classes
+    prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
+    logs: true, // Shows info about daisyUI version and used config in the console when building your CSS
+    themeRoot: ":root", // The element that receives theme color CSS variables
+  },
+});

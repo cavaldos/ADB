@@ -1,20 +1,17 @@
-// khach hang
-
 import { lazy } from "react";
-
 const StudentLayout = lazy(() => import("~/components/Layout/StudentLayout"));
 const HomeStudent = lazy(() => import("~/pages/student/index"));
-const DevPage = lazy(() => import("~/pages/student/chat"));
-const Cart = lazy(() => import("~/pages/student/Cart"));
-const Learning = lazy(() => import("~/pages/student/Learning"));
-const CourseDetail = lazy(() => import("~/pages/student/CourseDetail"));
-const Chats = lazy(() => import("~/pages/student/Chats"));
-const LearnProcess = lazy(() => import("~/pages/student/LearnProcess"));
-const BankAccount = lazy(() => import("~/pages/guest/BankAccount"));
-const Profile = lazy(() => import("~/pages/guest/Profile"));
-const Image = lazy(() => import("~/pages/student/image"));
-const SaleOrder = lazy(() => import("../components/testcomponent/SaleOrder"));
-import Test from "../pages/student/test";
+const SearchCourse = lazy(() => import("~/pages/student/SearchCourse.page"));
+const CourseDetail = lazy(() => import("~/pages/student/CourseDetail.page"));
+const Cart = lazy(() => import("~/pages/student/Cart.page"));
+const Learning = lazy(() => import("~/pages/student/LearningPage"));
+const LearnProcess = lazy(() => import("~/pages/student/LearnProcess.page"));
+const Invoice = lazy(() => import("~/pages/student/Invoice.page"));
+const InvoiceDetail = lazy(() => import("~/pages/student/InvoiceDetails.page"));
+const Profile = lazy(() => import("~/components/Profile/Profile"));
+const ChatPage = lazy(() => import("~/pages/student/ChatPage"));
+const ProfileLayout = lazy(() => import("~/components/Layout/ProfileLayout"));
+
 const StudentRouter = [
   {
     name: "Home",
@@ -23,35 +20,27 @@ const StudentRouter = [
     Layout: StudentLayout,
   },
   {
-    name: "Dev",
-    path: "/dev",
-    component: DevPage,
-    Layout: StudentLayout,
-  },
-
-  {
     name: "Cart",
     path: "/cart",
     component: Cart,
     Layout: StudentLayout,
   },
-
+  {
+    name: "Invoice",
+    path: "/invoice",
+    component: Invoice,
+    Layout: StudentLayout,
+  },
+  {
+    name: null,
+    path: "/invoice-detail/:invoiceID",
+    component: InvoiceDetail,
+    Layout: StudentLayout,
+  },
   {
     name: "Learning",
     path: "/learning",
     component: Learning,
-    Layout: StudentLayout,
-  },
-  {
-    name: "CourseDetail",
-    path: "/course-detail",
-    component: CourseDetail,
-    Layout: StudentLayout,
-  },
-  {
-    name: "Chats",
-    path: "/chat",
-    component: Chats,
     Layout: StudentLayout,
   },
   {
@@ -62,32 +51,38 @@ const StudentRouter = [
   },
   {
     name: null,
-    path: "/bank",
-    component: BankAccount,
-    Layout: null,
+    path: "/learn-process/:learnProcessID",
+    component: LearnProcess,
+    Layout: StudentLayout,
   },
   {
-    name: "Profile",
+    name: null,
+    path: "/search/:search",
+    component: SearchCourse,
+    Layout: StudentLayout,
+  },
+  {
+    name: null,
+    path: "/course-detail/:courseID",
+    component: CourseDetail,
+    Layout: StudentLayout,
+  },
+  {
+    name: null,
     path: "/profile",
     component: Profile,
+    Layout: ProfileLayout,
+  },
+  {
+    name: null,
+    path: "/chat",
+    component: ChatPage,
     Layout: StudentLayout,
   },
   {
-    name: "Image",
-    path: "/image",
-    component: Image,
-    Layout: StudentLayout,
-  },
-  {
-    name: "SaleOrder",
-    path: "/saleorder",
-    component: SaleOrder,
-    Layout: StudentLayout,
-  },
-  {
-    name: "Test",
-    path: "/test",
-    component: Test,
+    name: null,
+    path: "/chat/:chatID",
+    component: ChatPage,
     Layout: StudentLayout,
   },
 ];

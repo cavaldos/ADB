@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <h1 className="mx-auto">
+        <h1 className="mx-auto text-red-400 font-bold p-4">
           Something went wrong{" :("} {this.state.hasError}
         </h1>
       );
@@ -38,5 +38,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <App />
       </ErrorBoundary>
     </Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
