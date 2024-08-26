@@ -1,35 +1,46 @@
 const fs = require('fs');
 const path = require('path');
 
-// Hàm để tạo ngày ngẫu nhiên trong khoảng thời gian nhất định
-function getRandomDate(start, end) {
-    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-}
-
-// Hàm để tạo các câu lệnh SQL
-function generateSQL(numCertificates, procedureName) {
+// Hàm để tạo các câu lệnh SQL cho việc tạo mới chứng chỉ
+function generateCreateCertificateData(numCertificates, procedureName) {
     let sqlStatements = '';
-    const startDate = new Date(2020, 0, 1); // Ngày bắt đầu giả định
-    const endDate = new Date(2024, 11, 31); // Ngày kết thúc giả định
 
     for (let i = 1; i <= numCertificates; i++) {
         const certificateName = `Certificate${i}`;
-        const start = getRandomDate(startDate, endDate);
-        const end = getRandomDate(start, new Date(start.getFullYear() + 1, start.getMonth(), start.getDate())); // Giả định chứng chỉ có thời hạn tối đa 1 năm
-        const instructorID = Math.floor(Math.random() * 1000) + 1; // Giả định có 1000 giảng viên
+        const startDate = `2024-01-01`;  // Thay bằng ngày bắt đầu thực tế
+        const endDate = `2025-01-01`;    // Thay bằng ngày kết thúc thực tế
+        const instructorID = i;          // Giả sử mỗi giảng viên có một chứng chỉ
 
-        sqlStatements += `EXEC ${procedureName} '${certificateName}', '${start.toISOString().slice(0, 19).replace('T', ' ')}', '${end.toISOString().slice(0, 19).replace('T', ' ')}', ${instructorID};\n`;
+        sqlStatements += `EXEC ${procedureName} '${certificateName}', '${startDate}', '${endDate}', ${instructorID};\n`;
     }
 
     return sqlStatements;
 }
 
-// Số lượng chứng chỉ cần tạo
-const numCertificates = 1000; // Số lượng chứng chỉ
-const procedureName = 'create_certificate'; // Tên thủ tục
+// Hàm để tạo các câu lệnh SQL cho việc cập nhật chứng chỉ
+function generateUpdateCertificateData(numCertificates, procedureName) {
+    let sqlStatements = '';
+
+    for (let i = 1; i <= numCertificates; i++) {
+        const certificateID = i;         // Giả sử ID chứng chỉ là từ 1 đến numCertificates
+        const certificateName = `UpdatedCertificate${i}`;
+        const startDate = `2024-01-01`;  // Thay bằng ngày bắt đầu thực tế
+        const endDate = `2025-01-01`;    // Thay bằng ngày kết thúc thực tế
+
+        sqlStatements += `EXEC ${procedureName} ${certificateID}, '${certificateName}', '${startDate}', '${endDate}';\n`;
+    }
+
+    return sqlStatements;
+}
+
+// Số lượng chứng chỉ cần tạo và cập nhật
+const numCertificates = 100; // Số lượng chứng chỉ
+const createProcedureName = 'create_certificate'; // Tên thủ tục tạo chứng chỉ
+const updateProcedureName = 'update_certificate'; // Tên thủ tục cập nhật chứng chỉ
 
 // Tạo các câu lệnh SQL
-const sql = generateSQL(numCertificates, procedureName);
+const createSQL = generateCreateCertificateData(numCertificates, createProcedureName);
+const updateSQL = generateUpdateCertificateData(numCertificates, updateProcedureName);
 
 // Đảm bảo thư mục fakedata tồn tại
 const dir = path.join(__dirname, 'fakedata');
@@ -38,8 +49,14 @@ if (!fs.existsSync(dir)) {
 }
 
 // Ghi các câu lệnh SQL vào tệp trong thư mục fakedata
-const filePath = path.join(dir, 'generated_certificates.sql');
-fs.writeFile(filePath, sql, (err) => {
+const createFilePath = path.join(dir, 'generated_create_certificates.sql');
+fs.writeFile(createFilePath, createSQL, (err) => {
     if (err) throw err;
-    console.log('Tệp generated_certificates.sql đã được tạo trong thư mục fakedata!');
+    console.log('Tệp generated_create_certificates.sql đã được tạo trong thư mục fakedata!');
+});
+
+const updateFilePath = path.join(dir, 'generated_update_certificates.sql');
+fs.writeFile(updateFilePath, updateSQL, (err) => {
+    if (err) throw err;
+    console.log('Tệp generated_update_certificates.sql đã được tạo trong thư mục fakedata!');
 });

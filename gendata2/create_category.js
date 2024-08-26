@@ -8,14 +8,16 @@ function generateSQL(numCategories, procedureName) {
     for (let i = 1; i <= numCategories; i++) {
         const categoryName = `Category${i}`;
         const categoryDescription = `Description for ${categoryName}`;
-        sqlStatements += `EXEC ${procedureName} '${categoryName}', '${categoryDescription}';\n`;
+        const parentCategoryID = i % 2 === 0 ? i - 1 : null; // Tạo ParentCategoryID cho các danh mục chẵn
+
+        sqlStatements += `EXEC ${procedureName} '${categoryName}', N'${categoryDescription}', ${parentCategoryID};\n`;
     }
 
     return sqlStatements;
 }
 
 // Số lượng danh mục cần tạo
-const numCategories = 100000; // Số lượng danh mục
+const numCategories = 10000; // Số lượng danh mục
 const procedureName = 'create_category'; // Tên thủ tục
 
 // Tạo các câu lệnh SQL

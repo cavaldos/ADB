@@ -1,5 +1,6 @@
 
 -- 5. Create the procedure to create category
+
 IF OBJECT_ID('create_category', 'P') IS NOT NULL
     DROP PROCEDURE create_category;
 GO
@@ -37,7 +38,6 @@ BEGIN
         -- Insert the new category if it does not exist
         INSERT INTO [Category] (CategoryName, CategoryDescription, ParentCategoryID)
         VALUES (@CategoryName, @CategoryDescription, @ParentCategoryID);
-         RAISERROR ('Category created successfully.',16,1);
 
         COMMIT TRANSACTION;
     END TRY
@@ -73,7 +73,8 @@ BEGIN
                 CategoryDescription = @CategoryDescription,
                 ParentCategoryID = @ParentCategoryID
             WHERE CategoryID = @CategoryID
-            RAISERROR ('Category updated successfully.',16,1);
+      
+            PRINT 'Category updated successfully.';
         END
         ELSE
         BEGIN
@@ -134,6 +135,7 @@ END;
 GO
 
 -- 8. Create the procedure to create discussion forum
+
 IF OBJECT_ID('create_discussion_forum', 'P') IS NOT NULL
     DROP PROCEDURE create_discussion_forum;
 GO
@@ -142,26 +144,29 @@ CREATE PROCEDURE create_discussion_forum
 AS
 BEGIN
     BEGIN TRY
-    BEGIN TRANSACTION;
+        BEGIN TRANSACTION;
+
         IF NOT EXISTS (SELECT 1 FROM [DiscussionForum] WHERE CourseID = @CourseID)
         BEGIN
             INSERT INTO [DiscussionForum] (CreatedDate, CourseID)
             VALUES (GETDATE(), @CourseID);
-            RAISERROR ('Discussion forum created successfully.',16,1);
+            PRINT 'Discussion forum created successfully.';
         END
         ELSE
         BEGIN
-        RAISERROR('Discussion forum already exists for this course.',16,1);
+            PRINT 'Discussion forum already exists for this course.';
         END
-    COMMIT TRANSACTION;
+
+        COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-        RAISERROR ('Error occurred while creating discussion forum.',16,1);
+        RAISERROR ('Error occurred while creating discussion forum.', 16, 1);
         PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
+
 
 -- 9. Create the procedure to create course
 IF OBJECT_ID('create_course', 'P') IS NOT NULL
@@ -1155,7 +1160,6 @@ BEGIN
     END CATCH
 END;
 GO
-
 -- 31. Create the procedure create_message_forum
 IF OBJECT_ID('create_message_forum', 'P') IS NOT NULL
     DROP PROCEDURE create_message_forum;
@@ -1163,7 +1167,7 @@ GO
 CREATE PROCEDURE create_message_forum
     @MessageContent nvarchar(500),
     @UserID integer,
-    @DiscussionForumID integer
+    @CourseID integer
 AS
 BEGIN
     BEGIN TRY
@@ -1175,16 +1179,22 @@ BEGIN
             RETURN;
         END
 
-        -- Check if the discussion forum exists
-        IF NOT EXISTS (SELECT 1 FROM [DiscussionForum] WHERE ForumID = @DiscussionForumID)
+   
+         -- Retrieve the ForumID for the given CourseID
+        DECLARE @ForumID integer;
+        SELECT @ForumID = df.ForumID
+        FROM [DiscussionForum] df
+        JOIN [Course] c ON df.CourseID = c.CourseID
+        WHERE c.CourseID = @CourseID;
+     -- Check if the discussion forum exists
+        IF NOT EXISTS (SELECT 1 FROM [DiscussionForum] WHERE ForumID = @ForumID)
         BEGIN
             RAISERROR('Discussion forum does not exist.',16,1);
             RETURN;
         END
-
         -- Insert a new forum message
         INSERT INTO [ForumMessage] (MessageContent, SendTime, SenderID, DiscussionForumID)
-        VALUES (@MessageContent, GETDATE(), @UserID, @DiscussionForumID);
+        VALUES (@MessageContent, GETDATE(), @UserID, @ForumID);
 
     COMMIT TRANSACTION;
     PRINT'Forum message created successfully.';
