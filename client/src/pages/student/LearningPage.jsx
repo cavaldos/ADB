@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import StudentSetvice from "../../services/Student.service";
-import { Table } from "antd";
-
+import { message, Table } from "antd";
+import { useNavigate } from "react-router-dom";
 const Learning = () => {
   const [activeTab, setActiveTab] = useState("in-progress");
 
@@ -15,6 +15,18 @@ const Learning = () => {
     );
     if (response.status === 200) {
       setLearnReady(response.data);
+    }
+  };
+  const naviagte = useNavigate();
+  const startLearn = async (CourseID) => {
+    const response = await StudentSetvice.Learn.startLearnProcess(
+      profile.StudentID,
+      CourseID
+    );
+    if (response.status === 200) {
+      message.success("Start learning successfully");
+      naviagte(`learn-process/${response.data.LearnProcessID}`);
+      fetchLeaarnReady();
     }
   };
 
@@ -72,6 +84,19 @@ const Learning = () => {
       title: "Instructor ID",
       dataIndex: "InstructorID",
       key: "InstructorID",
+    },
+    {
+      title: "Action",
+      dataIndex: "Action",
+      key: "Action",
+      render: (text, record) => (
+        <button
+          onClick={() => startLearn(record.CourseID)}
+          className="btn btn-sm bg-green-500 text-white hover:text-black"
+        >
+          Start Learn
+        </button>
+      ),
     },
   ];
 

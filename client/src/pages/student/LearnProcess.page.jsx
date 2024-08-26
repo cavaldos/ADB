@@ -107,6 +107,7 @@ const LearningProcess = () => {
   const [learnProcessDetail, setLearnProcessDetail] = useState([]);
 
   const { learnProcessID } = useParams();
+
   const profile = useSelector((state) => state.profile);
   const fetchStaticLeaProcess = async () => {
     const response = await StudentService.Learn.statisticalLearnProcess(
@@ -124,6 +125,7 @@ const LearningProcess = () => {
     fetchStaticLeaProcess();
   }, []);
   const updateLearnProcess = async (learnProcessID, status) => {
+    
     const res = await StudentService.Learn.updateLearnProcess(
       learnProcessID,
       status,
